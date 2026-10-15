@@ -3980,7 +3980,7 @@ function renderExamSection(){
   // 保存當前部分題目供評分
   $('examBody').dataset.sec = sec;
   $('examBody').dataset.qs = JSON.stringify(qs);
-  startMockTimer(mins*60);
+  startExamTimer(mins*60);
 }
 function startExamTimer(seconds){
   clearInterval(examTimer);
