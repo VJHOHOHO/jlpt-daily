@@ -145,14 +145,16 @@ function shuffle(a){
   return a;
 }
 
+var qStartTimes = {};
 function renderQuestions(){
   var html = '';
   secQuestions.forEach(function(q, i){
+    qStartTimes[i] = Date.now();
     html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
     if(q.img) html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
     if(q.audio) html += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
-      html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="secAnswers['+i+']='+ (j+1) +'"> ' + esc(op) + '</label>';
+      html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + esc(op) + '</label>';
     });
     html += '</div>';
   });
@@ -161,6 +163,17 @@ function renderQuestions(){
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+var qAnswerTimes = {};
+function answerQ(i, val){
+  secAnswers[i] = val;
+  var elapsed = (Date.now() - (qStartTimes[i]||Date.now())) / 1000;
+  qAnswerTimes[i] = elapsed;
+  // 少於8秒作答視為猜題
+  if(elapsed < 8){
+    console.log('Q'+(i+1)+' 可能係猜 ('+elapsed.toFixed(1)+'s)');
+  }
+}
 
 function startTimer(seconds){
   clearInterval(timerInt);
@@ -184,7 +197,9 @@ function submitSection(auto){
     var ua = secAnswers[i] || 0;
     var ok = (ua === q.answer);
     if(ok) correct++;
-    results.push({ q: q, userAns: ua, correct: ok });
+    var elapsed = qAnswerTimes[i] || 0;
+    var guessed = ok && elapsed < 8; // 答對但好快=猜對
+    results.push({ q: q, userAns: ua, correct: ok, time: elapsed, guessed: guessed });
   });
   allResults.push({ sec: sec, correct: correct, total: secQuestions.length, results: results });
 
@@ -225,18 +240,31 @@ function showFinal(){
         else if(j+1 === res.userAns && !res.correct) cls = 'wrong';
         html += '<div class="opt ' + cls + '">' + (j+1) + '. ' + esc(op) + '</div>';
       });
+      if(res.guessed) html += '<div class="explain" style="background:#fff3e0">🎲 猜對！用咗 ' + res.time.toFixed(1) + ' 秒，建議重溫。</div>';
+      if(!res.correct) html += '<div class="explain" style="background:#ffebee">❌ 答錯，加入錯題本加強。</div>';
       if(q.explanation) html += '<div class="explain">💡 ' + esc(q.explanation) + '</div>';
       html += '</div>';
     });
   });
   document.getElementById('review').innerHTML = html;
 
-  // 儲存成績
+  // 儲存成績同錯題
   try{
     var key = 'mockexam_' + currentUser;
     var hist = JSON.parse(localStorage.getItem(key) || '[]');
     hist.push({ date: new Date().toISOString().slice(0,10), score: totalCorrect, total: totalQ });
     localStorage.setItem(key, JSON.stringify(hist));
+    // 錯題＋猜對存入錯題本
+    var wrongKey = 'wrong_' + currentUser;
+    var wrongs = JSON.parse(localStorage.getItem(wrongKey) || '[]');
+    allResults.forEach(function(r){
+      r.results.forEach(function(res){
+        if(!res.correct || res.guessed){
+          wrongs.push({ qid: res.q.id, date: new Date().toISOString().slice(0,10), reason: res.guessed ? 'guessed' : 'wrong' });
+        }
+      });
+    });
+    localStorage.setItem(wrongKey, JSON.stringify(wrongs));
   }catch(e){}
 }
 </script>
