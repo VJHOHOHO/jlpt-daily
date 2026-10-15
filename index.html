@@ -3952,7 +3952,7 @@ function startExamMock(){
     });
     examSecIdx = 0; examAnswers = {};
     $('examIntro').style.display='none'; $('examBody').style.display='block';
-    renderMockSection();
+    renderExamSection();
   });
 }
 function renderExamSection(){
@@ -4003,7 +4003,7 @@ function nextExamSection(auto){
     if(sel) examAnswers[sec+'_'+i] = parseInt(sel.value);
   });
   clearInterval(examTimer);
-  if(examSecIdx < 2){ examSecIdx++; renderMockSection(); }
+  if(examSecIdx < 2){ examSecIdx++; renderExamSection(); }
   else submitExamMock();
 }
 function submitExamMock(){
