@@ -161,15 +161,23 @@
 .section-title::after { content: ' ▼'; font-size: 14px; opacity: 0.6; }
 .big-char { font-size: 32px; margin-right: 8px; }
 .section-title.collapsed::after { content: ' ▶'; }
-.section-content { padding: 12px; background: #fff; }
+.section-content { padding: 12px; background: #fafafa; }
+.sec-lianxi .section-content { background: #f0f9ff; }
+.sec-zuoye .section-content { background: #fff8f0; }
+.sec-huigu .section-content { background: #f8f5ff; }
+.sec-ceyan .section-content { background: #fff5f7; }
+.sec-ziyuan .section-content { background: #f0f7ff; }
 .section-content.hidden { display: none; }
 /* 每個 section 唔同 pastel 色，對應原本風格 */
-/* Pantone 2026 Cloud Dancer #F0EFEB 為基調 */
-.sec-lianxi .section-title { background: linear-gradient(135deg, #e8b4c8 0%, #F0EFEB 100%); }
-.sec-zuoye .section-title { background: linear-gradient(135deg, #b4d8c8 0%, #F0EFEB 100%); }
-.sec-huigu .section-title { background: linear-gradient(135deg, #c8b4e8 0%, #F0EFEB 100%); }
-.sec-ceyan .section-title { background: linear-gradient(135deg, #f0c8b4 0%, #F0EFEB 100%); }
-.sec-ziyuan .section-title { background: linear-gradient(135deg, #b4d0e8 0%, #F0EFEB 100%); }
+/* 參考鮮明配色 */
+.sec-lianxi .section-title { background: linear-gradient(135deg, #00b4d8 0%, #90e0ef 100%); }
+.sec-zuoye .section-title { background: linear-gradient(135deg, #ff8500 0%, #ffcc80 100%); }
+.sec-huigu .section-title { background: linear-gradient(135deg, #6a4c93 0%, #c8b4e8 100%); }
+.sec-ceyan .section-title { background: linear-gradient(135deg, #ef476f 0%, #ff8fab 100%); }
+.sec-ziyuan .section-title { background: linear-gradient(135deg, #1d3557 0%, #a8dadc 100%); }
+.sec-lianxi .section-title, .sec-ceyan .section-title, .sec-ziyuan .section-title { color: #fff; }
+.sec-lianxi .section-title .big-char, .sec-ceyan .section-title .big-char, .sec-ziyuan .section-title .big-char { color: #fff; }
+.sec-lianxi .section-title em, .sec-ceyan .section-title em, .sec-ziyuan .section-title em { color: #fff; }
 .main-section .section-title { color: #111; }
 .main-section .section-title .big-char { color: #111; font-size: 36px; font-weight: 900; }
 .main-section .section-title em { color: #111; font-style: italic; }
