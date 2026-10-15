@@ -165,11 +165,11 @@
 .section-content.hidden { display: none; }
 /* 每個 section 唔同 pastel 色，對應原本風格 */
 /* Pantone 2026 Cloud Dancer #F0EFEB 為基調 */
-.main-section:nth-of-type(1) .section-title { background: linear-gradient(135deg, #d4e6f7 0%, #F0EFEB 100%); }
-.main-section:nth-of-type(2) .section-title { background: linear-gradient(135deg, #f5e6c8 0%, #F0EFEB 100%); }
-.main-section:nth-of-type(3) .section-title { background: linear-gradient(135deg, #ddd0f5 0%, #F0EFEB 100%); }
-.main-section:nth-of-type(4) .section-title { background: linear-gradient(135deg, #f5d0dc 0%, #F0EFEB 100%); }
-.main-section:nth-of-type(5) .section-title { background: linear-gradient(135deg, #c8e8d4 0%, #F0EFEB 100%); }
+.sec-lianxi .section-title { background: linear-gradient(135deg, #e8b4c8 0%, #F0EFEB 100%); }
+.sec-zuoye .section-title { background: linear-gradient(135deg, #b4d8c8 0%, #F0EFEB 100%); }
+.sec-huigu .section-title { background: linear-gradient(135deg, #c8b4e8 0%, #F0EFEB 100%); }
+.sec-ceyan .section-title { background: linear-gradient(135deg, #f0c8b4 0%, #F0EFEB 100%); }
+.sec-ziyuan .section-title { background: linear-gradient(135deg, #b4d0e8 0%, #F0EFEB 100%); }
 .main-section .section-title { color: #111; }
 .main-section .section-title .big-char { color: #111; font-size: 36px; font-weight: 900; }
 .main-section .section-title em { color: #111; font-style: italic; }
@@ -196,7 +196,7 @@ dy>
     <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
   </div>
 </div>
-<div class="main-section">
+<div class="main-section sec-lianxi">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">練</span><em>練習</em></h2>
 <div class="section-content">
 <div class="card" id="dailyCard">
@@ -216,7 +216,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section">
+<div class="main-section sec-zuoye">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">作</span><em>作業</em></h2>
 <div class="section-content">
 <div class="card" id="formCard">
@@ -238,7 +238,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section">
+<div class="main-section sec-huigu">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">顧</span><em>回顧</em></h2>
 <div class="section-content">
 <div class="card" id="flashCard">
@@ -271,7 +271,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section">
+<div class="main-section sec-ceyan">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">測</span><em>測驗</em></h2>
 <div class="section-content">
 <div class="card" id="weekCard">
@@ -316,7 +316,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section">
+<div class="main-section sec-ziyuan">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">資</span><em>資源</em></h2>
 <div class="section-content">
 <div class="card" id="mockCard">
