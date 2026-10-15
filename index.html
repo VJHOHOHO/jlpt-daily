@@ -276,7 +276,7 @@ dy>
   <div class="wrow"><span class="wnum">4</span><input type="text" id="w4" placeholder="生字" autocomplete="off"><input type="text" id="m4" placeholder="中文意思" autocomplete="off"></div>
   <div class="wrow"><span class="wnum">5</span><input type="text" id="w5" placeholder="生字" autocomplete="off"><input type="text" id="m5" placeholder="中文意思" autocomplete="off"></div>
   <label>造句（一句）</label><input type="text" id="sent" autocomplete="off">
-  <button id="submitBtn" onclick="submitDaily()">提交</button>
+  <button id="submitBtn">提交</button>
   <div id="assess"></div>
   <div class="msg" id="msg"></div>
 </div>
@@ -4234,6 +4234,17 @@ function setRing(id, pct){
   var el = document.getElementById(id);
   if(el) el.dataset.percent = pct;
 }
+</script>
+
+<script>
+(function(){
+  var btn = document.getElementById('submitBtn');
+  if(btn){
+    btn.addEventListener('click', function(e){ e.preventDefault(); submitDaily(); });
+    // iOS Safari 備用
+    btn.addEventListener('touchend', function(e){ e.preventDefault(); submitDaily(); });
+  }
+})();
 </script>
 </body>
 </html>
