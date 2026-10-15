@@ -1,0 +1,3960 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@900&display=swap" rel="stylesheet">
+<title>日語學習記錄</title>
+<link rel="icon" type="image/webp" href="img/logo.webp">
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: "PingFang TC", "PingFang HK", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+         max-width: 680px; margin: 0 auto; padding: 20px 16px 60px;
+         background: #FDF9F3; color: #1a1a1a; font-size: 18px; line-height: 1.7; }
+  h1 { font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+       font-size: 50px; text-align: center; margin: 24px 0 10px; letter-spacing: 2px; font-weight: 900;
+       color: #111; line-height: 1.2; white-space: nowrap; }
+  .date { text-align: left; color: #999; font-size: 15px; font-weight: 600; margin: 0 4px 20px; }
+  .date::before, .date::after { content: none; }
+  .countdown { text-align: center; margin: 0 auto 24px; padding: 16px 24px;
+               background: #1a1a1a; border-radius: 20px; max-width: 480px;
+               font-size: 17px; font-weight: 700; color: #fff; }
+  .countdown b { font-size: 32px; color: #FFD166; margin: 0 6px; font-weight: 900; }
+  .card { border: none; border-radius: 24px; padding: 28px 24px; margin-bottom: 20px;
+          box-shadow: 0 2px 12px rgba(0,0,0,.04); }
+  .card:nth-of-type(odd) { background: #FDE8EF; }
+  .card:nth-of-type(even) { background: #E9E2FB; }
+  /* 逐張卡唔同粉彩色 */
+  #whoCard { background: #FDE8EF; }
+  #learnCard { background: #DFF5E9; }
+  #missCard { background: #FFF3D6; }
+  #recallCard { background: #DDEBFC; }
+  #quizCard { background: #E9E2FB; }
+  #weekCard { background: #FDEBD8; }
+  #flashCard { background: #DFF5E9; }
+  #anaCard { background: #FDE8EF; }
+  #mockCard { background: #DDEBFC; }
+  #corrCard { background: #FFF3D6; }
+  #formCard { background: #E9E2FB; }
+  #histCard { background: #F5F0E8; }
+  .card h2 { font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+             font-size: 23px; margin: 0 0 16px; color: #111; font-weight: 900;
+             display: flex; align-items: center; gap: 12px; }
+  .card h2::before { content: none; }
+  .card h2 .kicon { font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+                    font-size: 52px; font-weight: 900; color: #111; line-height: 1;
+                    flex-shrink: 0; }
+  .who { display: flex; gap: 14px; }
+  .who button { flex: 1; padding: 22px 8px; font-size: 24px; font-weight: 900; color: #111;
+                border: none; border-radius: 20px; background: rgba(255,255,255,.65); cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,.06); transition: transform .08s; }
+  .who button:active { transform: scale(.96); }
+  .who button.active { background: #111; color: #fff; }
+  .who button.testbtn { border: 2px dashed #ccc; color: #999; background: rgba(255,255,255,.4); }
+  .who button.testbtn.active { border-color: #999; background: #666; color: #fff; }
+  .who button .testtag { display: block; font-size: 12px; font-weight: 600; }
+  label { display: block; font-size: 17px; font-weight: 700; color: #444; margin: 14px 0 8px; }
+  input[type=text] { width: 100%; padding: 16px; font-size: 19px; color: #1a1a1a;
+                     border: none; border-radius: 16px; background: rgba(255,255,255,.8); }
+  input[type=text]:focus { outline: none; box-shadow: 0 0 0 3px rgba(0,0,0,.08); }
+  .hint { font-size: 15px; color: #777; margin-top: 10px; line-height: 1.6; }
+  .wrow { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+  .wrow .wnum { font-size: 18px; font-weight: 900; color: #111; width: 24px; flex-shrink: 0; text-align: center; }
+  .wrow input { flex: 1; min-width: 0; }
+  .wrow input::placeholder { color: #aaa; font-size: 16px; }
+  .card-sub { font-size: 16px; font-weight: 700; color: #555; margin: -8px 0 14px 64px; white-space: nowrap; }
+  #submitBtn { width: 100%; padding: 20px; font-size: 22px; font-weight: 900; letter-spacing: 2px;
+               color: #fff; background: #111; border: none; border-radius: 20px; cursor: pointer;
+               margin-top: 20px; transition: transform .08s; }
+  #submitBtn:active { transform: scale(.98); }
+  #submitBtn:disabled { background: #ccc; }
+  .btn2 { padding: 14px 28px; font-size: 17px; font-weight: 800; background: #111; color: #fff;
+          border: none; border-radius: 30px; cursor: pointer; margin-top: 14px;
+          transition: transform .08s; }
+  .btn2:active { transform: scale(.96); }
+  .msg { text-align: center; padding: 16px; font-size: 18px; font-weight: 700; border-radius: 16px; }
+  .msg.ok { color: #1a7a4a; background: rgba(255,255,255,.6); }
+  .msg.err { color: #c0392b; background: rgba(255,255,255,.6); }
+  .recall-empty { color: #999; font-size: 16px; }
+  .word-row { padding: 12px 4px; border-bottom: 1px solid rgba(0,0,0,.06); font-size: 18px; }
+  .word-row:last-child { border-bottom: none; }
+  .hist-item { border: none; border-radius: 18px; padding: 18px; margin-bottom: 12px;
+               background: rgba(255,255,255,.65); }
+  .hist-date { font-weight: 800; font-size: 17px; margin-bottom: 8px; color: #111; }
+  .hist-words { font-size: 17px; color: #444; }
+  .hist-sent { font-size: 17px; margin-top: 8px; color: #444; }
+  .recall-tip { font-size: 15px; color: #999; margin-top: 12px; }
+  .miss-row { padding: 14px 4px; border-bottom: 1px solid rgba(0,0,0,.06); font-size: 18px;
+              display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .miss-row .btn2 { margin-top: 0; padding: 10px 22px; font-size: 16px; }
+  .src { font-size: 13px; color: #aaa; margin-top: 12px; text-align: center; }
+  .badge { display: inline-block; font-size: 14px; font-weight: 800; padding: 6px 14px;
+           border-radius: 20px; margin-left: 8px; }
+  .b-n4 { background: #1a1a1a; color: #fff; }
+  .b-easy { background: #fff; color: #b7791f; border: 2px solid #f0c96a; }
+  .b-out { background: #fff; color: #888; border: 2px solid #ddd; }
+  .q-progress { font-size: 15px; font-weight: 700; color: #999; margin-bottom: 12px; }
+  .q-text { font-size: 26px; font-weight: 800; margin-bottom: 20px; color: #111;
+            text-align: center; background: rgba(255,255,255,.6); border-radius: 18px; padding: 20px; }
+  .opt { display: block; width: 100%; text-align: center; padding: 18px; font-size: 20px;
+         font-weight: 700; color: #1a1a1a; margin-bottom: 14px;
+         border: none; border-radius: 18px; background: rgba(255,255,255,.75); cursor: pointer;
+         box-shadow: 0 2px 6px rgba(0,0,0,.05); transition: transform .08s; }
+  .opt:active { transform: scale(.98); }
+  .opt.ok { background: #1a1a1a; color: #fff; }
+  .opt.no { background: #fff; color: #999; opacity: .6; }
+  .opt:disabled { cursor: default; }
+  .q-score { font-size: 30px; font-weight: 900; text-align: center; padding: 20px; color: #111;
+             animation: pop .4s ease; }
+  .passage { background: rgba(255,255,255,.6); border-radius: 16px; padding: 18px;
+             font-size: 18px; margin-bottom: 16px; line-height: 2; }
+  .card a { color: #111; font-weight: 800; text-decoration: underline; }
+  @keyframes pop { 0% { transform: scale(.7); } 60% { transform: scale(1.12); } 100% { transform: scale(1); } }
+
+  .review { margin-top: 20px; text-align: left; }
+  .review-title { font-size: 20px; font-weight: 900; color: #111; margin-bottom: 12px; text-align: center; }
+  .ritem { background: rgba(255,255,255,.65); border-radius: 16px; padding: 14px 16px;
+           margin-bottom: 10px; font-size: 16px; line-height: 1.7; border-left: 6px solid #ddd; }
+  .ritem.rok { border-left-color: #1a1a1a; }
+  .ritem.rno { border-left-color: #e57373; }
+  .ritem.rskip { border-left-color: #FFD166; }
+  .rq { font-weight: 800; margin-bottom: 6px; color: #111; }
+  .rmark { font-weight: 900; margin-left: 8px; }
+  .rok .rmark { color: #1a7a4a; } .rno .rmark { color: #c0392b; } .rskip .rmark { color: #b7791f; }
+  .rlearn { color: #666; margin-top: 6px; }
+  .fcard-wrap { perspective: 1000px; margin: 20px auto; max-width: 440px; }
+  .fcard { position: relative; width: 100%; height: 260px; cursor: pointer;
+           transform-style: preserve-3d; transition: transform .5s; }
+  .fcard.flipped { transform: rotateY(180deg); }
+  .fface { position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+           -webkit-backface-visibility: hidden; border-radius: 24px;
+           display: flex; align-items: center; justify-content: center; flex-direction: column;
+           font-size: 36px; font-weight: 900; padding: 24px; box-sizing: border-box; }
+  .ffront { background: #111; color: #fff; }
+  .fback { background: #fff; color: #111; transform: rotateY(180deg); font-size: 30px;
+           border: 3px solid #111; }
+  .fhint { font-size: 14px; color: #999; margin-top: 12px; font-weight: 600; }
+  .ffront .fhint { color: #aaa; }
+  .fprog { text-align: center; color: #666; margin-bottom: 12px; font-size: 16px; font-weight: 700; }
+  .fbtns { display: flex; gap: 14px; justify-content: center; margin-top: 18px; }
+  .fbtn-know { background: #1a1a1a !important; color: #fff !important; }
+  .fbtn-dunno { background: #fff !important; color: #111 !important; border: 3px solid #111 !important; }
+  ruby rt { font-size: 15px; color: #FFD166; font-weight: 600; }
+  .ffront ruby { font-size: 40px; }
+  .ffront ruby rt { color: #FFD166; }
+</style>
+
+</head>
+<body>
+<iframe name="gformFrame" style="display:none" title="gform"></iframe>
+
+<h1><img src="img/logo.webp" alt="達摩" style="width:48px;height:48px;vertical-align:middle;margin-right:8px;border-radius:50%;">日語學習記錄</h1>
+<div class="date" id="todayStr"></div>
+<div class="countdown" id="countdown"></div>
+
+<div class="card" id="whoCard">
+  <h2><span class="kicon">人</span>我是誰</h2>
+  <div class="who">
+    <button id="btnYue" onclick="pickChild('許悅')">許悅</button>
+    <button id="btnYi" onclick="pickChild('許逸')">許逸</button>
+    <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
+  </div>
+</div>
+
+<div class="card" id="missCard" style="display:none">
+  <h2><span class="kicon">日</span>未交嘅日子</h2>
+  <div id="missBody"></div>
+</div>
+
+<div class="card" id="recallCard" style="display:none">
+  <h2><span class="kicon">回</span>上次回憶</h2>
+  <div class="card-sub">先回憶，唔好偷睇</div>
+  <div id="recallBody"></div>
+  <div class="recall-tip">試下唔睇，講返出昨日 5 個生字同造句，講得出先好繼續。</div>
+</div>
+
+<div class="card" id="quizCard" style="display:none">
+  <h2><span class="kicon">試</span>每日小測驗</h2>
+  <div id="quizIntro">
+    <div class="hint">用你學過嘅生字出 5 題，考下記唔記得。</div>
+    <button class="btn2" onclick="startQuiz()">開始測驗</button>
+    <div id="quizHist"></div>
+  </div>
+  <div id="quizBody" style="display:none"></div>
+</div>
+<div class="card" id="weekCard" style="display:none">
+  <h2><span class="kicon">級</span>本週大測驗</h2>
+  <div id="weekIntro">
+    <div class="hint">語彙 8 題＋文法 8 題＋讀解 4 題＋複習 5 題，每星期做一次，成績會交去做每週分析。</div>
+    <button class="btn2" onclick="startWeekQuiz()">開始測驗</button>
+    <div id="weekHist"></div>
+  </div>
+  <div id="weekBody" style="display:none"></div>
+</div>
+<div class="card" id="randCard" style="display:none">
+  <h2><span class="kicon">隨</span>N4 隨機練習</h2>
+  <div id="randIntro">
+    <div class="hint">每日隨機 5 題 N4 真題（語彙＋文法＋讀解），做完即時對答案＋講解，成績會記錄。</div>
+    <button class="btn2" onclick="startRandPractice()">開始練習</button>
+    <div id="randHist"></div>
+  </div>
+  <div id="randBody" style="display:none"></div>
+</div>
+<div class="card" id="dailyCard" style="display:none">
+  <h2><span class="kicon">日</span>每日練習</h2>
+  <div id="dailyIntro">
+    <div class="hint">平日每日 5–10 題（N5–N3 真題隨機），錯題會記錄，聽日先複習錯題再做新題。</div>
+    <div style="margin:10px 0">
+      <label>級數：</label>
+      <select id="dailyLevel" style="font-size:18px;padding:6px">
+        <option value="N5">N5</option>
+        <option value="N4" selected>N4</option>
+        <option value="N3">N3</option>
+      </select>
+    </div>
+    <div id="dailyReview"></div>
+    <button class="btn2" onclick="startDailyPractice()">開始今日練習</button>
+    <div id="dailyHist"></div>
+  </div>
+  <div id="dailyBody" style="display:none"></div>
+</div>
+<div class="card" id="examCard" style="display:none">
+  <h2><span class="kicon">考</span>假日模擬考</h2>
+  <div id="examIntro">
+    <div class="hint">四部分：語彙 → 文法 → 讀解 → 聽解，按真實考試時間計時。</div>
+    <div style="margin:10px 0">
+      <label>級數：</label>
+      <select id="examLevel" style="font-size:18px;padding:6px">
+        <option value="N5">N5</option>
+        <option value="N4" selected>N4</option>
+        <option value="N3">N3</option>
+      </select>
+    </div>
+    <button class="btn2" onclick="startExamMock()">開始模擬考</button>
+    <div id="examHist"></div>
+  </div>
+  <div id="examBody" style="display:none"></div>
+</div>
+<div class="card" id="fullCard" style="display:none">
+  <h2><span class="kicon">卷</span>N4 完整模擬卷</h2>
+  <div id="fullIntro">
+    <div class="hint">完整 N4 模擬考試（言語知識＋讀解＋聽解），計時完成，成績會記錄並分析錯題。</div>
+    <button class="btn2" onclick="startFullMock()">開始模擬卷</button>
+    <div id="fullHist"></div>
+  </div>
+  <div id="fullBody" style="display:none"></div>
+</div>
+<div class="card" id="flashCard" style="display:none">
+  <h2><span class="kicon">脳</span>Flash Card 背單字</h2>
+  <div id="flashIntro">
+    <div class="hint">學習為主，唔計分。睇住日文諗意思，撳卡反轉對答案。唔識嘅會再出現，直到記住為止。</div>
+    <div style="margin:10px 0">
+      <button class="btn2" onclick="startFlash('mine')">我嘅生字</button>
+      <button class="btn2" onclick="startFlash('n4')">N4 系統字</button>
+      <button class="btn2" onclick="startFlash('wrong')">錯過嘅字</button>
+    </div>
+  </div>
+  <div id="flashBody" style="display:none"></div>
+</div>
+
+<div class="card" id="anaCard" style="display:none">
+  <h2><span class="kicon">析</span>每週分析</h2>
+  <div id="anaBody"><div class="recall-empty">載入中…</div></div>
+  <div class="hint">逢星期日出分析，睇下今週邊方面要加油。</div>
+</div>
+<div class="card" id="mockCard" style="display:none">
+  <h2><span class="kicon">模</span>模擬試資源</h2>
+  <div class="hint">目標：超越 N4！考前每星期做一回完整模擬卷，練時間分配。</div>
+  <div class="hist-item">
+    <div class="hist-date">完整模擬卷（115 分鐘）</div>
+    <div class="hist-words"><a href="https://www.minnanihongo.com/jlpt-mock-tests" target="_blank" rel="noopener">Minna Nihongo N4 模擬試</a> — 5 回免費，計時＋即時評分，唔使登入</div>
+  </div>
+  <div class="hist-item">
+    <div class="hist-date">快速練習（15–25 分鐘）</div>
+    <div class="hist-words"><a href="http://www.nihongomaster.com/jlpt-n4-practice-test" target="_blank" rel="noopener">NihongoMaster N4 練習</a> — 25 題，連聽力，即時知分數</div>
+  </div>
+  <div class="hist-item">
+    <div class="hist-date">官方例題（最準）</div>
+    <div class="hist-words"><a href="https://www.jlpt.jp/tw/samples/n4/index.html?mode=pc" target="_blank" rel="noopener">JLPT 官方 N4 試題範例</a> — 官方出題格式，每種題型都有，考前必做</div>
+  </div>
+  <div class="hint">11/14、11/21、11/28 做完整卷，目標 130/180 分以上。</div>
+</div>
+
+
+<div class="card" id="corrCard" style="display:none">
+  <h2><span class="kicon">正</span>改錯提醒</h2>
+  <div id="corrBody"><div class="recall-empty">載入中…</div></div>
+  <div class="hint">每晚檢查發現嘅錯處會喺度提醒你。</div>
+</div>
+
+<div class="card" id="formCard" style="display:none">
+  <h2 id="formTitle"><span class="kicon">書</span>今日學習</h2>
+  <div class="hint">左邊寫生字，右邊寫中文意思，兩個都要填</div>
+  <div class="wrow"><span class="wnum">1</span><input type="text" id="w1" placeholder="生字" autocomplete="off"><input type="text" id="m1" placeholder="中文意思" autocomplete="off"></div>
+  <div class="wrow"><span class="wnum">2</span><input type="text" id="w2" placeholder="生字" autocomplete="off"><input type="text" id="m2" placeholder="中文意思" autocomplete="off"></div>
+  <div class="wrow"><span class="wnum">3</span><input type="text" id="w3" placeholder="生字" autocomplete="off"><input type="text" id="m3" placeholder="中文意思" autocomplete="off"></div>
+  <div class="wrow"><span class="wnum">4</span><input type="text" id="w4" placeholder="生字" autocomplete="off"><input type="text" id="m4" placeholder="中文意思" autocomplete="off"></div>
+  <div class="wrow"><span class="wnum">5</span><input type="text" id="w5" placeholder="生字" autocomplete="off"><input type="text" id="m5" placeholder="中文意思" autocomplete="off"></div>
+  <label>造句（一句）</label><input type="text" id="sent" autocomplete="off">
+  <button id="submitBtn" onclick="submitDaily()">提交</button>
+  <div id="assess"></div>
+  <div class="msg" id="msg"></div>
+</div>
+
+<div class="card" id="histCard" style="display:none">
+  <h2><span class="kicon">史</span>歷史記錄</h2>
+  <div id="histBody"></div>
+</div>
+
+<div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
+
+<script>
+var N4SET={};
+N4SET["\u3042"]=1;
+N4SET["\u3042\u3042"]=1;
+N4SET["\u3042\u3044\u3055\u3064\u3059\u308b"]=1;
+N4SET["\u3042\u3044\u3060"]=1;
+N4SET["\u3042\u304b\u3061\u3083\u3093"]=1;
+N4SET["\u3042\u304b\u3093\u307c\u3046"]=1;
+N4SET["\u3042\u304c\u308b"]=1;
+N4SET["\u3042\u3055\u3044"]=1;
+N4SET["\u3042\u3058"]=1;
+N4SET["\u3042\u3059"]=1;
+N4SET["\u3042\u305d\u3073"]=1;
+N4SET["\u3042\u3064\u307e\u308b"]=1;
+N4SET["\u3042\u3064\u3081\u308b"]=1;
+N4SET["\u3042\u3084\u307e\u308b"]=1;
+N4SET["\u3042\u3093\u3057\u3093"]=1;
+N4SET["\u3042\u3093\u305c\u3093"]=1;
+N4SET["\u3042\u3093\u306a"]=1;
+N4SET["\u3042\u3093\u306a\u3044"]=1;
+N4SET["\u3044\u304b"]=1;
+N4SET["\u3044\u304c\u3044"]=1;
+N4SET["\u3044\u304c\u304f"]=1;
+N4SET["\u3044\u304d\u308b"]=1;
+N4SET["\u3044\u3051\u3093"]=1;
+N4SET["\u3044\u3057"]=1;
+N4SET["\u3044\u3058\u3081\u308b"]=1;
+N4SET["\u3044\u3058\u3087\u3046"]=1;
+N4SET["\u3044\u305d\u3050"]=1;
+N4SET["\u3044\u305f\u3059"]=1;
+N4SET["\u3044\u305f\u3060\u304f"]=1;
+N4SET["\u3044\u3061\u3069"]=1;
+N4SET["\u3044\u3063\u3057\u3087\u3046\u3051\u3093\u3081\u3044"]=1;
+N4SET["\u3044\u3063\u3071\u3044"]=1;
+N4SET["\u3044\u3068"]=1;
+N4SET["\u3044\u306a\u3044"]=1;
+N4SET["\u3044\u306a\u304b"]=1;
+N4SET["\u3044\u306e\u308b"]=1;
+N4SET["\u3044\u3089\u3063\u3057\u3083\u308b"]=1;
+N4SET["\u3046\u3048\u308b"]=1;
+N4SET["\u3046\u304b\u304c\u3046"]=1;
+N4SET["\u3046\u3051\u3064\u3051"]=1;
+N4SET["\u3046\u3051\u308b"]=1;
+N4SET["\u3046\u3054\u304f"]=1;
+N4SET["\u3046\u305d"]=1;
+N4SET["\u3046\u3061"]=1;
+N4SET["\u3046\u3064"]=1;
+N4SET["\u3046\u3064\u304f\u3057\u3044"]=1;
+N4SET["\u3046\u3064\u3059"]=1;
+N4SET["\u3046\u3064\u308b"]=1;
+N4SET["\u3046\u3067"]=1;
+N4SET["\u3046\u307e\u3044"]=1;
+N4SET["\u3046\u3089"]=1;
+N4SET["\u3046\u308a\u3070"]=1;
+N4SET["\u3046\u308c\u3057\u3044"]=1;
+N4SET["\u3046\u3093"]=1;
+N4SET["\u3046\u3093\u3066\u3093"]=1;
+N4SET["\u3046\u3093\u3066\u3093\u3057\u3085"]=1;
+N4SET["\u3046\u3093\u3069\u3046"]=1;
+N4SET["\u3048\u3060"]=1;
+N4SET["\u3048\u3089\u3076"]=1;
+N4SET["\u3048\u3093\u308a\u3087"]=1;
+N4SET["\u304a\u3044\u3067\u306b\u306a\u308b"]=1;
+N4SET["\u304a\u3044\u308f\u3044"]=1;
+N4SET["\u304a\u304b\u3052"]=1;
+N4SET["\u304a\u304b\u3057\u3044"]=1;
+N4SET["\u304a\u304b\u306d\u3082\u3061"]=1;
+N4SET["\u304a\u304f\u3058\u3087\u3046"]=1;
+N4SET["\u304a\u304f\u308a\u3082\u306e"]=1;
+N4SET["\u304a\u304f\u308b"]=1;
+N4SET["\u304a\u304f\u308c\u308b"]=1;
+N4SET["\u304a\u3053\u3059"]=1;
+N4SET["\u304a\u3053\u306a\u3046"]=1;
+N4SET["\u304a\u3053\u308b"]=1;
+N4SET["\u304a\u3057\u3044\u308c"]=1;
+N4SET["\u304a\u3058\u3087\u3046\u3055\u3093"]=1;
+N4SET["\u304a\u305f\u304f"]=1;
+N4SET["\u304a\u3061\u308b"]=1;
+N4SET["\u304a\u3063\u3057\u3083\u308b"]=1;
+N4SET["\u304a\u3063\u3068"]=1;
+N4SET["\u304a\u3064\u308a"]=1;
+N4SET["\u304a\u3068"]=1;
+N4SET["\u304a\u3068\u3059"]=1;
+N4SET["\u304a\u3069\u308a"]=1;
+N4SET["\u304a\u3069\u308b"]=1;
+N4SET["\u304a\u3069\u308d\u304f"]=1;
+N4SET["\u304a\u307e\u3064\u308a"]=1;
+N4SET["\u304a\u307f\u307e\u3044"]=1;
+N4SET["\u304a\u307f\u3084\u3052"]=1;
+N4SET["\u304a\u3082\u3044\u3060\u3059"]=1;
+N4SET["\u304a\u3082\u3046"]=1;
+N4SET["\u304a\u3082\u3061\u3083"]=1;
+N4SET["\u304a\u3082\u3066"]=1;
+N4SET["\u304a\u3084"]=1;
+N4SET["\u304a\u3088\u304e\u304b\u305f"]=1;
+N4SET["\u304a\u308b"]=1;
+N4SET["\u304a\u308c\u3044"]=1;
+N4SET["\u304a\u308c\u308b"]=1;
+N4SET["\u304a\u308f\u308a"]=1;
+N4SET["\u304a\u51fa\u3067\u306b\u306a\u308b"]=1;
+N4SET["\u304a\u571f\u7523"]=1;
+N4SET["\u304a\u5b22\u3055\u3093"]=1;
+N4SET["\u304a\u5b85"]=1;
+N4SET["\u304a\u793c"]=1;
+N4SET["\u304a\u795d\u3044"]=1;
+N4SET["\u304a\u796d\u308a"]=1;
+N4SET["\u304a\u852d"]=1;
+N4SET["\u304a\u898b\u821e\u3044"]=1;
+N4SET["\u304a\u91d1\u6301\u3061"]=1;
+N4SET["\u304a\u9670"]=1;
+N4SET["\u304b\u3044\u304c\u3093"]=1;
+N4SET["\u304b\u3044\u304e"]=1;
+N4SET["\u304b\u3044\u304e\u3057\u3064"]=1;
+N4SET["\u304b\u3044\u3058\u3087\u3046"]=1;
+N4SET["\u304b\u3044\u308f"]=1;
+N4SET["\u304b\u3048\u308a"]=1;
+N4SET["\u304b\u304c\u304f"]=1;
+N4SET["\u304b\u304c\u307f"]=1;
+N4SET["\u304b\u3056\u308b"]=1;
+N4SET["\u304b\u3058"]=1;
+N4SET["\u304b\u305f\u3044"]=1;
+N4SET["\u304b\u305f\u3061"]=1;
+N4SET["\u304b\u305f\u3065\u3051\u308b"]=1;
+N4SET["\u304b\u3061\u3087\u3046"]=1;
+N4SET["\u304b\u3063\u3053\u3046"]=1;
+N4SET["\u304b\u3064"]=1;
+N4SET["\u304b\u306a\u3044"]=1;
+N4SET["\u304b\u306a\u3057\u3044"]=1;
+N4SET["\u304b\u306a\u3089\u305a"]=1;
+N4SET["\u304b\u306e\u3058\u3087"]=1;
+N4SET["\u304b\u3079"]=1;
+N4SET["\u304b\u307e\u3046"]=1;
+N4SET["\u304b\u3080"]=1;
+N4SET["\u304b\u3088\u3046"]=1;
+N4SET["\u304b\u308c"]=1;
+N4SET["\u304b\u308c\u3089"]=1;
+N4SET["\u304b\u308f\u304f"]=1;
+N4SET["\u304b\u308f\u308a"]=1;
+N4SET["\u304b\u308f\u308b"]=1;
+N4SET["\u304b\u3093\u304c\u3048\u308b"]=1;
+N4SET["\u304b\u3093\u3051\u3044"]=1;
+N4SET["\u304b\u3093\u3054\u3075"]=1;
+N4SET["\u304b\u3093\u305f\u3093"]=1;
+N4SET["\u304d\u304b\u3044"]=1;
+N4SET["\u304d\u3051\u3093"]=1;
+N4SET["\u304d\u3053\u3048\u308b"]=1;
+N4SET["\u304d\u3057\u3083"]=1;
+N4SET["\u304d\u305b\u3064"]=1;
+N4SET["\u304d\u305d\u304f"]=1;
+N4SET["\u304d\u3063\u3068"]=1;
+N4SET["\u304d\u306c"]=1;
+N4SET["\u304d\u3073\u3057\u3044"]=1;
+N4SET["\u304d\u3076\u3093"]=1;
+N4SET["\u304d\u307e\u308b"]=1;
+N4SET["\u304d\u307f"]=1;
+N4SET["\u304d\u3081\u308b"]=1;
+N4SET["\u304d\u3082\u3061"]=1;
+N4SET["\u304d\u3082\u306e"]=1;
+N4SET["\u304d\u3083\u304f"]=1;
+N4SET["\u304d\u3085\u3046\u3053\u3046"]=1;
+N4SET["\u304d\u3087\u3046\u3044\u304f"]=1;
+N4SET["\u304d\u3087\u3046\u304b\u3044"]=1;
+N4SET["\u304d\u3087\u3046\u305d\u3046"]=1;
+N4SET["\u304d\u3087\u3046\u307f"]=1;
+N4SET["\u304d\u3093\u3058\u3087"]=1;
+N4SET["\u304e\u3058\u3085\u3064"]=1;
+N4SET["\u304f\u3046\u304d"]=1;
+N4SET["\u304f\u3046\u3053\u3046"]=1;
+N4SET["\u304f\u3055"]=1;
+N4SET["\u304f\u3060\u3055\u308b"]=1;
+N4SET["\u304f\u3073"]=1;
+N4SET["\u304f\u3082"]=1;
+N4SET["\u304f\u3089\u3079\u308b"]=1;
+N4SET["\u304f\u308c\u308b"]=1;
+N4SET["\u3050\u3042\u3044"]=1;
+N4SET["\u3051"]=1;
+N4SET["\u3051\u3044\u304b\u304f"]=1;
+N4SET["\u3051\u3044\u3051\u3093"]=1;
+N4SET["\u3051\u3044\u3055\u3064"]=1;
+N4SET["\u3051\u3044\u3056\u3044"]=1;
+N4SET["\u3051\u304c\u3059\u308b"]=1;
+N4SET["\u3051\u3057\u304d"]=1;
+N4SET["\u3051\u3057\u30b4\u30e0"]=1;
+N4SET["\u3051\u3063\u3057\u3066"]=1;
+N4SET["\u3051\u308c\u3069"]=1;
+N4SET["\u3051\u308c\u3069\u3082"]=1;
+N4SET["\u3051\u3093\u304b\u3059\u308b"]=1;
+N4SET["\u3051\u3093\u304d\u3085\u3046"]=1;
+N4SET["\u3051\u3093\u304d\u3085\u3046\u3057\u3064"]=1;
+N4SET["\u3051\u3093\u3076\u3064"]=1;
+N4SET["\u3052\u3057\u3085\u304f"]=1;
+N4SET["\u3052\u3093\u3044\u3093"]=1;
+N4SET["\u3053"]=1;
+N4SET["\u3053\u3046"]=1;
+N4SET["\u3053\u3046\u304c\u3044"]=1;
+N4SET["\u3053\u3046\u304e"]=1;
+N4SET["\u3053\u3046\u304e\u3087\u3046"]=1;
+N4SET["\u3053\u3046\u3053\u3046"]=1;
+N4SET["\u3053\u3046\u3053\u3046\u305b\u3044"]=1;
+N4SET["\u3053\u3046\u3058\u3087\u3046"]=1;
+N4SET["\u3053\u3046\u3061\u3087\u3046"]=1;
+N4SET["\u3053\u3046\u3064\u3046"]=1;
+N4SET["\u3053\u3046\u3068\u3046\u304c\u3063\u3053\u3046"]=1;
+N4SET["\u3053\u3046\u3069\u3046"]=1;
+N4SET["\u3053\u3046\u3080\u3044\u3093"]=1;
+N4SET["\u3053\u304f\u3055\u3044"]=1;
+N4SET["\u3053\u3053\u308d"]=1;
+N4SET["\u3053\u3057\u3087\u3046"]=1;
+N4SET["\u3053\u305f\u3048"]=1;
+N4SET["\u3053\u3068"]=1;
+N4SET["\u3053\u3068\u308a"]=1;
+N4SET["\u3053\u306e\u3042\u3044\u3060"]=1;
+N4SET["\u3053\u306e\u3054\u308d"]=1;
+N4SET["\u3053\u306e\u9593"]=1;
+N4SET["\u3053\u306e\u9803"]=1;
+N4SET["\u3053\u307e\u304b\u3044"]=1;
+N4SET["\u3053\u3080"]=1;
+N4SET["\u3053\u3081"]=1;
+N4SET["\u3053\u308c\u304b\u3089"]=1;
+N4SET["\u3053\u308f\u3044"]=1;
+N4SET["\u3053\u308f\u3059"]=1;
+N4SET["\u3053\u308f\u308c\u308b"]=1;
+N4SET["\u3053\u3093\u3069"]=1;
+N4SET["\u3053\u3093\u3084"]=1;
+N4SET["\u3054\u3057\u3085\u3058\u3093"]=1;
+N4SET["\u3054\u305e\u3093\u3058"]=1;
+N4SET["\u3054\u3061\u305d\u3046"]=1;
+N4SET["\u3054\u307f"]=1;
+N4SET["\u3054\u3089\u3093\u306b\u306a\u308b"]=1;
+N4SET["\u3054\u5b58\u3058"]=1;
+N4SET["\u3054\u99b3\u8d70"]=1;
+N4SET["\u3055\u3044\u304d\u3093"]=1;
+N4SET["\u3055\u3044\u3054"]=1;
+N4SET["\u3055\u3044\u3057\u3087"]=1;
+N4SET["\u3055\u304b"]=1;
+N4SET["\u3055\u304b\u3093"]=1;
+N4SET["\u3055\u304c\u3059"]=1;
+N4SET["\u3055\u304c\u308b"]=1;
+N4SET["\u3055\u3052\u308b"]=1;
+N4SET["\u3055\u3057\u3042\u3052\u308b"]=1;
+N4SET["\u3055\u3063\u304d"]=1;
+N4SET["\u3055\u3073\u3057\u3044"]=1;
+N4SET["\u3055\u3089\u3044\u3052\u3064"]=1;
+N4SET["\u3055\u3089\u3044\u3057\u3085\u3046"]=1;
+N4SET["\u3055\u308f\u3050"]=1;
+N4SET["\u3055\u308f\u308b"]=1;
+N4SET["\u3055\u3093\u304e\u3087\u3046"]=1;
+N4SET["\u3056\u3093\u306d\u3093"]=1;
+N4SET["\u3057\u3042\u3044"]=1;
+N4SET["\u3057\u304b\u305f"]=1;
+N4SET["\u3057\u304b\u308b"]=1;
+N4SET["\u3057\u3051\u3093"]=1;
+N4SET["\u3057\u305f\u304e"]=1;
+N4SET["\u3057\u305f\u304f"]=1;
+N4SET["\u3057\u3063\u304b\u308a"]=1;
+N4SET["\u3057\u3063\u3071\u3044"]=1;
+N4SET["\u3057\u306a\u3082\u306e"]=1;
+N4SET["\u3057\u3070\u3089\u304f"]=1;
+N4SET["\u3057\u307e"]=1;
+N4SET["\u3057\u307f\u3093"]=1;
+N4SET["\u3057\u3083\u304b\u3044"]=1;
+N4SET["\u3057\u3083\u3061\u3087\u3046"]=1;
+N4SET["\u3057\u3085\u3046\u304b\u3093"]=1;
+N4SET["\u3057\u3085\u3063\u305b\u304d"]=1;
+N4SET["\u3057\u3085\u3063\u3071\u3064"]=1;
+N4SET["\u3057\u3085\u307f"]=1;
+N4SET["\u3057\u3087\u3046\u304b\u3044"]=1;
+N4SET["\u3057\u3087\u3046\u304c\u3063\u3053\u3046"]=1;
+N4SET["\u3057\u3087\u3046\u305b\u3064"]=1;
+N4SET["\u3057\u3087\u3046\u305f\u3044"]=1;
+N4SET["\u3057\u3087\u3046\u3061"]=1;
+N4SET["\u3057\u3087\u3046\u3089\u3044"]=1;
+N4SET["\u3057\u3087\u304f\u3058"]=1;
+N4SET["\u3057\u3087\u304f\u308a\u3087\u3046\u3072\u3093"]=1;
+N4SET["\u3057\u3089\u305b\u308b"]=1;
+N4SET["\u3057\u3089\u3079\u308b"]=1;
+N4SET["\u3057\u3093\u305b\u3064"]=1;
+N4SET["\u3057\u3093\u3071\u3044"]=1;
+N4SET["\u3057\u3093\u3076\u3093\u3057\u3083"]=1;
+N4SET["\u3058"]=1;
+N4SET["\u3058\u3053"]=1;
+N4SET["\u3058\u3057\u3093"]=1;
+N4SET["\u3058\u3060\u3044"]=1;
+N4SET["\u3058\u3066\u3093"]=1;
+N4SET["\u3058\u3080\u3057\u3087"]=1;
+N4SET["\u3058\u3083\u307e"]=1;
+N4SET["\u3058\u3085\u3046\u3057\u3087"]=1;
+N4SET["\u3058\u3085\u3046\u3069\u3046"]=1;
+N4SET["\u3058\u3085\u3046\u3076\u3093"]=1;
+N4SET["\u3058\u3085\u3093\u3073"]=1;
+N4SET["\u3058\u3086\u3046"]=1;
+N4SET["\u3058\u3087\u305b\u3044"]=1;
+N4SET["\u3058\u3093\u3053\u3046"]=1;
+N4SET["\u3058\u3093\u3058\u3083"]=1;
+N4SET["\u3059\u3044\u3048\u3044"]=1;
+N4SET["\u3059\u3044\u3069\u3046"]=1;
+N4SET["\u3059\u3046\u304c\u304f"]=1;
+N4SET["\u3059\u304e\u308b"]=1;
+N4SET["\u3059\u304f"]=1;
+N4SET["\u3059\u3054\u3044"]=1;
+N4SET["\u3059\u3059\u3080"]=1;
+N4SET["\u3059\u3063\u304b\u308a"]=1;
+N4SET["\u3059\u3063\u3068"]=1;
+N4SET["\u3059\u3066\u308b"]=1;
+N4SET["\u3059\u306a"]=1;
+N4SET["\u3059\u3070\u3089\u3057\u3044"]=1;
+N4SET["\u3059\u3079\u308b"]=1;
+N4SET["\u3059\u307f"]=1;
+N4SET["\u3059\u308a"]=1;
+N4SET["\u3059\u308b\u3068"]=1;
+N4SET["\u305a\u3044\u3076\u3093"]=1;
+N4SET["\u305b\u3044\u304b\u3064"]=1;
+N4SET["\u305b\u3044\u3055\u3093"]=1;
+N4SET["\u305b\u3044\u3058"]=1;
+N4SET["\u305b\u3044\u3088\u3046"]=1;
+N4SET["\u305b\u304b\u3044"]=1;
+N4SET["\u305b\u304d"]=1;
+N4SET["\u305b\u3064\u3081\u3044"]=1;
+N4SET["\u305b\u306a\u304b"]=1;
+N4SET["\u305b\u308f"]=1;
+N4SET["\u305b\u3093\u305d\u3046"]=1;
+N4SET["\u305b\u3093\u3071\u3044"]=1;
+N4SET["\u305c\u3072"]=1;
+N4SET["\u305c\u3093\u305c\u3093"]=1;
+N4SET["\u305d\u3046"]=1;
+N4SET["\u305d\u3046\u3060\u3093"]=1;
+N4SET["\u305d\u3060\u3066\u308b"]=1;
+N4SET["\u305d\u3064\u304e\u3087\u3046"]=1;
+N4SET["\u305d\u3075"]=1;
+N4SET["\u305d\u307c"]=1;
+N4SET["\u305d\u308c\u3067"]=1;
+N4SET["\u305d\u308c\u306b"]=1;
+N4SET["\u305d\u308c\u307b\u3069"]=1;
+N4SET["\u305d\u308d\u305d\u308d"]=1;
+N4SET["\u305d\u3093\u306a"]=1;
+N4SET["\u305d\u3093\u306a\u306b"]=1;
+N4SET["\u305f\u3044\u3044\u3093"]=1;
+N4SET["\u305f\u3044\u3066\u3044"]=1;
+N4SET["\u305f\u3044\u3075\u3046"]=1;
+N4SET["\u305f\u304a\u308c\u308b"]=1;
+N4SET["\u305f\u3057\u304b"]=1;
+N4SET["\u305f\u3059"]=1;
+N4SET["\u305f\u305a\u306d\u308b"]=1;
+N4SET["\u305f\u305f\u307f"]=1;
+N4SET["\u305f\u3060\u3057\u3044"]=1;
+N4SET["\u305f\u3066\u308b"]=1;
+N4SET["\u305f\u3068\u3048\u3070"]=1;
+N4SET["\u305f\u306a"]=1;
+N4SET["\u305f\u306e\u3057\u307f"]=1;
+N4SET["\u305f\u306e\u3057\u3080"]=1;
+N4SET["\u305f\u307e\u306b"]=1;
+N4SET["\u305f\u3081"]=1;
+N4SET["\u305f\u308a\u308b"]=1;
+N4SET["\u3060\u3044\u304c\u304f\u305b\u3044"]=1;
+N4SET["\u3060\u3044\u3058"]=1;
+N4SET["\u3060\u3044\u305f\u3044"]=1;
+N4SET["\u3060\u3044\u3076"]=1;
+N4SET["\u3060\u304b\u3089"]=1;
+N4SET["\u3060\u3081"]=1;
+N4SET["\u3060\u3093\u305b\u3044"]=1;
+N4SET["\u3060\u3093\u307c\u3046"]=1;
+N4SET["\u3061"]=1;
+N4SET["\u3061\u304b\u3089"]=1;
+N4SET["\u3061\u3063\u3068\u3082"]=1;
+N4SET["\u3061\u3083\u3093"]=1;
+N4SET["\u3061\u3085\u3046\u3044"]=1;
+N4SET["\u3061\u3085\u3046\u304c\u3063\u3053\u3046"]=1;
+N4SET["\u3061\u3085\u3046\u3057\u3083"]=1;
+N4SET["\u3061\u3085\u3046\u3057\u3083\u3058\u3087\u3046"]=1;
+N4SET["\u3061\u308a"]=1;
+N4SET["\u3064\u304b\u307e\u3048\u308b"]=1;
+N4SET["\u3064\u304d"]=1;
+N4SET["\u3064\u3054\u3046"]=1;
+N4SET["\u3064\u305f\u3048\u308b"]=1;
+N4SET["\u3064\u3064\u3080"]=1;
+N4SET["\u3064\u3065\u304f"]=1;
+N4SET["\u3064\u3065\u3051\u308b"]=1;
+N4SET["\u3064\u307e"]=1;
+N4SET["\u3064\u3082\u308a"]=1;
+N4SET["\u3064\u308b"]=1;
+N4SET["\u3064\u308c\u308b"]=1;
+N4SET["\u3066\u3044\u306d\u3044"]=1;
+N4SET["\u3066\u304d\u3068\u3046"]=1;
+N4SET["\u3066\u3064\u3060\u3046"]=1;
+N4SET["\u3066\u3076\u304f\u308d"]=1;
+N4SET["\u3066\u3089"]=1;
+N4SET["\u3066\u3093"]=1;
+N4SET["\u3066\u3093\u3044\u3093"]=1;
+N4SET["\u3066\u3093\u304d\u3088\u307b\u3046"]=1;
+N4SET["\u3066\u3093\u3089\u3093\u304b\u3044"]=1;
+N4SET["\u3067\u304d\u308b\u3060\u3051"]=1;
+N4SET["\u3067\u3093\u3068\u3046"]=1;
+N4SET["\u3067\u3093\u307d\u3046"]=1;
+N4SET["\u3068\u3046\u3068\u3046"]=1;
+N4SET["\u3068\u304a\u304f"]=1;
+N4SET["\u3068\u304a\u308b"]=1;
+N4SET["\u3068\u304f\u306b"]=1;
+N4SET["\u3068\u304f\u3079\u3064"]=1;
+N4SET["\u3068\u3053\u3084"]=1;
+N4SET["\u3068\u3061\u3085\u3046"]=1;
+N4SET["\u3068\u3063\u304d\u3085\u3046"]=1;
+N4SET["\u3068\u3069\u3051\u308b"]=1;
+N4SET["\u3068\u3081\u308b"]=1;
+N4SET["\u3068\u308a\u304b\u3048\u308b"]=1;
+N4SET["\u3069\u3046\u3050"]=1;
+N4SET["\u3069\u3046\u3076\u3064\u3048\u3093"]=1;
+N4SET["\u3069\u308d\u307c\u3046"]=1;
+N4SET["\u3069\u3093\u3069\u3093"]=1;
+N4SET["\u306a\u304a\u3059"]=1;
+N4SET["\u306a\u304a\u308b"]=1;
+N4SET["\u306a\u304b\u306a\u304b"]=1;
+N4SET["\u306a\u304f\u306a\u308b"]=1;
+N4SET["\u306a\u3052\u308b"]=1;
+N4SET["\u306a\u3055\u308b"]=1;
+N4SET["\u306a\u308b\u3079\u304f"]=1;
+N4SET["\u306a\u308b\u307b\u3069"]=1;
+N4SET["\u306a\u308c\u308b"]=1;
+N4SET["\u306b\u304a\u3044"]=1;
+N4SET["\u306b\u304b\u3044\u3060\u3066"]=1;
+N4SET["\u306b\u304c\u3044"]=1;
+N4SET["\u306b\u3052\u308b"]=1;
+N4SET["\u306b\u3063\u304d"]=1;
+N4SET["\u306b\u3085\u3046\u3044\u3093"]=1;
+N4SET["\u306b\u3085\u3046\u304c\u304f"]=1;
+N4SET["\u306b\u308b"]=1;
+N4SET["\u306b\u3093\u304e\u3087\u3046"]=1;
+N4SET["\u306c\u3059\u3080"]=1;
+N4SET["\u306c\u308b"]=1;
+N4SET["\u306c\u308c\u308b"]=1;
+N4SET["\u306d\u3060\u3093"]=1;
+N4SET["\u306d\u3063\u3057\u3093"]=1;
+N4SET["\u306d\u3064"]=1;
+N4SET["\u306d\u307c\u3046"]=1;
+N4SET["\u306d\u3080\u3044"]=1;
+N4SET["\u306d\u3080\u308b"]=1;
+N4SET["\u306e\u3053\u308b"]=1;
+N4SET["\u306e\u3069"]=1;
+N4SET["\u306e\u308a\u304b\u3048\u308b"]=1;
+N4SET["\u306e\u308a\u3082\u306e"]=1;
+N4SET["\u306f\u3044\u3051\u3093"]=1;
+N4SET["\u306f\u3044\u3057\u3083"]=1;
+N4SET["\u306f\u3053\u3076"]=1;
+N4SET["\u306f\u3058\u3081\u308b"]=1;
+N4SET["\u306f\u305a"]=1;
+N4SET["\u306f\u305a\u304b\u3057\u3044"]=1;
+N4SET["\u306f\u3063\u304d\u308a"]=1;
+N4SET["\u306f\u3064\u304a\u3093"]=1;
+N4SET["\u306f\u306a\u307f"]=1;
+N4SET["\u306f\u3084\u3057"]=1;
+N4SET["\u306f\u3089\u3046"]=1;
+N4SET["\u306f\u3093\u305f\u3044"]=1;
+N4SET["\u3070\u3042\u3044"]=1;
+N4SET["\u3070\u3044"]=1;
+N4SET["\u3070\u3057\u3087"]=1;
+N4SET["\u3070\u3093\u3050\u307f"]=1;
+N4SET["\u3072"]=1;
+N4SET["\u3072\u3048\u308b"]=1;
+N4SET["\u3072\u304b\u308a"]=1;
+N4SET["\u3072\u304b\u308b"]=1;
+N4SET["\u3072\u304d\u3060\u3057"]=1;
+N4SET["\u3072\u304d\u3060\u3059"]=1;
+N4SET["\u3072\u3052"]=1;
+N4SET["\u3072\u3053\u3046\u3058\u3087\u3046"]=1;
+N4SET["\u3072\u3055\u3057\u3076\u308a"]=1;
+N4SET["\u3072\u3058\u3087\u3046\u306b"]=1;
+N4SET["\u3072\u3063\u3053\u3059"]=1;
+N4SET["\u3072\u3064\u3088\u3046"]=1;
+N4SET["\u3072\u3069\u3044"]=1;
+N4SET["\u3072\u3089\u304f"]=1;
+N4SET["\u3072\u308b\u307e"]=1;
+N4SET["\u3072\u308b\u3084\u3059\u307f"]=1;
+N4SET["\u3072\u308d\u3046"]=1;
+N4SET["\u3073\u3058\u3085\u3064\u304b\u3093"]=1;
+N4SET["\u3073\u3063\u304f\u308a\u3059\u308b"]=1;
+N4SET["\u3075\u3048\u308b"]=1;
+N4SET["\u3075\u304b\u3044"]=1;
+N4SET["\u3075\u304f\u3056\u3064"]=1;
+N4SET["\u3075\u304f\u3057\u3085\u3046"]=1;
+N4SET["\u3075\u3064\u3046"]=1;
+N4SET["\u3075\u3068\u308b"]=1;
+N4SET["\u3075\u3068\u3093"]=1;
+N4SET["\u3075\u306d"]=1;
+N4SET["\u3075\u3079\u3093"]=1;
+N4SET["\u3075\u3080"]=1;
+N4SET["\u3075\u308a\u3060\u3059"]=1;
+N4SET["\u3076\u3061\u3087\u3046"]=1;
+N4SET["\u3076\u3069\u3046"]=1;
+N4SET["\u3076\u3093\u304b"]=1;
+N4SET["\u3076\u3093\u304c\u304f"]=1;
+N4SET["\u3076\u3093\u307d\u3046"]=1;
+N4SET["\u3078\u3093\u3058"]=1;
+N4SET["\u3079\u3064"]=1;
+N4SET["\u307b\u3046\u305d\u3046"]=1;
+N4SET["\u307b\u3046\u308a\u3064"]=1;
+N4SET["\u307b\u3057"]=1;
+N4SET["\u307b\u3068\u3093\u3069"]=1;
+N4SET["\u307b\u3069"]=1;
+N4SET["\u307b\u3081\u308b"]=1;
+N4SET["\u307b\u3093\u3084\u304f"]=1;
+N4SET["\u307c\u3046\u3048\u304d"]=1;
+N4SET["\u307c\u304f"]=1;
+N4SET["\u307e\u3044\u308b"]=1;
+N4SET["\u307e\u3051\u308b"]=1;
+N4SET["\u307e\u3058\u3081"]=1;
+N4SET["\u307e\u305a"]=1;
+N4SET["\u307e\u305f\u306f"]=1;
+N4SET["\u307e\u3061\u304c\u3048\u308b"]=1;
+N4SET["\u307e\u306b\u3042\u3046"]=1;
+N4SET["\u307e\u308f\u308a"]=1;
+N4SET["\u307e\u308f\u308b"]=1;
+N4SET["\u307e\u3093\u304c"]=1;
+N4SET["\u307e\u3093\u306a\u304b"]=1;
+N4SET["\u307f\u3048\u308b"]=1;
+N4SET["\u307f\u305a\u3046\u307f"]=1;
+N4SET["\u307f\u305d"]=1;
+N4SET["\u307f\u3064\u304b\u308b"]=1;
+N4SET["\u307f\u3064\u3051\u308b"]=1;
+N4SET["\u307f\u306a"]=1;
+N4SET["\u307f\u306a\u3068"]=1;
+N4SET["\u3080\u304b\u3046"]=1;
+N4SET["\u3080\u304b\u3048\u308b"]=1;
+N4SET["\u3080\u304b\u3057"]=1;
+N4SET["\u3080\u3057"]=1;
+N4SET["\u3080\u3059\u3053"]=1;
+N4SET["\u3080\u3059\u3081"]=1;
+N4SET["\u3080\u308a"]=1;
+N4SET["\u3081\u3057\u3042\u304c\u308b"]=1;
+N4SET["\u3081\u305a\u3089\u3057\u3044"]=1;
+N4SET["\u3082\u3046\u3057\u3042\u3052\u308b"]=1;
+N4SET["\u3082\u3046\u3059"]=1;
+N4SET["\u3082\u3046\u3059\u3050"]=1;
+N4SET["\u3082\u3057"]=1;
+N4SET["\u3082\u3061\u308d\u3093"]=1;
+N4SET["\u3082\u3063\u3068\u3082"]=1;
+N4SET["\u3082\u3069\u308b"]=1;
+N4SET["\u3082\u3081\u3093"]=1;
+N4SET["\u3082\u3089\u3046"]=1;
+N4SET["\u3082\u308a"]=1;
+N4SET["\u3084\u304f"]=1;
+N4SET["\u3084\u304f\u305d\u304f"]=1;
+N4SET["\u3084\u304f\u306b\u305f\u3064"]=1;
+N4SET["\u3084\u3051\u308b"]=1;
+N4SET["\u3084\u305b\u308b"]=1;
+N4SET["\u3084\u3063\u3068"]=1;
+N4SET["\u3084\u3063\u3071\u308a"]=1;
+N4SET["\u3084\u306f\u308a"]=1;
+N4SET["\u3084\u3080"]=1;
+N4SET["\u3084\u308f\u3089\u304b\u3044"]=1;
+N4SET["\u3086"]=1;
+N4SET["\u3086\u3057\u3085\u3064"]=1;
+N4SET["\u3086\u306b\u3085\u3046"]=1;
+N4SET["\u3086\u3073"]=1;
+N4SET["\u3086\u3073\u308f"]=1;
+N4SET["\u3086\u3081"]=1;
+N4SET["\u3086\u308c\u308b"]=1;
+N4SET["\u3088\u3046"]=1;
+N4SET["\u3088\u3046\u3044"]=1;
+N4SET["\u3088\u3046\u3058"]=1;
+N4SET["\u3088\u3054\u308c\u308b"]=1;
+N4SET["\u3088\u3057\u3085\u3046"]=1;
+N4SET["\u3088\u3066\u3044"]=1;
+N4SET["\u3088\u3084\u304f"]=1;
+N4SET["\u3088\u308d\u3053\u3076"]=1;
+N4SET["\u3088\u308d\u3057\u3044"]=1;
+N4SET["\u308a\u3086\u3046"]=1;
+N4SET["\u308a\u3087\u3046\u307b\u3046"]=1;
+N4SET["\u308a\u3087\u304b\u3093"]=1;
+N4SET["\u308a\u3088\u3046"]=1;
+N4SET["\u308b\u3059"]=1;
+N4SET["\u308c\u3044\u307c\u3046"]=1;
+N4SET["\u308c\u304d\u3057"]=1;
+N4SET["\u308c\u3093\u3089\u304f"]=1;
+N4SET["\u308f\u304b\u3059"]=1;
+N4SET["\u308f\u304b\u308c\u308b"]=1;
+N4SET["\u308f\u304f"]=1;
+N4SET["\u308f\u3051"]=1;
+N4SET["\u308f\u3059\u308c\u3082\u306e"]=1;
+N4SET["\u308f\u3089\u3046"]=1;
+N4SET["\u308f\u308a\u3042\u3044"]=1;
+N4SET["\u308f\u308c\u308b"]=1;
+N4SET["\u30a2\u30af\u30bb\u30b5\u30ea\u30fc"]=1;
+N4SET["\u30a2\u30b8\u30a2"]=1;
+N4SET["\u30a2\u30ca\u30a6\u30f3\u30b5\u30fc"]=1;
+N4SET["\u30a2\u30d5\u30ea\u30ab"]=1;
+N4SET["\u30a2\u30e1\u30ea\u30ab"]=1;
+N4SET["\u30a2\u30eb\u30b3\u30fc\u30eb"]=1;
+N4SET["\u30a2\u30eb\u30d0\u30a4\u30c8"]=1;
+N4SET["\u30a8\u30b9\u30ab\u30ec\u30fc\u30bf\u30fc"]=1;
+N4SET["\u30aa\u30fc\u30c8\u30d0\u30a4"]=1;
+N4SET["\u30ab\u30fc\u30c6\u30f3"]=1;
+N4SET["\u30ac\u30b9"]=1;
+N4SET["\u30ac\u30bd\u30ea\u30f3"]=1;
+N4SET["\u30ac\u30bd\u30ea\u30f3\u30b9\u30bf\u30f3\u30c9"]=1;
+N4SET["\u30ac\u30e9\u30b9"]=1;
+N4SET["\u30b1\u30fc\u30ad"]=1;
+N4SET["\u30b3\u30f3\u30b5\u30fc\u30c8"]=1;
+N4SET["\u30b3\u30f3\u30d4\u30e5\u30fc\u30bf"]=1;
+N4SET["\u30b3\u30f3\u30d4\u30e5\u30fc\u30bf\u30fc"]=1;
+N4SET["\u30b4\u30df"]=1;
+N4SET["\u30b5\u30e9\u30c0"]=1;
+N4SET["\u30b5\u30f3\u30c0\u30eb"]=1;
+N4SET["\u30b5\u30f3\u30c9\u30a4\u30c3\u30c1"]=1;
+N4SET["\u30b8\u30e3\u30e0"]=1;
+N4SET["\u30b9\u30af\u30ea\u30fc\u30f3"]=1;
+N4SET["\u30b9\u30c6\u30ec\u30aa"]=1;
+N4SET["\u30b9\u30c6\u30fc\u30ad"]=1;
+N4SET["\u30b9\u30fc\u30c4"]=1;
+N4SET["\u30b9\u30fc\u30c4\u30b1\u30fc\u30b9"]=1;
+N4SET["\u30bd\u30d5\u30c8"]=1;
+N4SET["\u30bf\u30a4\u30d7"]=1;
+N4SET["\u30c1\u30a7\u30c3\u30af\u3059\u308b"]=1;
+N4SET["\u30c6\u30ad\u30b9\u30c8"]=1;
+N4SET["\u30c6\u30cb\u30b9"]=1;
+N4SET["\u30cf\u30f3\u30c9\u30d0\u30c3\u30b0"]=1;
+N4SET["\u30d1\u30bd\u30b3\u30f3"]=1;
+N4SET["\u30d1\u30fc\u30c8"]=1;
+N4SET["\u30d3\u30eb"]=1;
+N4SET["\u30d4\u30a2\u30ce"]=1;
+N4SET["\u30d5\u30a1\u30c3\u30af\u30b9"]=1;
+N4SET["\u30d7\u30ec\u30bc\u30f3\u30c8"]=1;
+N4SET["\u30d9\u30eb"]=1;
+N4SET["\u30ea\u30dd\u30fc\u30c8"]=1;
+N4SET["\u30ec\u30b8"]=1;
+N4SET["\u30ec\u30dd\u30fc\u30c8"]=1;
+N4SET["\u30ef\u30fc\u30d7\u30ed"]=1;
+N4SET["\u4e00\u5ea6"]=1;
+N4SET["\u4e00\u751f\u61f8\u547d"]=1;
+N4SET["\u4e01\u5be7"]=1;
+N4SET["\u4e0a\u304c\u308b"]=1;
+N4SET["\u4e0b\u304c\u308b"]=1;
+N4SET["\u4e0b\u3052\u308b"]=1;
+N4SET["\u4e0b\u3055\u308b"]=1;
+N4SET["\u4e0b\u308a\u308b"]=1;
+N4SET["\u4e0b\u5bbf"]=1;
+N4SET["\u4e0b\u7740"]=1;
+N4SET["\u4e0d\u4fbf"]=1;
+N4SET["\u4e16\u754c"]=1;
+N4SET["\u4e16\u8a71"]=1;
+N4SET["\u4e21\u65b9"]=1;
+N4SET["\u4e2d\u3005"]=1;
+N4SET["\u4e2d\u5b66\u6821"]=1;
+N4SET["\u4e45\u3057\u3076\u308a"]=1;
+N4SET["\u4e45\u3057\u632f\u308a"]=1;
+N4SET["\u4e57\u308a\u63db\u3048\u308b"]=1;
+N4SET["\u4e57\u308a\u7269"]=1;
+N4SET["\u4e7e\u304f"]=1;
+N4SET["\u4e88\u5b9a"]=1;
+N4SET["\u4e88\u7d04"]=1;
+N4SET["\u4e88\u7fd2"]=1;
+N4SET["\u4e8b"]=1;
+N4SET["\u4e8b\u52d9\u6240"]=1;
+N4SET["\u4e8b\u6545"]=1;
+N4SET["\u4e8c\u968e\u5efa\u3066"]=1;
+N4SET["\u4e9b\u3068\u3082"]=1;
+N4SET["\u4ea1\u304f\u306a\u308b"]=1;
+N4SET["\u4ea4\u901a"]=1;
+N4SET["\u4eba\u53e3"]=1;
+N4SET["\u4eba\u5f62"]=1;
+N4SET["\u4eca\u591c"]=1;
+N4SET["\u4eca\u5ea6"]=1;
+N4SET["\u4ed5\u65b9"]=1;
+N4SET["\u4ed8\u304f"]=1;
+N4SET["\u4ee3\u308f\u308a"]=1;
+N4SET["\u4ee5\u4e0a"]=1;
+N4SET["\u4ee5\u4e0b"]=1;
+N4SET["\u4ee5\u5185"]=1;
+N4SET["\u4ee5\u5916"]=1;
+N4SET["\u4ef0\u308b"]=1;
+N4SET["\u4f1a\u5834"]=1;
+N4SET["\u4f1a\u8a71"]=1;
+N4SET["\u4f1a\u8b70"]=1;
+N4SET["\u4f1a\u8b70\u5ba4"]=1;
+N4SET["\u4f1d\u3048\u308b"]=1;
+N4SET["\u4f3a\u3046"]=1;
+N4SET["\u4f3c\u308b"]=1;
+N4SET["\u4f4f\u6240"]=1;
+N4SET["\u4f8b\u3048\u3070"]=1;
+N4SET["\u500d"]=1;
+N4SET["\u5012\u308c\u308b"]=1;
+N4SET["\u5024\u6bb5"]=1;
+N4SET["\u5076\u306b"]=1;
+N4SET["\u50d5"]=1;
+N4SET["\u5104"]=1;
+N4SET["\u512a\u3057\u3044"]=1;
+N4SET["\u5148\u305a"]=1;
+N4SET["\u5148\u8f29"]=1;
+N4SET["\u5149"]=1;
+N4SET["\u5149\u308b"]=1;
+N4SET["\u5165\u5b66"]=1;
+N4SET["\u5165\u9662"]=1;
+N4SET["\u5168\u7136"]=1;
+N4SET["\u516c\u52d9\u54e1"]=1;
+N4SET["\u5176\u308c\u3067"]=1;
+N4SET["\u5176\u308c\u306b"]=1;
+N4SET["\u5176\u308c\u7a0b"]=1;
+N4SET["\u5177\u5408"]=1;
+N4SET["\u5185"]=1;
+N4SET["\u518d\u6765\u6708"]=1;
+N4SET["\u518d\u6765\u9031"]=1;
+N4SET["\u5199\u3059"]=1;
+N4SET["\u51b7\u3048\u308b"]=1;
+N4SET["\u51b7\u623f"]=1;
+N4SET["\u51c4\u3044"]=1;
+N4SET["\u51fa\u5e2d"]=1;
+N4SET["\u51fa\u6765\u308b\u3060\u3051"]=1;
+N4SET["\u51fa\u767a"]=1;
+N4SET["\u5225"]=1;
+N4SET["\u5225\u308c\u308b"]=1;
+N4SET["\u5229\u7528"]=1;
+N4SET["\u5272\u308c\u308b"]=1;
+N4SET["\u5272\u5408"]=1;
+N4SET["\u529b"]=1;
+N4SET["\u52d5\u304f"]=1;
+N4SET["\u52d5\u7269\u5712"]=1;
+N4SET["\u52dd\u3064"]=1;
+N4SET["\u52ff\u8ad6"]=1;
+N4SET["\u5302\u3044"]=1;
+N4SET["\u5305\u3080"]=1;
+N4SET["\u533b\u5b66"]=1;
+N4SET["\u5341\u5206"]=1;
+N4SET["\u5352\u696d"]=1;
+N4SET["\u5371\u967a"]=1;
+N4SET["\u539f\u56e0"]=1;
+N4SET["\u53b3\u3057\u3044"]=1;
+N4SET["\u53c2\u308b"]=1;
+N4SET["\u53c8\u306f"]=1;
+N4SET["\u53cd\u5bfe"]=1;
+N4SET["\u53d6\u308a\u66ff\u3048\u308b"]=1;
+N4SET["\u53d7\u3051\u308b"]=1;
+N4SET["\u53d7\u4ed8"]=1;
+N4SET["\u53ec\u3057\u4e0a\u304c\u308b"]=1;
+N4SET["\u53ef\u7b11\u3057\u3044"]=1;
+N4SET["\u53f0\u98a8"]=1;
+N4SET["\u5408\u3046"]=1;
+N4SET["\u5411\u3046"]=1;
+N4SET["\u5411\u304b\u3046"]=1;
+N4SET["\u541b"]=1;
+N4SET["\u5449\u308c\u308b"]=1;
+N4SET["\u5468\u308a"]=1;
+N4SET["\u5473"]=1;
+N4SET["\u5473\u564c"]=1;
+N4SET["\u54c1\u7269"]=1;
+N4SET["\u5589"]=1;
+N4SET["\u559c\u3076"]=1;
+N4SET["\u5618"]=1;
+N4SET["\u565b\u3080"]=1;
+N4SET["\u56de\u308b"]=1;
+N4SET["\u56fd\u969b"]=1;
+N4SET["\u5730\u7406"]=1;
+N4SET["\u5730\u9707"]=1;
+N4SET["\u5742"]=1;
+N4SET["\u5805\u3044"]=1;
+N4SET["\u5834\u5408"]=1;
+N4SET["\u5834\u6240"]=1;
+N4SET["\u5857\u308b"]=1;
+N4SET["\u5875"]=1;
+N4SET["\u5897\u3048\u308b"]=1;
+N4SET["\u58c1"]=1;
+N4SET["\u58ca\u3059"]=1;
+N4SET["\u58ca\u308c\u308b"]=1;
+N4SET["\u58f2\u308a\u5834"]=1;
+N4SET["\u5909"]=1;
+N4SET["\u5909\u3048\u308b"]=1;
+N4SET["\u5909\u308f\u308b"]=1;
+N4SET["\u5922"]=1;
+N4SET["\u5927\u4e8b"]=1;
+N4SET["\u5927\u4f53"]=1;
+N4SET["\u5927\u5206"]=1;
+N4SET["\u5927\u5b66\u751f"]=1;
+N4SET["\u5927\u62b5"]=1;
+N4SET["\u5929\u6c17\u4e88\u5831"]=1;
+N4SET["\u592a\u308b"]=1;
+N4SET["\u592b"]=1;
+N4SET["\u5931\u6557"]=1;
+N4SET["\u5973\u6027"]=1;
+N4SET["\u59bb"]=1;
+N4SET["\u59cb\u3081\u308b"]=1;
+N4SET["\u5a18"]=1;
+N4SET["\u5b09\u3057\u3044"]=1;
+N4SET["\u5b50"]=1;
+N4SET["\u5b57"]=1;
+N4SET["\u5b63\u7bc0"]=1;
+N4SET["\u5b89\u5168"]=1;
+N4SET["\u5b89\u5fc3"]=1;
+N4SET["\u5b9c\u3057\u3044"]=1;
+N4SET["\u5ba2"]=1;
+N4SET["\u5bb6\u5185"]=1;
+N4SET["\u5bc2\u3057\u3044"]=1;
+N4SET["\u5bc4\u308b"]=1;
+N4SET["\u5bdd\u574a"]=1;
+N4SET["\u5bfa"]=1;
+N4SET["\u5c06\u6765"]=1;
+N4SET["\u5c0b\u306d\u308b"]=1;
+N4SET["\u5c0f\u5b66\u6821"]=1;
+N4SET["\u5c0f\u8aac"]=1;
+N4SET["\u5c0f\u9ce5"]=1;
+N4SET["\u5c4a\u3051\u308b"]=1;
+N4SET["\u5c4b\u4e0a"]=1;
+N4SET["\u5c55\u89a7\u4f1a"]=1;
+N4SET["\u5c79\u5ea6"]=1;
+N4SET["\u5cf6"]=1;
+N4SET["\u5de5\u5834"]=1;
+N4SET["\u5de5\u696d"]=1;
+N4SET["\u5dee\u3057\u4e0a\u3052\u308b"]=1;
+N4SET["\u5e02"]=1;
+N4SET["\u5e02\u6c11"]=1;
+N4SET["\u5e03\u56e3"]=1;
+N4SET["\u5e2d"]=1;
+N4SET["\u5e30\u308a"]=1;
+N4SET["\u5e8a\u5c4b"]=1;
+N4SET["\u5e97\u54e1"]=1;
+N4SET["\u5efa\u3066\u308b"]=1;
+N4SET["\u5f15\u304d\u51fa\u3057"]=1;
+N4SET["\u5f15\u304d\u51fa\u3059"]=1;
+N4SET["\u5f15\u3063\u8d8a\u3059"]=1;
+N4SET["\u5f62"]=1;
+N4SET["\u5f79\u306b\u7acb\u3064"]=1;
+N4SET["\u5f7c"]=1;
+N4SET["\u5f7c\u3089"]=1;
+N4SET["\u5f7c\u5973"]=1;
+N4SET["\u5f7c\u7b49"]=1;
+N4SET["\u5fa1\u4e3b\u4eba"]=1;
+N4SET["\u5fa1\u99b3\u8d70"]=1;
+N4SET["\u5fa9\u7fd2"]=1;
+N4SET["\u5fc3"]=1;
+N4SET["\u5fc3\u914d"]=1;
+N4SET["\u5fc5\u305a"]=1;
+N4SET["\u5fc5\u8981"]=1;
+N4SET["\u5fd8\u308c\u7269"]=1;
+N4SET["\u6012\u308b"]=1;
+N4SET["\u6016\u3044"]=1;
+N4SET["\u601d\u3044\u51fa\u3059"]=1;
+N4SET["\u601d\u3046"]=1;
+N4SET["\u6025"]=1;
+N4SET["\u6025\u3050"]=1;
+N4SET["\u6025\u884c"]=1;
+N4SET["\u6065\u305a\u304b\u3057\u3044"]=1;
+N4SET["\u606f\u5b50"]=1;
+N4SET["\u60b2\u3057\u3044"]=1;
+N4SET["\u610f\u898b"]=1;
+N4SET["\u6163\u308c\u308b"]=1;
+N4SET["\u6176\u3076"]=1;
+N4SET["\u6210\u308b\u3079\u304f"]=1;
+N4SET["\u6226\u4e89"]=1;
+N4SET["\u623b\u308b"]=1;
+N4SET["\u624b\u4f1d\u3046"]=1;
+N4SET["\u624b\u888b"]=1;
+N4SET["\u6253\u3064"]=1;
+N4SET["\u6255\u3046"]=1;
+N4SET["\u627f\u77e5"]=1;
+N4SET["\u6280\u8853"]=1;
+N4SET["\u6295\u3052\u308b"]=1;
+N4SET["\u6298\u308b"]=1;
+N4SET["\u6298\u308c\u308b"]=1;
+N4SET["\u62bc\u3057\u5165\u308c"]=1;
+N4SET["\u62db\u5f85"]=1;
+N4SET["\u62dd\u898b"]=1;
+N4SET["\u62fe\u3046"]=1;
+N4SET["\u6307"]=1;
+N4SET["\u6307\u8f2a"]=1;
+N4SET["\u6355\u307e\u3048\u308b"]=1;
+N4SET["\u6368\u3066\u308b"]=1;
+N4SET["\u638f\u6478"]=1;
+N4SET["\u63a2\u3059"]=1;
+N4SET["\u63fa\u308c\u308b"]=1;
+N4SET["\u652f\u5ea6"]=1;
+N4SET["\u653e\u9001"]=1;
+N4SET["\u653f\u6cbb"]=1;
+N4SET["\u6545\u969c"]=1;
+N4SET["\u6559\u4f1a"]=1;
+N4SET["\u6559\u80b2"]=1;
+N4SET["\u6570\u5b66"]=1;
+N4SET["\u6587\u5316"]=1;
+N4SET["\u6587\u5b66"]=1;
+N4SET["\u6587\u6cd5"]=1;
+N4SET["\u65b0\u805e\u793e"]=1;
+N4SET["\u65c5\u9928"]=1;
+N4SET["\u65e5"]=1;
+N4SET["\u65e5\u8a18"]=1;
+N4SET["\u6614"]=1;
+N4SET["\u661f"]=1;
+N4SET["\u662f\u975e"]=1;
+N4SET["\u663c\u4f11\u307f"]=1;
+N4SET["\u663c\u9593"]=1;
+N4SET["\u6642\u4ee3"]=1;
+N4SET["\u666e\u901a"]=1;
+N4SET["\u666f\u8272"]=1;
+N4SET["\u6696\u623f"]=1;
+N4SET["\u66ab\u304f"]=1;
+N4SET["\u66ae\u308c\u308b"]=1;
+N4SET["\u6700\u3082"]=1;
+N4SET["\u6700\u521d"]=1;
+N4SET["\u6700\u5f8c"]=1;
+N4SET["\u6700\u8fd1"]=1;
+N4SET["\u6708"]=1;
+N4SET["\u6728\u7dbf"]=1;
+N4SET["\u6797"]=1;
+N4SET["\u679d"]=1;
+N4SET["\u67d4\u3089\u304b\u3044"]=1;
+N4SET["\u67d4\u9053"]=1;
+N4SET["\u6821\u9577"]=1;
+N4SET["\u683c\u597d"]=1;
+N4SET["\u6848\u5185"]=1;
+N4SET["\u68c4\u3066\u308b"]=1;
+N4SET["\u68da"]=1;
+N4SET["\u68ee"]=1;
+N4SET["\u690d\u3048\u308b"]=1;
+N4SET["\u697d\u3057\u307f"]=1;
+N4SET["\u697d\u3057\u3080"]=1;
+N4SET["\u69cb\u3046"]=1;
+N4SET["\u6a5f\u4f1a"]=1;
+N4SET["\u6b62\u3080"]=1;
+N4SET["\u6b62\u3081\u308b"]=1;
+N4SET["\u6b63\u3057\u3044"]=1;
+N4SET["\u6b6f\u533b\u8005"]=1;
+N4SET["\u6b74\u53f2"]=1;
+N4SET["\u6b86\u3069"]=1;
+N4SET["\u6b8b\u308b"]=1;
+N4SET["\u6b8b\u5ff5"]=1;
+N4SET["\u6bd4\u3079\u308b"]=1;
+N4SET["\u6bdb"]=1;
+N4SET["\u6c17"]=1;
+N4SET["\u6c17\u5206"]=1;
+N4SET["\u6c17\u6301\u3061"]=1;
+N4SET["\u6c34\u6cf3"]=1;
+N4SET["\u6c34\u9053"]=1;
+N4SET["\u6c5a\u308c\u308b"]=1;
+N4SET["\u6c7a\u3057\u3066"]=1;
+N4SET["\u6c7a\u307e\u308b"]=1;
+N4SET["\u6c7a\u3081\u308b"]=1;
+N4SET["\u6c7d\u8eca"]=1;
+N4SET["\u6cb8\u304b\u3059"]=1;
+N4SET["\u6cb8\u304f"]=1;
+N4SET["\u6cbb\u308b"]=1;
+N4SET["\u6cca\u307e\u308b"]=1;
+N4SET["\u6cd5\u5f8b"]=1;
+N4SET["\u6ce3\u304f"]=1;
+N4SET["\u6ce5\u68d2"]=1;
+N4SET["\u6ce8\u5c04"]=1;
+N4SET["\u6ce8\u610f"]=1;
+N4SET["\u6cf3\u304e\u65b9"]=1;
+N4SET["\u6d45\u3044"]=1;
+N4SET["\u6d77\u5cb8"]=1;
+N4SET["\u6d88\u3057\u30b4\u30e0"]=1;
+N4SET["\u6df1\u3044"]=1;
+N4SET["\u6e08\u3080"]=1;
+N4SET["\u6e2f"]=1;
+N4SET["\u6e56"]=1;
+N4SET["\u6e6f"]=1;
+N4SET["\u6e96\u5099"]=1;
+N4SET["\u6ed1\u308b"]=1;
+N4SET["\u6f2b\u753b"]=1;
+N4SET["\u6f2c\u3051\u308b"]=1;
+N4SET["\u6fe1\u308c\u308b"]=1;
+N4SET["\u706b"]=1;
+N4SET["\u706b\u4e8b"]=1;
+N4SET["\u70b9"]=1;
+N4SET["\u70ba"]=1;
+N4SET["\u70ba\u3055\u308b"]=1;
+N4SET["\u7121\u304f\u306a\u308b"]=1;
+N4SET["\u7121\u7406"]=1;
+N4SET["\u713c\u304f"]=1;
+N4SET["\u713c\u3051\u308b"]=1;
+N4SET["\u71b1"]=1;
+N4SET["\u71b1\u5fc3"]=1;
+N4SET["\u7247\u4ed8\u3051\u308b"]=1;
+N4SET["\u7279\u306b"]=1;
+N4SET["\u7279\u5225"]=1;
+N4SET["\u7279\u6025"]=1;
+N4SET["\u73a9\u5177"]=1;
+N4SET["\u73cd\u3057\u3044"]=1;
+N4SET["\u7406\u7531"]=1;
+N4SET["\u751f\u304d\u308b"]=1;
+N4SET["\u751f\u6d3b"]=1;
+N4SET["\u751f\u7523"]=1;
+N4SET["\u7523\u696d"]=1;
+N4SET["\u7528"]=1;
+N4SET["\u7528\u4e8b"]=1;
+N4SET["\u7528\u610f"]=1;
+N4SET["\u7530\u820e"]=1;
+N4SET["\u7533\u3057\u4e0a\u3052\u308b"]=1;
+N4SET["\u7533\u3059"]=1;
+N4SET["\u7537\u6027"]=1;
+N4SET["\u7559\u5b88"]=1;
+N4SET["\u756a\u7d44"]=1;
+N4SET["\u7573"]=1;
+N4SET["\u75e9\u305b\u308b"]=1;
+N4SET["\u767a\u97f3"]=1;
+N4SET["\u76d7\u3080"]=1;
+N4SET["\u76db\u3093"]=1;
+N4SET["\u76f4\u3059"]=1;
+N4SET["\u76f4\u308b"]=1;
+N4SET["\u76f8\u8ac7"]=1;
+N4SET["\u770b\u8b77\u5a66"]=1;
+N4SET["\u771f\u3093\u4e2d"]=1;
+N4SET["\u771f\u9762\u76ee"]=1;
+N4SET["\u7720\u3044"]=1;
+N4SET["\u7720\u308b"]=1;
+N4SET["\u7740\u7269"]=1;
+N4SET["\u77e5\u3089\u305b\u308b"]=1;
+N4SET["\u77f3"]=1;
+N4SET["\u7802"]=1;
+N4SET["\u7814\u7a76"]=1;
+N4SET["\u7814\u7a76\u5ba4"]=1;
+N4SET["\u78ba\u304b"]=1;
+N4SET["\u78ba\u308a"]=1;
+N4SET["\u793e\u4f1a"]=1;
+N4SET["\u793e\u9577"]=1;
+N4SET["\u7948\u308b"]=1;
+N4SET["\u7956\u6bcd"]=1;
+N4SET["\u7956\u7236"]=1;
+N4SET["\u795e\u793e"]=1;
+N4SET["\u79d1\u5b66"]=1;
+N4SET["\u79fb\u308b"]=1;
+N4SET["\u7a0b"]=1;
+N4SET["\u7a4d\u3082\u308a"]=1;
+N4SET["\u7a7a\u304f"]=1;
+N4SET["\u7a7a\u6c17"]=1;
+N4SET["\u7a7a\u6e2f"]=1;
+N4SET["\u7acb\u3066\u308b"]=1;
+N4SET["\u7af6\u4e89"]=1;
+N4SET["\u7b11\u3046"]=1;
+N4SET["\u7b48"]=1;
+N4SET["\u7b54"]=1;
+N4SET["\u7b54\u3048"]=1;
+N4SET["\u7c21\u5358"]=1;
+N4SET["\u7c73"]=1;
+N4SET["\u7cf8"]=1;
+N4SET["\u7d04\u675f"]=1;
+N4SET["\u7d20\u6674\u3089\u3057\u3044"]=1;
+N4SET["\u7d30\u304b\u3044"]=1;
+N4SET["\u7d39\u4ecb"]=1;
+N4SET["\u7d42\u308f\u308a"]=1;
+N4SET["\u7d4c\u6e08"]=1;
+N4SET["\u7d4c\u9a13"]=1;
+N4SET["\u7d79"]=1;
+N4SET["\u7d9a\u304f"]=1;
+N4SET["\u7d9a\u3051\u308b"]=1;
+N4SET["\u7dda"]=1;
+N4SET["\u7f8e\u3057\u3044"]=1;
+N4SET["\u7f8e\u8853\u9928"]=1;
+N4SET["\u7fd2\u6163"]=1;
+N4SET["\u7ffb\u8a33"]=1;
+N4SET["\u8003\u3048\u308b"]=1;
+N4SET["\u805e\u3053\u3048\u308b"]=1;
+N4SET["\u80b2\u3066\u308b"]=1;
+N4SET["\u80cc\u4e2d"]=1;
+N4SET["\u8155"]=1;
+N4SET["\u81ea\u7531"]=1;
+N4SET["\u81f4\u3059"]=1;
+N4SET["\u8208\u5473"]=1;
+N4SET["\u821f"]=1;
+N4SET["\u82b1\u898b"]=1;
+N4SET["\u82db\u3081\u308b"]=1;
+N4SET["\u82e5\u3057"]=1;
+N4SET["\u82e6\u3044"]=1;
+N4SET["\u8349"]=1;
+N4SET["\u843d\u3059"]=1;
+N4SET["\u843d\u3061\u308b"]=1;
+N4SET["\u843d\u3068\u3059"]=1;
+N4SET["\u8449"]=1;
+N4SET["\u866b"]=1;
+N4SET["\u8840"]=1;
+N4SET["\u884c\u3046"]=1;
+N4SET["\u8868"]=1;
+N4SET["\u88cf"]=1;
+N4SET["\u8907\u96d1"]=1;
+N4SET["\u8912\u3081\u308b"]=1;
+N4SET["\u897f\u6d0b"]=1;
+N4SET["\u898b\u3048\u308b"]=1;
+N4SET["\u898b\u3064\u304b\u308b"]=1;
+N4SET["\u898b\u3064\u3051\u308b"]=1;
+N4SET["\u898b\u4ed8\u304b\u308b"]=1;
+N4SET["\u898b\u4ed8\u3051\u308b"]=1;
+N4SET["\u898b\u7269"]=1;
+N4SET["\u898f\u5247"]=1;
+N4SET["\u89aa"]=1;
+N4SET["\u89aa\u5207"]=1;
+N4SET["\u89e6\u308b"]=1;
+N4SET["\u8a08\u753b"]=1;
+N4SET["\u8a2a\u306d\u308b"]=1;
+N4SET["\u8a33"]=1;
+N4SET["\u8a66\u5408"]=1;
+N4SET["\u8a66\u9a13"]=1;
+N4SET["\u8aac\u660e"]=1;
+N4SET["\u8ab2\u9577"]=1;
+N4SET["\u8abf\u3079\u308b"]=1;
+N4SET["\u8b1b\u5802"]=1;
+N4SET["\u8b1b\u7fa9"]=1;
+N4SET["\u8b1d\u308b"]=1;
+N4SET["\u8b66\u5bdf"]=1;
+N4SET["\u8ca0\u3051\u308b"]=1;
+N4SET["\u8cb0\u3046"]=1;
+N4SET["\u8cbf\u6613"]=1;
+N4SET["\u8d08\u308a\u7269"]=1;
+N4SET["\u8d64\u3061\u3083\u3093"]=1;
+N4SET["\u8d64\u3093\u574a"]=1;
+N4SET["\u8d77\u3053\u3059"]=1;
+N4SET["\u8d77\u3059"]=1;
+N4SET["\u8da3\u5473"]=1;
+N4SET["\u8db3\u3059"]=1;
+N4SET["\u8db3\u308a\u308b"]=1;
+N4SET["\u8e0a\u308a"]=1;
+N4SET["\u8e0a\u308b"]=1;
+N4SET["\u8e0f\u3080"]=1;
+N4SET["\u8f38\u5165"]=1;
+N4SET["\u8f38\u51fa"]=1;
+N4SET["\u8f9e\u5178"]=1;
+N4SET["\u8fbc\u3080"]=1;
+N4SET["\u8fce\u3048\u308b"]=1;
+N4SET["\u8fd1\u6240"]=1;
+N4SET["\u8fd4\u4e8b"]=1;
+N4SET["\u9000\u9662"]=1;
+N4SET["\u9001\u308b"]=1;
+N4SET["\u9003\u3052\u308b"]=1;
+N4SET["\u9014\u4e2d"]=1;
+N4SET["\u901a\u3046"]=1;
+N4SET["\u901a\u308b"]=1;
+N4SET["\u9023\u308c\u308b"]=1;
+N4SET["\u9023\u7d61"]=1;
+N4SET["\u9032\u3080"]=1;
+N4SET["\u9045\u308c\u308b"]=1;
+N4SET["\u904a\u3073"]=1;
+N4SET["\u904b\u3076"]=1;
+N4SET["\u904b\u52d5"]=1;
+N4SET["\u904b\u8ee2"]=1;
+N4SET["\u904b\u8ee2\u624b"]=1;
+N4SET["\u904e\u304e\u308b"]=1;
+N4SET["\u9053\u5177"]=1;
+N4SET["\u9060\u304f"]=1;
+N4SET["\u9060\u616e"]=1;
+N4SET["\u9069\u5f53"]=1;
+N4SET["\u9078\u3076"]=1;
+N4SET["\u90aa\u9b54"]=1;
+N4SET["\u90ca\u5916"]=1;
+N4SET["\u90e8\u9577"]=1;
+N4SET["\u90fd"]=1;
+N4SET["\u90fd\u5408"]=1;
+N4SET["\u9177\u3044"]=1;
+N4SET["\u91e3\u308b"]=1;
+N4SET["\u93e1"]=1;
+N4SET["\u9593"]=1;
+N4SET["\u9593\u306b\u5408\u3046"]=1;
+N4SET["\u9593\u9055\u3048\u308b"]=1;
+N4SET["\u95a2\u4fc2"]=1;
+N4SET["\u964d\u308a\u51fa\u3059"]=1;
+N4SET["\u9685"]=1;
+N4SET["\u968f\u5206"]=1;
+N4SET["\u96c6\u307e\u308b"]=1;
+N4SET["\u96c6\u3081\u308b"]=1;
+N4SET["\u96f2"]=1;
+N4SET["\u96fb\u5831"]=1;
+N4SET["\u96fb\u706f"]=1;
+N4SET["\u975e\u5e38\u306b"]=1;
+N4SET["\u97f3"]=1;
+N4SET["\u9802\u304f"]=1;
+N4SET["\u98db\u884c\u5834"]=1;
+N4SET["\u98df\u4e8b"]=1;
+N4SET["\u98df\u6599\u54c1"]=1;
+N4SET["\u98fe\u308b"]=1;
+N4SET["\u9996"]=1;
+N4SET["\u99c4\u76ee"]=1;
+N4SET["\u99d0\u8eca\u5834"]=1;
+N4SET["\u9a12\u3050"]=1;
+N4SET["\u9a5a\u304f"]=1;
+N4SET["\u9ad8\u6821"]=1;
+N4SET["\u9ad8\u6821\u751f"]=1;
+N4SET["\u9ad8\u7b49\u5b66\u6821"]=1;
+N4SET["\u9aea"]=1;
+N4SET["\u9aed"]=1;
+N4SET["\u9cf4\u308b"]=1;
+var N5SET={};
+N5SET["\u3042\u3046"]=1;
+N5SET["\u3042\u304a"]=1;
+N5SET["\u3042\u304a\u3044"]=1;
+N5SET["\u3042\u304b"]=1;
+N5SET["\u3042\u304b\u3044"]=1;
+N5SET["\u3042\u304b\u308b\u3044"]=1;
+N5SET["\u3042\u304d"]=1;
+N5SET["\u3042\u304f"]=1;
+N5SET["\u3042\u3051\u308b"]=1;
+N5SET["\u3042\u3052\u308b"]=1;
+N5SET["\u3042\u3055"]=1;
+N5SET["\u3042\u3055\u3054\u306f\u3093"]=1;
+N5SET["\u3042\u3055\u3063\u3066"]=1;
+N5SET["\u3042\u3057"]=1;
+N5SET["\u3042\u3057\u305f"]=1;
+N5SET["\u3042\u305d\u3053"]=1;
+N5SET["\u3042\u305d\u3076"]=1;
+N5SET["\u3042\u305f\u305f\u304b\u3044"]=1;
+N5SET["\u3042\u305f\u307e"]=1;
+N5SET["\u3042\u305f\u3089\u3057\u3044"]=1;
+N5SET["\u3042\u3061\u3089"]=1;
+N5SET["\u3042\u3063\u3061"]=1;
+N5SET["\u3042\u3064\u3044"]=1;
+N5SET["\u3042\u3068"]=1;
+N5SET["\u3042\u306a\u305f"]=1;
+N5SET["\u3042\u306b"]=1;
+N5SET["\u3042\u306d"]=1;
+N5SET["\u3042\u306e"]=1;
+N5SET["\u3042\u3073\u308b"]=1;
+N5SET["\u3042\u3076\u306a\u3044"]=1;
+N5SET["\u3042\u307e\u3044"]=1;
+N5SET["\u3042\u307e\u308a"]=1;
+N5SET["\u3042\u3081"]=1;
+N5SET["\u3042\u3089\u3046"]=1;
+N5SET["\u3042\u308a\u304c\u3068\u3046"]=1;
+N5SET["\u3042\u308b"]=1;
+N5SET["\u3042\u308b\u304f"]=1;
+N5SET["\u3042\u308c"]=1;
+N5SET["\u3044\u3044"]=1;
+N5SET["\u3044\u3044\u3048"]=1;
+N5SET["\u3044\u3046"]=1;
+N5SET["\u3044\u3048"]=1;
+N5SET["\u3044\u304b\u304c"]=1;
+N5SET["\u3044\u304f"]=1;
+N5SET["\u3044\u304f\u3064"]=1;
+N5SET["\u3044\u304f\u3089"]=1;
+N5SET["\u3044\u3051"]=1;
+N5SET["\u3044\u3057\u3083"]=1;
+N5SET["\u3044\u3059"]=1;
+N5SET["\u3044\u305d\u304c\u3057\u3044"]=1;
+N5SET["\u3044\u305f\u3044"]=1;
+N5SET["\u3044\u305f\u3060\u304d\u307e\u3059"]=1;
+N5SET["\u3044\u3061"]=1;
+N5SET["\u3044\u3061\u306b\u3061"]=1;
+N5SET["\u3044\u3061\u3070\u3093"]=1;
+N5SET["\u3044\u3063\u3057\u3087"]=1;
+N5SET["\u3044\u3064"]=1;
+N5SET["\u3044\u3064\u304b"]=1;
+N5SET["\u3044\u3064\u3064"]=1;
+N5SET["\u3044\u3064\u3082"]=1;
+N5SET["\u3044\u306c"]=1;
+N5SET["\u3044\u307e"]=1;
+N5SET["\u3044\u307f"]=1;
+N5SET["\u3044\u3082\u3046\u3068"]=1;
+N5SET["\u3044\u3084"]=1;
+N5SET["\u3044\u308a\u3050\u3061"]=1;
+N5SET["\u3044\u308b"]=1;
+N5SET["\u3044\u308c\u308b"]=1;
+N5SET["\u3044\u308d"]=1;
+N5SET["\u3044\u308d\u3044\u308d"]=1;
+N5SET["\u3046\u3048"]=1;
+N5SET["\u3046\u3057\u308d"]=1;
+N5SET["\u3046\u3059\u3044"]=1;
+N5SET["\u3046\u305f"]=1;
+N5SET["\u3046\u305f\u3046"]=1;
+N5SET["\u3046\u307e\u308c\u308b"]=1;
+N5SET["\u3046\u307f"]=1;
+N5SET["\u3046\u308b"]=1;
+N5SET["\u3046\u308b\u3055\u3044"]=1;
+N5SET["\u3046\u308f\u304e"]=1;
+N5SET["\u3048"]=1;
+N5SET["\u3048\u3044\u304c"]=1;
+N5SET["\u3048\u3044\u304c\u304b\u3093"]=1;
+N5SET["\u3048\u3044\u3054"]=1;
+N5SET["\u3048\u3048"]=1;
+N5SET["\u3048\u304d"]=1;
+N5SET["\u3048\u3093\u3074\u3064"]=1;
+N5SET["\u304a\u3044\u3057\u3044"]=1;
+N5SET["\u304a\u304a\u3044"]=1;
+N5SET["\u304a\u304a\u304d\u3044"]=1;
+N5SET["\u304a\u304a\u304d\u306a"]=1;
+N5SET["\u304a\u304a\u305c\u3044"]=1;
+N5SET["\u304a\u304b\u3042\u3055\u3093"]=1;
+N5SET["\u304a\u304b\u3057"]=1;
+N5SET["\u304a\u304b\u306d"]=1;
+N5SET["\u304a\u304d\u308b"]=1;
+N5SET["\u304a\u304f"]=1;
+N5SET["\u304a\u304f\u3055\u3093"]=1;
+N5SET["\u304a\u3055\u3051"]=1;
+N5SET["\u304a\u3055\u3089"]=1;
+N5SET["\u304a\u3057\u3048\u308b"]=1;
+N5SET["\u304a\u3058\u3044\u3055\u3093"]=1;
+N5SET["\u304a\u3059"]=1;
+N5SET["\u304a\u305d\u3044"]=1;
+N5SET["\u304a\u3061\u3083"]=1;
+N5SET["\u304a\u3066\u3042\u3089\u3044"]=1;
+N5SET["\u304a\u3068\u3046\u3055\u3093"]=1;
+N5SET["\u304a\u3068\u3046\u3068"]=1;
+N5SET["\u304a\u3068\u3053"]=1;
+N5SET["\u304a\u3068\u3053\u306e\u3053"]=1;
+N5SET["\u304a\u3068\u3068\u3044"]=1;
+N5SET["\u304a\u3068\u3068\u3057"]=1;
+N5SET["\u304a\u3068\u306a"]=1;
+N5SET["\u304a\u306a\u304b"]=1;
+N5SET["\u304a\u306a\u3058"]=1;
+N5SET["\u304a\u306b\u3044\u3055\u3093"]=1;
+N5SET["\u304a\u306d\u3048\u3055\u3093"]=1;
+N5SET["\u304a\u306d\u304c\u3044\u3057\u307e\u3059"]=1;
+N5SET["\u304a\u306f\u3088\u3046"]=1;
+N5SET["\u304a\u3070\u3042\u3055\u3093"]=1;
+N5SET["\u304a\u3070\u3055\u3093"]=1;
+N5SET["\u304a\u3075\u308d"]=1;
+N5SET["\u304a\u3079\u3093\u3068\u3046"]=1;
+N5SET["\u304a\u307c\u3048\u308b"]=1;
+N5SET["\u304a\u307e\u308f\u308a\u3055\u3093"]=1;
+N5SET["\u304a\u3082\u3044"]=1;
+N5SET["\u304a\u3082\u3057\u308d\u3044"]=1;
+N5SET["\u304a\u3088\u3050"]=1;
+N5SET["\u304a\u308a\u308b"]=1;
+N5SET["\u304a\u308f\u308b"]=1;
+N5SET["\u304a\u3093\u304c\u304f"]=1;
+N5SET["\u304a\u3093\u306a"]=1;
+N5SET["\u304a\u3093\u306a\u306e\u3053"]=1;
+N5SET["\u304a\u5144\u3055\u3093"]=1;
+N5SET["\u304a\u59c9\u3055\u3093"]=1;
+N5SET["\u304a\u5de1\u308a\u3055\u3093"]=1;
+N5SET["\u304a\u5f01\u5f53"]=1;
+N5SET["\u304a\u624b\u6d17\u3044"]=1;
+N5SET["\u304a\u65e9\u3046"]=1;
+N5SET["\u304a\u6bcd\u3055\u3093"]=1;
+N5SET["\u304a\u7236\u3055\u3093"]=1;
+N5SET["\u304a\u723a\u3055\u3093"]=1;
+N5SET["\u304a\u76bf"]=1;
+N5SET["\u304a\u7956\u6bcd\u3055\u3093"]=1;
+N5SET["\u304a\u7956\u7236\u3055\u3093"]=1;
+N5SET["\u304a\u8179"]=1;
+N5SET["\u304a\u8336"]=1;
+N5SET["\u304a\u83d3\u5b50"]=1;
+N5SET["\u304a\u9152"]=1;
+N5SET["\u304a\u91d1"]=1;
+N5SET["\u304a\u9858\u3044\u3057\u307e\u3059"]=1;
+N5SET["\u304a\u98a8\u5442"]=1;
+N5SET["\u304b\u3044\u3057\u3083"]=1;
+N5SET["\u304b\u3044\u3060\u3093"]=1;
+N5SET["\u304b\u3044\u3082\u306e"]=1;
+N5SET["\u304b\u3046"]=1;
+N5SET["\u304b\u3048\u3059"]=1;
+N5SET["\u304b\u3048\u308b"]=1;
+N5SET["\u304b\u304b\u308b"]=1;
+N5SET["\u304b\u304e"]=1;
+N5SET["\u304b\u304f"]=1;
+N5SET["\u304b\u3051\u308b"]=1;
+N5SET["\u304b\u3055"]=1;
+N5SET["\u304b\u3059"]=1;
+N5SET["\u304b\u305c"]=1;
+N5SET["\u304b\u305e\u304f"]=1;
+N5SET["\u304b\u305f"]=1;
+N5SET["\u304b\u3066\u3044"]=1;
+N5SET["\u304b\u3069"]=1;
+N5SET["\u304b\u3070\u3093"]=1;
+N5SET["\u304b\u3073\u3093"]=1;
+N5SET["\u304b\u307f"]=1;
+N5SET["\u304b\u3088\u3046\u3073"]=1;
+N5SET["\u304b\u3089\u3044"]=1;
+N5SET["\u304b\u3089\u3060"]=1;
+N5SET["\u304b\u308a\u308b"]=1;
+N5SET["\u304b\u308b\u3044"]=1;
+N5SET["\u304b\u308f"]=1;
+N5SET["\u304b\u308f\u3044\u3044"]=1;
+N5SET["\u304b\u3093\u3058"]=1;
+N5SET["\u304c\u3044\u3053\u304f"]=1;
+N5SET["\u304c\u3044\u3053\u304f\u3058\u3093"]=1;
+N5SET["\u304c\u304f\u305b\u3044"]=1;
+N5SET["\u304c\u3063\u3053\u3046"]=1;
+N5SET["\u304d"]=1;
+N5SET["\u304d\u3044\u308d"]=1;
+N5SET["\u304d\u3044\u308d\u3044"]=1;
+N5SET["\u304d\u3048\u308b"]=1;
+N5SET["\u304d\u304f"]=1;
+N5SET["\u304d\u305f"]=1;
+N5SET["\u304d\u305f\u306a\u3044"]=1;
+N5SET["\u304d\u3063\u3055\u3066\u3093"]=1;
+N5SET["\u304d\u3063\u3066"]=1;
+N5SET["\u304d\u3063\u3077"]=1;
+N5SET["\u304d\u306e\u3046"]=1;
+N5SET["\u304d\u3085\u3046"]=1;
+N5SET["\u304d\u3087\u3046"]=1;
+N5SET["\u304d\u3087\u3046\u3057\u3064"]=1;
+N5SET["\u304d\u3087\u3046\u3060\u3044"]=1;
+N5SET["\u304d\u3087\u306d\u3093"]=1;
+N5SET["\u304d\u3089\u3044"]=1;
+N5SET["\u304d\u308b"]=1;
+N5SET["\u304d\u308c\u3044"]=1;
+N5SET["\u304d\u3093\u3088\u3046\u3073"]=1;
+N5SET["\u304e\u3085\u3046\u306b\u304f"]=1;
+N5SET["\u304e\u3085\u3046\u306b\u3085\u3046"]=1;
+N5SET["\u304e\u3093\u3053\u3046"]=1;
+N5SET["\u304f\u3059\u308a"]=1;
+N5SET["\u304f\u3060\u3055\u3044"]=1;
+N5SET["\u304f\u3060\u3082\u306e"]=1;
+N5SET["\u304f\u3061"]=1;
+N5SET["\u304f\u3064"]=1;
+N5SET["\u304f\u3064\u3057\u305f"]=1;
+N5SET["\u304f\u306b"]=1;
+N5SET["\u304f\u3082\u308a"]=1;
+N5SET["\u304f\u3082\u308b"]=1;
+N5SET["\u304f\u3089\u3044"]=1;
+N5SET["\u304f\u308b"]=1;
+N5SET["\u304f\u308b\u307e"]=1;
+N5SET["\u304f\u308d"]=1;
+N5SET["\u304f\u308d\u3044"]=1;
+N5SET["\u3051\u3044\u304b\u3093"]=1;
+N5SET["\u3051\u3055"]=1;
+N5SET["\u3051\u3059"]=1;
+N5SET["\u3051\u3063\u3053\u3046"]=1;
+N5SET["\u3051\u3063\u3053\u3093"]=1;
+N5SET["\u3052\u3064\u3088\u3046\u3073"]=1;
+N5SET["\u3052\u3093\u304b\u3093"]=1;
+N5SET["\u3052\u3093\u304d"]=1;
+N5SET["\u3053\u3046\u3048\u3093"]=1;
+N5SET["\u3053\u3046\u3055\u3066\u3093"]=1;
+N5SET["\u3053\u3046\u3061\u3083"]=1;
+N5SET["\u3053\u3046\u3070\u3093"]=1;
+N5SET["\u3053\u3048"]=1;
+N5SET["\u3053\u3053"]=1;
+N5SET["\u3053\u3053\u306e\u304b"]=1;
+N5SET["\u3053\u3053\u306e\u3064"]=1;
+N5SET["\u3053\u305f\u3048\u308b"]=1;
+N5SET["\u3053\u3061\u3089"]=1;
+N5SET["\u3053\u3063\u3061"]=1;
+N5SET["\u3053\u3068\u3057"]=1;
+N5SET["\u3053\u3068\u3070"]=1;
+N5SET["\u3053\u3069\u3082"]=1;
+N5SET["\u3053\u306e"]=1;
+N5SET["\u3053\u307e\u308b"]=1;
+N5SET["\u3053\u308c"]=1;
+N5SET["\u3053\u3093\u3052\u3064"]=1;
+N5SET["\u3053\u3093\u3057\u3085\u3046"]=1;
+N5SET["\u3053\u3093\u306a"]=1;
+N5SET["\u3053\u3093\u306b\u3061\u306f"]=1;
+N5SET["\u3053\u3093\u3070\u3093"]=1;
+N5SET["\u3053\u3093\u3070\u3093\u306f"]=1;
+N5SET["\u3054"]=1;
+N5SET["\u3054\u3054"]=1;
+N5SET["\u3054\u305c\u3093"]=1;
+N5SET["\u3054\u3061\u305d\u3046\u3055\u307e"]=1;
+N5SET["\u3054\u306f\u3093"]=1;
+N5SET["\u3054\u3081\u3093\u306a\u3055\u3044"]=1;
+N5SET["\u3054\u99b3\u8d70\u3055\u307e"]=1;
+N5SET["\u3055\u3042"]=1;
+N5SET["\u3055\u3044\u3075"]=1;
+N5SET["\u3055\u304b\u306a"]=1;
+N5SET["\u3055\u304d"]=1;
+N5SET["\u3055\u304f"]=1;
+N5SET["\u3055\u304f\u3076\u3093"]=1;
+N5SET["\u3055\u3059"]=1;
+N5SET["\u3055\u3068\u3046"]=1;
+N5SET["\u3055\u3080\u3044"]=1;
+N5SET["\u3055\u3088\u3046\u306a\u3089"]=1;
+N5SET["\u3055\u3089\u3044\u306d\u3093"]=1;
+N5SET["\u3055\u3093"]=1;
+N5SET["\u3055\u3093\u307d"]=1;
+N5SET["\u3056\u3063\u3057"]=1;
+N5SET["\u3057"]=1;
+N5SET["\u3057\u304a"]=1;
+N5SET["\u3057\u304b\u3057"]=1;
+N5SET["\u3057\u3054\u3068"]=1;
+N5SET["\u3057\u305a\u304b"]=1;
+N5SET["\u3057\u305f"]=1;
+N5SET["\u3057\u3061"]=1;
+N5SET["\u3057\u3064\u3082\u3093"]=1;
+N5SET["\u3057\u306c"]=1;
+N5SET["\u3057\u307e\u308b"]=1;
+N5SET["\u3057\u3081\u308b"]=1;
+N5SET["\u3057\u3083\u3057\u3093"]=1;
+N5SET["\u3057\u3085\u304f\u3060\u3044"]=1;
+N5SET["\u3057\u3087\u3046\u3086"]=1;
+N5SET["\u3057\u3087\u304f\u3069\u3046"]=1;
+N5SET["\u3057\u308b"]=1;
+N5SET["\u3057\u308d"]=1;
+N5SET["\u3057\u308d\u3044"]=1;
+N5SET["\u3057\u3093\u3076\u3093"]=1;
+N5SET["\u3058\u304b\u3093"]=1;
+N5SET["\u3058\u3057\u3087"]=1;
+N5SET["\u3058\u3066\u3093\u3057\u3083"]=1;
+N5SET["\u3058\u3069\u3046\u3057\u3083"]=1;
+N5SET["\u3058\u3073\u304d"]=1;
+N5SET["\u3058\u3076\u3093"]=1;
+N5SET["\u3058\u3083"]=1;
+N5SET["\u3058\u3083\u3042"]=1;
+N5SET["\u3058\u3085\u3046"]=1;
+N5SET["\u3058\u3085\u304e\u3087\u3046"]=1;
+N5SET["\u3058\u3087\u3046\u305a"]=1;
+N5SET["\u3058\u3087\u3046\u3076"]=1;
+N5SET["\u3059\u3044\u3088\u3046\u3073"]=1;
+N5SET["\u3059\u3046"]=1;
+N5SET["\u3059\u304d"]=1;
+N5SET["\u3059\u304f\u306a\u3044"]=1;
+N5SET["\u3059\u3050"]=1;
+N5SET["\u3059\u3050\u306b"]=1;
+N5SET["\u3059\u3053\u3057"]=1;
+N5SET["\u3059\u305a\u3057\u3044"]=1;
+N5SET["\u3059\u307f\u307e\u305b\u3093"]=1;
+N5SET["\u3059\u3080"]=1;
+N5SET["\u3059\u308b"]=1;
+N5SET["\u3059\u308f\u308b"]=1;
+N5SET["\u305b"]=1;
+N5SET["\u305b\u3044\u3068"]=1;
+N5SET["\u305b\u3063\u3051\u3093"]=1;
+N5SET["\u305b\u3073\u308d"]=1;
+N5SET["\u305b\u307e\u3044"]=1;
+N5SET["\u305b\u3093"]=1;
+N5SET["\u305b\u3093\u3052\u3064"]=1;
+N5SET["\u305b\u3093\u3057\u3085\u3046"]=1;
+N5SET["\u305b\u3093\u305b\u3044"]=1;
+N5SET["\u305b\u3093\u305f\u304f"]=1;
+N5SET["\u305c\u3093\u3076"]=1;
+N5SET["\u305d\u3046\u3057\u3066"]=1;
+N5SET["\u305d\u3046\u3058"]=1;
+N5SET["\u305d\u3053"]=1;
+N5SET["\u305d\u3057\u3066"]=1;
+N5SET["\u305d\u3061\u3089"]=1;
+N5SET["\u305d\u3063\u3061"]=1;
+N5SET["\u305d\u3068"]=1;
+N5SET["\u305d\u306e"]=1;
+N5SET["\u305d\u3070"]=1;
+N5SET["\u305d\u3089"]=1;
+N5SET["\u305d\u308c"]=1;
+N5SET["\u305d\u308c\u304b\u3089"]=1;
+N5SET["\u305d\u308c\u3067\u306f"]=1;
+N5SET["\u305f\u3044\u3057\u304b\u3093"]=1;
+N5SET["\u305f\u3044\u305b\u3064"]=1;
+N5SET["\u305f\u3044\u3078\u3093"]=1;
+N5SET["\u305f\u304b\u3044"]=1;
+N5SET["\u305f\u304f\u3055\u3093"]=1;
+N5SET["\u305f\u3064"]=1;
+N5SET["\u305f\u3066"]=1;
+N5SET["\u305f\u3066\u3082\u306e"]=1;
+N5SET["\u305f\u306e\u3057\u3044"]=1;
+N5SET["\u305f\u306e\u3080"]=1;
+N5SET["\u305f\u3070\u3053"]=1;
+N5SET["\u305f\u3076\u3093"]=1;
+N5SET["\u305f\u3079\u3082\u306e"]=1;
+N5SET["\u305f\u3079\u308b"]=1;
+N5SET["\u305f\u307e\u3054"]=1;
+N5SET["\u305f\u3093\u3058\u3087\u3046\u3073"]=1;
+N5SET["\u3060\u3044\u304c\u304f"]=1;
+N5SET["\u3060\u3044\u3058\u3087\u3046\u3076"]=1;
+N5SET["\u3060\u3044\u3059\u304d"]=1;
+N5SET["\u3060\u3044\u3069\u3053\u308d"]=1;
+N5SET["\u3060\u3059"]=1;
+N5SET["\u3060\u308c"]=1;
+N5SET["\u3060\u3093\u3060\u3093"]=1;
+N5SET["\u3061\u3044\u3055\u3044"]=1;
+N5SET["\u3061\u3044\u3055\u306a"]=1;
+N5SET["\u3061\u304b\u3044"]=1;
+N5SET["\u3061\u304b\u304f"]=1;
+N5SET["\u3061\u304b\u3066\u3064"]=1;
+N5SET["\u3061\u304c\u3046"]=1;
+N5SET["\u3061\u305a"]=1;
+N5SET["\u3061\u3083\u3044\u308d"]=1;
+N5SET["\u3061\u3083\u308f\u3093"]=1;
+N5SET["\u3061\u3087\u3046\u3069"]=1;
+N5SET["\u3061\u3087\u3063\u3068"]=1;
+N5SET["\u3064\u304b\u3046"]=1;
+N5SET["\u3064\u304b\u308c\u308b"]=1;
+N5SET["\u3064\u304e"]=1;
+N5SET["\u3064\u304f"]=1;
+N5SET["\u3064\u304f\u3048"]=1;
+N5SET["\u3064\u304f\u308b"]=1;
+N5SET["\u3064\u3051\u308b"]=1;
+N5SET["\u3064\u3068\u3081\u308b"]=1;
+N5SET["\u3064\u307e\u3089\u306a\u3044"]=1;
+N5SET["\u3064\u3081\u305f\u3044"]=1;
+N5SET["\u3064\u3088\u3044"]=1;
+N5SET["\u3066"]=1;
+N5SET["\u3066\u304c\u307f"]=1;
+N5SET["\u3066\u3093\u304d"]=1;
+N5SET["\u3067\u304b\u3051\u308b"]=1;
+N5SET["\u3067\u304d\u308b"]=1;
+N5SET["\u3067\u3050\u3061"]=1;
+N5SET["\u3067\u306f"]=1;
+N5SET["\u3067\u3082"]=1;
+N5SET["\u3067\u308b"]=1;
+N5SET["\u3067\u3093\u304d"]=1;
+N5SET["\u3067\u3093\u3057\u3083"]=1;
+N5SET["\u3067\u3093\u308f"]=1;
+N5SET["\u3068"]=1;
+N5SET["\u3068\u304a\u3044"]=1;
+N5SET["\u3068\u304a\u304b"]=1;
+N5SET["\u3068\u304d\u3069\u304d"]=1;
+N5SET["\u3068\u3051\u3044"]=1;
+N5SET["\u3068\u3053\u308d"]=1;
+N5SET["\u3068\u3057"]=1;
+N5SET["\u3068\u3057\u3087\u304b\u3093"]=1;
+N5SET["\u3068\u3066\u3082"]=1;
+N5SET["\u3068\u306a\u308a"]=1;
+N5SET["\u3068\u3076"]=1;
+N5SET["\u3068\u307e\u308b"]=1;
+N5SET["\u3068\u3082\u3060\u3061"]=1;
+N5SET["\u3068\u308a"]=1;
+N5SET["\u3068\u308a\u306b\u304f"]=1;
+N5SET["\u3068\u308b"]=1;
+N5SET["\u3069\u3046"]=1;
+N5SET["\u3069\u3046\u3057\u3066"]=1;
+N5SET["\u3069\u3046\u305e"]=1;
+N5SET["\u3069\u3046\u305e\u3088\u308d\u3057\u304f"]=1;
+N5SET["\u3069\u3046\u305e\u5b9c\u3057\u304f"]=1;
+N5SET["\u3069\u3046\u3076\u3064"]=1;
+N5SET["\u3069\u3046\u3082"]=1;
+N5SET["\u3069\u3053"]=1;
+N5SET["\u3069\u3061\u3089"]=1;
+N5SET["\u3069\u3063\u3061"]=1;
+N5SET["\u3069\u306a\u305f"]=1;
+N5SET["\u3069\u306e"]=1;
+N5SET["\u3069\u3088\u3046\u3073"]=1;
+N5SET["\u3069\u308c"]=1;
+N5SET["\u306a\u304b"]=1;
+N5SET["\u306a\u304c\u3044"]=1;
+N5SET["\u306a\u304f"]=1;
+N5SET["\u306a\u304f\u3059"]=1;
+N5SET["\u306a\u305c"]=1;
+N5SET["\u306a\u3064"]=1;
+N5SET["\u306a\u3064\u3084\u3059\u307f"]=1;
+N5SET["\u306a\u3069"]=1;
+N5SET["\u306a\u306a\u3064"]=1;
+N5SET["\u306a\u306e\u304b"]=1;
+N5SET["\u306a\u307e\u3048"]=1;
+N5SET["\u306a\u3089\u3046"]=1;
+N5SET["\u306a\u3089\u3076"]=1;
+N5SET["\u306a\u3089\u3079\u308b"]=1;
+N5SET["\u306a\u308b"]=1;
+N5SET["\u306a\u3093"]=1;
+N5SET["\u306b"]=1;
+N5SET["\u306b\u304e\u3084\u304b"]=1;
+N5SET["\u306b\u304f"]=1;
+N5SET["\u306b\u3057"]=1;
+N5SET["\u306b\u3061\u3088\u3046\u3073"]=1;
+N5SET["\u306b\u3082\u3064"]=1;
+N5SET["\u306b\u308f"]=1;
+N5SET["\u306c\u3050"]=1;
+N5SET["\u306c\u308b\u3044"]=1;
+N5SET["\u306d\u3053"]=1;
+N5SET["\u306d\u308b"]=1;
+N5SET["\u306e\u307c\u308b"]=1;
+N5SET["\u306e\u307f\u3082\u306e"]=1;
+N5SET["\u306e\u3080"]=1;
+N5SET["\u306e\u308b"]=1;
+N5SET["\u306f"]=1;
+N5SET["\u306f\u3044"]=1;
+N5SET["\u306f\u3044\u3056\u3089"]=1;
+N5SET["\u306f\u3044\u308b"]=1;
+N5SET["\u306f\u304c\u304d"]=1;
+N5SET["\u306f\u304f"]=1;
+N5SET["\u306f\u3053"]=1;
+N5SET["\u306f\u3057"]=1;
+N5SET["\u306f\u3057\u308b"]=1;
+N5SET["\u306f\u3058\u307e\u308b"]=1;
+N5SET["\u306f\u3058\u3081"]=1;
+N5SET["\u306f\u3058\u3081\u3066"]=1;
+N5SET["\u306f\u3058\u3081\u307e\u3057\u3066"]=1;
+N5SET["\u306f\u305f\u3061"]=1;
+N5SET["\u306f\u305f\u3089\u304f"]=1;
+N5SET["\u306f\u3061"]=1;
+N5SET["\u306f\u3064\u304b"]=1;
+N5SET["\u306f\u306a"]=1;
+N5SET["\u306f\u306a\u3057"]=1;
+N5SET["\u306f\u306a\u3059"]=1;
+N5SET["\u306f\u3084\u3044"]=1;
+N5SET["\u306f\u308b"]=1;
+N5SET["\u306f\u308c"]=1;
+N5SET["\u306f\u308c\u308b"]=1;
+N5SET["\u306f\u3093"]=1;
+N5SET["\u306f\u3093\u3076\u3093"]=1;
+N5SET["\u3070\u3093"]=1;
+N5SET["\u3070\u3093\u3054\u3046"]=1;
+N5SET["\u3070\u3093\u3054\u306f\u3093"]=1;
+N5SET["\u3072\u304c\u3057"]=1;
+N5SET["\u3072\u304f"]=1;
+N5SET["\u3072\u304f\u3044"]=1;
+N5SET["\u3072\u3053\u3046\u304d"]=1;
+N5SET["\u3072\u3060\u308a"]=1;
+N5SET["\u3072\u3068"]=1;
+N5SET["\u3072\u3068\u3064"]=1;
+N5SET["\u3072\u3068\u3064\u304d"]=1;
+N5SET["\u3072\u3068\u308a"]=1;
+N5SET["\u3072\u307e"]=1;
+N5SET["\u3072\u3083\u304f"]=1;
+N5SET["\u3072\u308b"]=1;
+N5SET["\u3072\u308b\u3054\u306f\u3093"]=1;
+N5SET["\u3072\u308d\u3044"]=1;
+N5SET["\u3073\u3087\u3046\u3044\u3093"]=1;
+N5SET["\u3073\u3087\u3046\u304d"]=1;
+N5SET["\u3075\u3046\u3068\u3046"]=1;
+N5SET["\u3075\u304f"]=1;
+N5SET["\u3075\u305f\u3064"]=1;
+N5SET["\u3075\u305f\u308a"]=1;
+N5SET["\u3075\u3064\u304b"]=1;
+N5SET["\u3075\u3068\u3044"]=1;
+N5SET["\u3075\u3086"]=1;
+N5SET["\u3075\u308b"]=1;
+N5SET["\u3075\u308b\u3044"]=1;
+N5SET["\u3075\u308d"]=1;
+N5SET["\u3076\u305f\u306b\u304f"]=1;
+N5SET["\u3076\u3093\u3057\u3087\u3046"]=1;
+N5SET["\u3078\u305f"]=1;
+N5SET["\u3078\u3084"]=1;
+N5SET["\u3078\u3093"]=1;
+N5SET["\u3079\u3093\u304d\u3087\u3046"]=1;
+N5SET["\u3079\u3093\u308a"]=1;
+N5SET["\u307a\u3093"]=1;
+N5SET["\u307b\u304b"]=1;
+N5SET["\u307b\u3057\u3044"]=1;
+N5SET["\u307b\u305d\u3044"]=1;
+N5SET["\u307b\u3093"]=1;
+N5SET["\u307b\u3093\u3060\u306a"]=1;
+N5SET["\u307b\u3093\u3068\u3046"]=1;
+N5SET["\u307c\u3046\u3057"]=1;
+N5SET["\u307e\u3044\u3042\u3055"]=1;
+N5SET["\u307e\u3044\u3052\u3064"]=1;
+N5SET["\u307e\u3044\u3057\u3085\u3046"]=1;
+N5SET["\u307e\u3044\u306b\u3061"]=1;
+N5SET["\u307e\u3044\u306d\u3093"]=1;
+N5SET["\u307e\u3044\u3070\u3093"]=1;
+N5SET["\u307e\u3048"]=1;
+N5SET["\u307e\u304c\u308b"]=1;
+N5SET["\u307e\u305a\u3044"]=1;
+N5SET["\u307e\u305f"]=1;
+N5SET["\u307e\u3060"]=1;
+N5SET["\u307e\u3061"]=1;
+N5SET["\u307e\u3063\u3059\u3050"]=1;
+N5SET["\u307e\u3064"]=1;
+N5SET["\u307e\u3069"]=1;
+N5SET["\u307e\u308b\u3044"]=1;
+N5SET["\u307e\u3093"]=1;
+N5SET["\u307e\u3093\u306d\u3093\u3072\u3064"]=1;
+N5SET["\u307f\u304c\u304f"]=1;
+N5SET["\u307f\u304e"]=1;
+N5SET["\u307f\u3058\u304b\u3044"]=1;
+N5SET["\u307f\u305a"]=1;
+N5SET["\u307f\u305b"]=1;
+N5SET["\u307f\u305b\u308b"]=1;
+N5SET["\u307f\u3061"]=1;
+N5SET["\u307f\u3063\u304b"]=1;
+N5SET["\u307f\u3063\u3064"]=1;
+N5SET["\u307f\u3069\u308a"]=1;
+N5SET["\u307f\u306a\u3055\u3093"]=1;
+N5SET["\u307f\u306a\u307f"]=1;
+N5SET["\u307f\u307f"]=1;
+N5SET["\u307f\u308b"]=1;
+N5SET["\u307f\u3093\u306a"]=1;
+N5SET["\u3080\u3044\u304b"]=1;
+N5SET["\u3080\u3053\u3046"]=1;
+N5SET["\u3080\u305a\u304b\u3057\u3044"]=1;
+N5SET["\u3080\u3063\u3064"]=1;
+N5SET["\u3080\u3089"]=1;
+N5SET["\u3081"]=1;
+N5SET["\u3081\u304c\u306d"]=1;
+N5SET["\u3082\u3046"]=1;
+N5SET["\u3082\u3046\u3044\u3061\u3069"]=1;
+N5SET["\u3082\u3046\u4e00\u5ea6"]=1;
+N5SET["\u3082\u304f\u3088\u3046\u3073"]=1;
+N5SET["\u3082\u3063\u3068"]=1;
+N5SET["\u3082\u3064"]=1;
+N5SET["\u3082\u306e"]=1;
+N5SET["\u3082\u3093"]=1;
+N5SET["\u3082\u3093\u3060\u3044"]=1;
+N5SET["\u3084\u304a\u3084"]=1;
+N5SET["\u3084\u3055\u3044"]=1;
+N5SET["\u3084\u3055\u3057\u3044"]=1;
+N5SET["\u3084\u3059\u3044"]=1;
+N5SET["\u3084\u3059\u307f"]=1;
+N5SET["\u3084\u3059\u3080"]=1;
+N5SET["\u3084\u3063\u3064"]=1;
+N5SET["\u3084\u307e"]=1;
+N5SET["\u3084\u308b"]=1;
+N5SET["\u3086\u3046\u304c\u305f"]=1;
+N5SET["\u3086\u3046\u306f\u3093"]=1;
+N5SET["\u3086\u3046\u3073\u3093\u304d\u3087\u304f"]=1;
+N5SET["\u3086\u3046\u3079"]=1;
+N5SET["\u3086\u3046\u3081\u3044"]=1;
+N5SET["\u3086\u304d"]=1;
+N5SET["\u3086\u3063\u304f\u308a\u3068"]=1;
+N5SET["\u3088\u3044"]=1;
+N5SET["\u3088\u3046\u304b"]=1;
+N5SET["\u3088\u3046\u3075\u304f"]=1;
+N5SET["\u3088\u304f"]=1;
+N5SET["\u3088\u3053"]=1;
+N5SET["\u3088\u3063\u304b"]=1;
+N5SET["\u3088\u3063\u3064"]=1;
+N5SET["\u3088\u3076"]=1;
+N5SET["\u3088\u3080"]=1;
+N5SET["\u3088\u308a"]=1;
+N5SET["\u3088\u308b"]=1;
+N5SET["\u3088\u308f\u3044"]=1;
+N5SET["\u3089\u3044\u3052\u3064"]=1;
+N5SET["\u3089\u3044\u3057\u3085\u3046"]=1;
+N5SET["\u3089\u3044\u306d\u3093"]=1;
+N5SET["\u308a\u3063\u3071"]=1;
+N5SET["\u308a\u3085\u3046\u304c\u304f\u305b\u3044"]=1;
+N5SET["\u308a\u3087\u3046\u3057\u3093"]=1;
+N5SET["\u308a\u3087\u3046\u308a"]=1;
+N5SET["\u308a\u3087\u3053\u3046"]=1;
+N5SET["\u308c\u3044"]=1;
+N5SET["\u308c\u3044\u305e\u3046\u3053"]=1;
+N5SET["\u308c\u3093\u3057\u3085\u3046"]=1;
+N5SET["\u308d\u3046\u304b"]=1;
+N5SET["\u308d\u304f"]=1;
+N5SET["\u308f\u304b\u3044"]=1;
+N5SET["\u308f\u304b\u308b"]=1;
+N5SET["\u308f\u3059\u308c\u308b"]=1;
+N5SET["\u308f\u305f\u304f\u3057"]=1;
+N5SET["\u308f\u305f\u3059"]=1;
+N5SET["\u308f\u305f\u308b"]=1;
+N5SET["\u308f\u308b\u3044"]=1;
+N5SET["\u30a2\u30d1\u30fc\u30c8"]=1;
+N5SET["\u30a8\u30ec\u30d9\u30fc\u30bf\u30fc"]=1;
+N5SET["\u30ab\u30c3\u30d7"]=1;
+N5SET["\u30ab\u30e1\u30e9"]=1;
+N5SET["\u30ab\u30ec\u30f3\u30c0\u30fc"]=1;
+N5SET["\u30ab\u30ec\u30fc"]=1;
+N5SET["\u30ad\u30ed"]=1;
+N5SET["\u30ad\u30ed\u30b0\u30e9\u30e0"]=1;
+N5SET["\u30ad\u30ed\u30e1\u30fc\u30c8\u30eb"]=1;
+N5SET["\u30ae\u30bf\u30fc"]=1;
+N5SET["\u30af\u30e9\u30b9"]=1;
+N5SET["\u30b0\u30e9\u30e0"]=1;
+N5SET["\u30b3\u30c3\u30d7"]=1;
+N5SET["\u30b3\u30d4\u30fc\u3059\u308b"]=1;
+N5SET["\u30b3\u30fc\u30c8"]=1;
+N5SET["\u30b3\u30fc\u30d2\u30fc"]=1;
+N5SET["\u30b7\u30e3\u30c4"]=1;
+N5SET["\u30b7\u30e3\u30ef\u30fc"]=1;
+N5SET["\u30b9\u30ab\u30fc\u30c8"]=1;
+N5SET["\u30b9\u30c8\u30fc\u30d6"]=1;
+N5SET["\u30b9\u30d7\u30fc\u30f3"]=1;
+N5SET["\u30b9\u30dd\u30fc\u30c4"]=1;
+N5SET["\u30b9\u30ea\u30c3\u30d1"]=1;
+N5SET["\u30ba\u30dc\u30f3"]=1;
+N5SET["\u30bb\u30fc\u30bf\u30fc"]=1;
+N5SET["\u30bc\u30ed"]=1;
+N5SET["\u30bf\u30af\u30b7\u30fc"]=1;
+N5SET["\u30c6\u30b9\u30c8"]=1;
+N5SET["\u30c6\u30ec\u30d3"]=1;
+N5SET["\u30c6\u30fc\u30d6\u30eb"]=1;
+N5SET["\u30c6\u30fc\u30d7"]=1;
+N5SET["\u30c6\u30fc\u30d7\u30ec\u30b3\u30fc\u30c0\u30fc"]=1;
+N5SET["\u30c7\u30d1\u30fc\u30c8"]=1;
+N5SET["\u30c8\u30a4\u30ec"]=1;
+N5SET["\u30c9\u30a2"]=1;
+N5SET["\u30ca\u30a4\u30d5"]=1;
+N5SET["\u30cb\u30e5\u30fc\u30b9"]=1;
+N5SET["\u30cd\u30af\u30bf\u30a4"]=1;
+N5SET["\u30ce\u30fc\u30c8"]=1;
+N5SET["\u30cf\u30f3\u30ab\u30c1"]=1;
+N5SET["\u30d0\u30b9"]=1;
+N5SET["\u30d0\u30bf\u30fc"]=1;
+N5SET["\u30d1\u30f3"]=1;
+N5SET["\u30d1\u30fc\u30c6\u30a3\u30fc"]=1;
+N5SET["\u30d5\u30a3\u30eb\u30e0"]=1;
+N5SET["\u30d5\u30a9\u30fc\u30af"]=1;
+N5SET["\u30d7\u30fc\u30eb"]=1;
+N5SET["\u30d9\u30c3\u30c9"]=1;
+N5SET["\u30da\u30c3\u30c8"]=1;
+N5SET["\u30da\u30f3"]=1;
+N5SET["\u30da\u30fc\u30b8"]=1;
+N5SET["\u30db\u30c6\u30eb"]=1;
+N5SET["\u30dc\u30bf\u30f3"]=1;
+N5SET["\u30dc\u30fc\u30eb\u30da\u30f3"]=1;
+N5SET["\u30dd\u30b1\u30c3\u30c8"]=1;
+N5SET["\u30dd\u30b9\u30c8"]=1;
+N5SET["\u30de\u30c3\u30c1"]=1;
+N5SET["\u30e1\u30fc\u30c8\u30eb"]=1;
+N5SET["\u30e9\u30b8\u30aa"]=1;
+N5SET["\u30e9\u30b8\u30aa\u30ab\u30bb\u30c3\u30c8"]=1;
+N5SET["\u30e9\u30b8\u30ab\u30bb"]=1;
+N5SET["\u30ec\u30b3\u30fc\u30c9"]=1;
+N5SET["\u30ec\u30b9\u30c8\u30e9\u30f3"]=1;
+N5SET["\u30ef\u30a4\u30b7\u30e3\u30c4"]=1;
+N5SET["\u4e00"]=1;
+N5SET["\u4e00\u3064"]=1;
+N5SET["\u4e00\u4eba"]=1;
+N5SET["\u4e00\u5bf8"]=1;
+N5SET["\u4e00\u65e5"]=1;
+N5SET["\u4e00\u6628\u5e74"]=1;
+N5SET["\u4e00\u6628\u65e5"]=1;
+N5SET["\u4e00\u6708"]=1;
+N5SET["\u4e00\u756a"]=1;
+N5SET["\u4e00\u7dd2"]=1;
+N5SET["\u4e01\u5ea6"]=1;
+N5SET["\u4e03"]=1;
+N5SET["\u4e03\u3064"]=1;
+N5SET["\u4e03\u65e5"]=1;
+N5SET["\u4e07"]=1;
+N5SET["\u4e07\u5e74\u7b46"]=1;
+N5SET["\u4e08\u592b"]=1;
+N5SET["\u4e09"]=1;
+N5SET["\u4e09\u3064"]=1;
+N5SET["\u4e09\u65e5"]=1;
+N5SET["\u4e0a"]=1;
+N5SET["\u4e0a\u3052\u308b"]=1;
+N5SET["\u4e0a\u624b"]=1;
+N5SET["\u4e0a\u7740"]=1;
+N5SET["\u4e0b"]=1;
+N5SET["\u4e0b\u624b"]=1;
+N5SET["\u4e0d\u5473\u3044"]=1;
+N5SET["\u4e21\u89aa"]=1;
+N5SET["\u4e26\u3076"]=1;
+N5SET["\u4e26\u3079\u308b"]=1;
+N5SET["\u4e2d"]=1;
+N5SET["\u4e38\u3044"]=1;
+N5SET["\u4e57\u308b"]=1;
+N5SET["\u4e5d"]=1;
+N5SET["\u4e5d\u3064"]=1;
+N5SET["\u4e5d\u65e5"]=1;
+N5SET["\u4e8c"]=1;
+N5SET["\u4e8c\u3064"]=1;
+N5SET["\u4e8c\u4eba"]=1;
+N5SET["\u4e8c\u5341"]=1;
+N5SET["\u4e8c\u5341\u65e5"]=1;
+N5SET["\u4e8c\u5341\u6b73"]=1;
+N5SET["\u4e8c\u65e5"]=1;
+N5SET["\u4e94"]=1;
+N5SET["\u4e94\u3064"]=1;
+N5SET["\u4e94\u65e5"]=1;
+N5SET["\u4ea4\u5dee\u70b9"]=1;
+N5SET["\u4ea4\u756a"]=1;
+N5SET["\u4eba"]=1;
+N5SET["\u4eca"]=1;
+N5SET["\u4eca\u5e74"]=1;
+N5SET["\u4eca\u65e5"]=1;
+N5SET["\u4eca\u65e5\u306f"]=1;
+N5SET["\u4eca\u6669"]=1;
+N5SET["\u4eca\u6669\u306f"]=1;
+N5SET["\u4eca\u6708"]=1;
+N5SET["\u4eca\u671d"]=1;
+N5SET["\u4eca\u9031"]=1;
+N5SET["\u4ed5\u4e8b"]=1;
+N5SET["\u4f11\u307f"]=1;
+N5SET["\u4f11\u3080"]=1;
+N5SET["\u4f1a\u3046"]=1;
+N5SET["\u4f1a\u793e"]=1;
+N5SET["\u4f2f\u6bcd\u3055\u3093"]=1;
+N5SET["\u4f4e\u3044"]=1;
+N5SET["\u4f4f\u3080"]=1;
+N5SET["\u4f53"]=1;
+N5SET["\u4f55"]=1;
+N5SET["\u4f55\u306e"]=1;
+N5SET["\u4f55\u51e6"]=1;
+N5SET["\u4f55\u6545"]=1;
+N5SET["\u4f55\u65b9"]=1;
+N5SET["\u4f55\u6642"]=1;
+N5SET["\u4f55\u6642\u3082"]=1;
+N5SET["\u4f59\u308a"]=1;
+N5SET["\u4f5c\u308b"]=1;
+N5SET["\u4f5c\u6587"]=1;
+N5SET["\u4f7f\u3046"]=1;
+N5SET["\u4fbf\u5229"]=1;
+N5SET["\u501f\u308a\u308b"]=1;
+N5SET["\u5074"]=1;
+N5SET["\u5098"]=1;
+N5SET["\u50cd\u304f"]=1;
+N5SET["\u5143\u6c17"]=1;
+N5SET["\u5144"]=1;
+N5SET["\u5144\u5f1f"]=1;
+N5SET["\u5148"]=1;
+N5SET["\u5148\u6708"]=1;
+N5SET["\u5148\u751f"]=1;
+N5SET["\u5148\u9031"]=1;
+N5SET["\u5165\u308b"]=1;
+N5SET["\u5165\u308c\u308b"]=1;
+N5SET["\u5165\u53e3"]=1;
+N5SET["\u5168\u90e8"]=1;
+N5SET["\u516b"]=1;
+N5SET["\u516b\u3064"]=1;
+N5SET["\u516b\u65e5"]=1;
+N5SET["\u516b\u767e\u5c4b"]=1;
+N5SET["\u516c\u5712"]=1;
+N5SET["\u516d"]=1;
+N5SET["\u516d\u3064"]=1;
+N5SET["\u516d\u65e5"]=1;
+N5SET["\u5176\u308c"]=1;
+N5SET["\u5176\u51e6"]=1;
+N5SET["\u5176\u65b9"]=1;
+N5SET["\u518d\u6765\u5e74"]=1;
+N5SET["\u5199\u771f"]=1;
+N5SET["\u51ac"]=1;
+N5SET["\u51b7\u305f\u3044"]=1;
+N5SET["\u51b7\u8535\u5eab"]=1;
+N5SET["\u51fa\u304b\u3051\u308b"]=1;
+N5SET["\u51fa\u3059"]=1;
+N5SET["\u51fa\u308b"]=1;
+N5SET["\u51fa\u53e3"]=1;
+N5SET["\u51fa\u639b\u3051\u308b"]=1;
+N5SET["\u5206\u304b\u308b"]=1;
+N5SET["\u5206\u308b"]=1;
+N5SET["\u5207\u308b"]=1;
+N5SET["\u5207\u624b"]=1;
+N5SET["\u5207\u7b26"]=1;
+N5SET["\u521d\u3081"]=1;
+N5SET["\u521d\u3081\u3066"]=1;
+N5SET["\u524d"]=1;
+N5SET["\u52c9\u5f37"]=1;
+N5SET["\u52d5\u7269"]=1;
+N5SET["\u52e4\u3081\u308b"]=1;
+N5SET["\u5317"]=1;
+N5SET["\u533b\u8005"]=1;
+N5SET["\u5341"]=1;
+N5SET["\u5341\u65e5"]=1;
+N5SET["\u5343"]=1;
+N5SET["\u5348\u524d"]=1;
+N5SET["\u5348\u5f8c"]=1;
+N5SET["\u534a"]=1;
+N5SET["\u534a\u5206"]=1;
+N5SET["\u5357"]=1;
+N5SET["\u5371\u306a\u3044"]=1;
+N5SET["\u5375"]=1;
+N5SET["\u539a\u3044"]=1;
+N5SET["\u53bb\u5e74"]=1;
+N5SET["\u53c8"]=1;
+N5SET["\u53cb\u9054"]=1;
+N5SET["\u53d6\u308b"]=1;
+N5SET["\u53e3"]=1;
+N5SET["\u53e4\u3044"]=1;
+N5SET["\u53ef\u611b\u3044"]=1;
+N5SET["\u53f0\u6240"]=1;
+N5SET["\u53f3"]=1;
+N5SET["\u540c\u3058"]=1;
+N5SET["\u540d\u524d"]=1;
+N5SET["\u5411\u3053\u3046"]=1;
+N5SET["\u5438\u3046"]=1;
+N5SET["\u5439\u304f"]=1;
+N5SET["\u547c\u3076"]=1;
+N5SET["\u54b2\u304f"]=1;
+N5SET["\u554f\u984c"]=1;
+N5SET["\u55ab\u8336\u5e97"]=1;
+N5SET["\u56db"]=1;
+N5SET["\u56db\u3064"]=1;
+N5SET["\u56db\u65e5"]=1;
+N5SET["\u56f0\u308b"]=1;
+N5SET["\u56f3\u66f8\u9928"]=1;
+N5SET["\u56fd"]=1;
+N5SET["\u571f\u66dc\u65e5"]=1;
+N5SET["\u5728\u308b"]=1;
+N5SET["\u5730\u4e0b\u9244"]=1;
+N5SET["\u5730\u56f3"]=1;
+N5SET["\u5869"]=1;
+N5SET["\u58f0"]=1;
+N5SET["\u58f2\u308b"]=1;
+N5SET["\u590f"]=1;
+N5SET["\u590f\u4f11\u307f"]=1;
+N5SET["\u5915\u65b9"]=1;
+N5SET["\u5915\u98ef"]=1;
+N5SET["\u5916"]=1;
+N5SET["\u5916\u56fd"]=1;
+N5SET["\u5916\u56fd\u4eba"]=1;
+N5SET["\u591a\u3044"]=1;
+N5SET["\u591a\u5206"]=1;
+N5SET["\u591c"]=1;
+N5SET["\u5927\u304d\u3044"]=1;
+N5SET["\u5927\u304d\u306a"]=1;
+N5SET["\u5927\u4e08\u592b"]=1;
+N5SET["\u5927\u4eba"]=1;
+N5SET["\u5927\u4f7f\u9928"]=1;
+N5SET["\u5927\u5207"]=1;
+N5SET["\u5927\u52e2"]=1;
+N5SET["\u5927\u5909"]=1;
+N5SET["\u5927\u597d\u304d"]=1;
+N5SET["\u5927\u5b66"]=1;
+N5SET["\u5929\u6c17"]=1;
+N5SET["\u592a\u3044"]=1;
+N5SET["\u5947\u9e97"]=1;
+N5SET["\u5965\u3055\u3093"]=1;
+N5SET["\u5973"]=1;
+N5SET["\u5973\u306e\u5b50"]=1;
+N5SET["\u597d\u304d"]=1;
+N5SET["\u5982\u4f55"]=1;
+N5SET["\u5982\u4f55\u3057\u3066"]=1;
+N5SET["\u59b9"]=1;
+N5SET["\u59c9"]=1;
+N5SET["\u59cb\u307e\u308b"]=1;
+N5SET["\u59cb\u3081\u307e\u3057\u3066"]=1;
+N5SET["\u5acc"]=1;
+N5SET["\u5acc\u3044"]=1;
+N5SET["\u5b50\u4f9b"]=1;
+N5SET["\u5b57\u5f15"]=1;
+N5SET["\u5b66\u6821"]=1;
+N5SET["\u5b66\u751f"]=1;
+N5SET["\u5b89\u3044"]=1;
+N5SET["\u5bb6"]=1;
+N5SET["\u5bb6\u5ead"]=1;
+N5SET["\u5bb6\u65cf"]=1;
+N5SET["\u5bbf\u984c"]=1;
+N5SET["\u5bd2\u3044"]=1;
+N5SET["\u5bdd\u308b"]=1;
+N5SET["\u5c01\u7b52"]=1;
+N5SET["\u5c0f\u3055\u3044"]=1;
+N5SET["\u5c0f\u3055\u306a"]=1;
+N5SET["\u5c11\u3057"]=1;
+N5SET["\u5c11\u306a\u3044"]=1;
+N5SET["\u5c45\u308b"]=1;
+N5SET["\u5c65\u304f"]=1;
+N5SET["\u5c71"]=1;
+N5SET["\u5ddd"]=1;
+N5SET["\u5de6"]=1;
+N5SET["\u5de6\u69d8\u306a\u3089"]=1;
+N5SET["\u5dee\u3059"]=1;
+N5SET["\u5e30\u308b"]=1;
+N5SET["\u5e3d\u5b50"]=1;
+N5SET["\u5e74"]=1;
+N5SET["\u5e7e\u3064"]=1;
+N5SET["\u5e7e\u3089"]=1;
+N5SET["\u5e83\u3044"]=1;
+N5SET["\u5e97"]=1;
+N5SET["\u5ea7\u308b"]=1;
+N5SET["\u5ead"]=1;
+N5SET["\u5eca\u4e0b"]=1;
+N5SET["\u5efa\u7269"]=1;
+N5SET["\u5f15\u304f"]=1;
+N5SET["\u5f1f"]=1;
+N5SET["\u5f31\u3044"]=1;
+N5SET["\u5f37\u3044"]=1;
+N5SET["\u5f3e\u304f"]=1;
+N5SET["\u5f7c\u306e"]=1;
+N5SET["\u5f7c\u51e6"]=1;
+N5SET["\u5f7c\u65b9"]=1;
+N5SET["\u5f85\u3064"]=1;
+N5SET["\u5f8c"]=1;
+N5SET["\u5f8c\u308d"]=1;
+N5SET["\u5fa1\u514d\u306a\u3055\u3044"]=1;
+N5SET["\u5fa1\u624b\u6d17"]=1;
+N5SET["\u5fa1\u98ef"]=1;
+N5SET["\u5fd8\u308c\u308b"]=1;
+N5SET["\u5fd9\u3057\u3044"]=1;
+N5SET["\u6070\u5ea6"]=1;
+N5SET["\u60aa\u3044"]=1;
+N5SET["\u610f\u5473"]=1;
+N5SET["\u6210\u308b"]=1;
+N5SET["\u6238"]=1;
+N5SET["\u6240"]=1;
+N5SET["\u624b"]=1;
+N5SET["\u624b\u7d19"]=1;
+N5SET["\u62bc\u3059"]=1;
+N5SET["\u6301\u3064"]=1;
+N5SET["\u6383\u9664"]=1;
+N5SET["\u6388\u696d"]=1;
+N5SET["\u639b\u304b\u308b"]=1;
+N5SET["\u639b\u3051\u308b"]=1;
+N5SET["\u64ae\u308b"]=1;
+N5SET["\u6559\u3048\u308b"]=1;
+N5SET["\u6559\u5ba4"]=1;
+N5SET["\u6563\u6b69"]=1;
+N5SET["\u6587\u7ae0"]=1;
+N5SET["\u6599\u7406"]=1;
+N5SET["\u65b0\u3057\u3044"]=1;
+N5SET["\u65b0\u805e"]=1;
+N5SET["\u65b9"]=1;
+N5SET["\u65c5\u884c"]=1;
+N5SET["\u65e5\u66dc\u65e5"]=1;
+N5SET["\u65e9\u3044"]=1;
+N5SET["\u660e\u308b\u3044"]=1;
+N5SET["\u660e\u5f8c\u65e5"]=1;
+N5SET["\u660e\u65e5"]=1;
+N5SET["\u6613\u3057\u3044"]=1;
+N5SET["\u6620\u753b"]=1;
+N5SET["\u6620\u753b\u9928"]=1;
+N5SET["\u6625"]=1;
+N5SET["\u6628\u591c"]=1;
+N5SET["\u6628\u65e5"]=1;
+N5SET["\u663c"]=1;
+N5SET["\u663c\u5fa1\u98ef"]=1;
+N5SET["\u6642\u3005"]=1;
+N5SET["\u6642\u8a08"]=1;
+N5SET["\u6642\u9593"]=1;
+N5SET["\u6669"]=1;
+N5SET["\u6669\u5fa1\u98ef"]=1;
+N5SET["\u6674\u308c"]=1;
+N5SET["\u6674\u308c\u308b"]=1;
+N5SET["\u6687"]=1;
+N5SET["\u6691\u3044"]=1;
+N5SET["\u6696\u304b\u3044"]=1;
+N5SET["\u6697\u3044"]=1;
+N5SET["\u66c7"]=1;
+N5SET["\u66c7\u308a"]=1;
+N5SET["\u66c7\u308b"]=1;
+N5SET["\u66f2\u304c\u308b"]=1;
+N5SET["\u66f2\u308b"]=1;
+N5SET["\u66f8\u304f"]=1;
+N5SET["\u6708\u66dc\u65e5"]=1;
+N5SET["\u6709\u308b"]=1;
+N5SET["\u6709\u540d"]=1;
+N5SET["\u6709\u96e3\u3046"]=1;
+N5SET["\u670d"]=1;
+N5SET["\u671d"]=1;
+N5SET["\u671d\u3054\u306f\u3093"]=1;
+N5SET["\u671d\u5fa1\u98ef"]=1;
+N5SET["\u6728"]=1;
+N5SET["\u6728\u66dc\u65e5"]=1;
+N5SET["\u672a\u3060"]=1;
+N5SET["\u672c"]=1;
+N5SET["\u672c\u5f53"]=1;
+N5SET["\u672c\u68da"]=1;
+N5SET["\u673a"]=1;
+N5SET["\u6751"]=1;
+N5SET["\u6765\u308b"]=1;
+N5SET["\u6765\u5e74"]=1;
+N5SET["\u6765\u6708"]=1;
+N5SET["\u6765\u9031"]=1;
+N5SET["\u6771"]=1;
+N5SET["\u679c\u7269"]=1;
+N5SET["\u6905\u5b50"]=1;
+N5SET["\u697d\u3057\u3044"]=1;
+N5SET["\u6a2a"]=1;
+N5SET["\u6a4b"]=1;
+N5SET["\u6b21"]=1;
+N5SET["\u6b32\u3057\u3044"]=1;
+N5SET["\u6b4c"]=1;
+N5SET["\u6b4c\u3046"]=1;
+N5SET["\u6b62\u307e\u308b"]=1;
+N5SET["\u6b64\u306e"]=1;
+N5SET["\u6b64\u308c"]=1;
+N5SET["\u6b69\u304f"]=1;
+N5SET["\u6b6f"]=1;
+N5SET["\u6b7b\u306c"]=1;
+N5SET["\u6bb5\u3005"]=1;
+N5SET["\u6bce\u5e74"]=1;
+N5SET["\u6bce\u65e5"]=1;
+N5SET["\u6bce\u6669"]=1;
+N5SET["\u6bce\u6708"]=1;
+N5SET["\u6bce\u671d"]=1;
+N5SET["\u6bce\u9031"]=1;
+N5SET["\u6c34"]=1;
+N5SET["\u6c34\u66dc\u65e5"]=1;
+N5SET["\u6c5a\u3044"]=1;
+N5SET["\u6c60"]=1;
+N5SET["\u6ca2\u5c71"]=1;
+N5SET["\u6cf3\u3050"]=1;
+N5SET["\u6d0b\u670d"]=1;
+N5SET["\u6d17\u3046"]=1;
+N5SET["\u6d17\u6fef"]=1;
+N5SET["\u6d74\u3073\u308b"]=1;
+N5SET["\u6d77"]=1;
+N5SET["\u6d88\u3048\u308b"]=1;
+N5SET["\u6d88\u3059"]=1;
+N5SET["\u6dbc\u3057\u3044"]=1;
+N5SET["\u6e08\u307f\u307e\u305b\u3093"]=1;
+N5SET["\u6e21\u3059"]=1;
+N5SET["\u6e21\u308b"]=1;
+N5SET["\u6e29\u3044"]=1;
+N5SET["\u6f22\u5b57"]=1;
+N5SET["\u706b\u66dc\u65e5"]=1;
+N5SET["\u7070\u76bf"]=1;
+N5SET["\u70b9\u3051\u308b"]=1;
+N5SET["\u70ba\u308b"]=1;
+N5SET["\u7121\u304f\u3059"]=1;
+N5SET["\u7136\u3046\u3057\u3066"]=1;
+N5SET["\u7136\u3057"]=1;
+N5SET["\u7159\u8349"]=1;
+N5SET["\u7169\u3044"]=1;
+N5SET["\u71b1\u3044"]=1;
+N5SET["\u725b\u4e73"]=1;
+N5SET["\u725b\u8089"]=1;
+N5SET["\u7269"]=1;
+N5SET["\u72ac"]=1;
+N5SET["\u72ed\u3044"]=1;
+N5SET["\u732b"]=1;
+N5SET["\u7384\u95a2"]=1;
+N5SET["\u7518\u3044"]=1;
+N5SET["\u751f\u307e\u308c\u308b"]=1;
+N5SET["\u751f\u5f92"]=1;
+N5SET["\u7537"]=1;
+N5SET["\u7537\u306e\u5b50"]=1;
+N5SET["\u753a"]=1;
+N5SET["\u7559\u5b66\u751f"]=1;
+N5SET["\u756a\u53f7"]=1;
+N5SET["\u75b2\u308c\u308b"]=1;
+N5SET["\u75c5\u6c17"]=1;
+N5SET["\u75c5\u9662"]=1;
+N5SET["\u75db\u3044"]=1;
+N5SET["\u767b\u308b"]=1;
+N5SET["\u767d"]=1;
+N5SET["\u767d\u3044"]=1;
+N5SET["\u767e"]=1;
+N5SET["\u7686"]=1;
+N5SET["\u7686\u3055\u3093"]=1;
+N5SET["\u76ee"]=1;
+N5SET["\u76f4\u3050"]=1;
+N5SET["\u771f\u3063\u76f4\u3050"]=1;
+N5SET["\u773c\u93e1"]=1;
+N5SET["\u7740\u304f"]=1;
+N5SET["\u7740\u308b"]=1;
+N5SET["\u77e5\u308b"]=1;
+N5SET["\u77ed\u3044"]=1;
+N5SET["\u7802\u7cd6"]=1;
+N5SET["\u78e8\u304f"]=1;
+N5SET["\u79c1"]=1;
+N5SET["\u79cb"]=1;
+N5SET["\u7a7a"]=1;
+N5SET["\u7a93"]=1;
+N5SET["\u7acb\u3064"]=1;
+N5SET["\u7acb\u6d3e"]=1;
+N5SET["\u7b49"]=1;
+N5SET["\u7b54\u3048\u308b"]=1;
+N5SET["\u7bb1"]=1;
+N5SET["\u7bb8"]=1;
+N5SET["\u7d05\u8336"]=1;
+N5SET["\u7d19"]=1;
+N5SET["\u7d30\u3044"]=1;
+N5SET["\u7d42\u308b"]=1;
+N5SET["\u7d42\u308f\u308b"]=1;
+N5SET["\u7d50\u5a5a"]=1;
+N5SET["\u7d50\u69cb"]=1;
+N5SET["\u7d75"]=1;
+N5SET["\u7dd1"]=1;
+N5SET["\u7de0\u3081\u308b"]=1;
+N5SET["\u7df4\u7fd2"]=1;
+N5SET["\u7e26"]=1;
+N5SET["\u7f6e\u304f"]=1;
+N5SET["\u7f8e\u5473\u3057\u3044"]=1;
+N5SET["\u7fd2\u3046"]=1;
+N5SET["\u8033"]=1;
+N5SET["\u805e\u304f"]=1;
+N5SET["\u8089"]=1;
+N5SET["\u80cc"]=1;
+N5SET["\u80cc\u5e83"]=1;
+N5SET["\u8131\u3050"]=1;
+N5SET["\u81ea\u5206"]=1;
+N5SET["\u81ea\u52d5\u8eca"]=1;
+N5SET["\u81ea\u8ee2\u8eca"]=1;
+N5SET["\u8272"]=1;
+N5SET["\u8272\u3005"]=1;
+N5SET["\u82b1"]=1;
+N5SET["\u82b1\u74f6"]=1;
+N5SET["\u82e5\u3044"]=1;
+N5SET["\u82f1\u8a9e"]=1;
+N5SET["\u8336\u7897"]=1;
+N5SET["\u8336\u8272"]=1;
+N5SET["\u8377\u7269"]=1;
+N5SET["\u8449\u66f8"]=1;
+N5SET["\u8584\u3044"]=1;
+N5SET["\u85ac"]=1;
+N5SET["\u884c\u304f"]=1;
+N5SET["\u897f"]=1;
+N5SET["\u8981\u308b"]=1;
+N5SET["\u898b\u305b\u308b"]=1;
+N5SET["\u898b\u308b"]=1;
+N5SET["\u899a\u3048\u308b"]=1;
+N5SET["\u89b3\u308b"]=1;
+N5SET["\u89d2"]=1;
+N5SET["\u8a00\u3046"]=1;
+N5SET["\u8a00\u8449"]=1;
+N5SET["\u8a70\u3089\u306a\u3044"]=1;
+N5SET["\u8a71"]=1;
+N5SET["\u8a71\u3059"]=1;
+N5SET["\u8a95\u751f\u65e5"]=1;
+N5SET["\u8aad\u3080"]=1;
+N5SET["\u8ab0"]=1;
+N5SET["\u8b66\u5b98"]=1;
+N5SET["\u8c5a\u8089"]=1;
+N5SET["\u8ca1\u5e03"]=1;
+N5SET["\u8cb4\u5973"]=1;
+N5SET["\u8cb7\u3044\u7269"]=1;
+N5SET["\u8cb7\u3046"]=1;
+N5SET["\u8cb8\u3059"]=1;
+N5SET["\u8cbc\u308b"]=1;
+N5SET["\u8cd1\u3084\u304b"]=1;
+N5SET["\u8cea\u554f"]=1;
+N5SET["\u8d64"]=1;
+N5SET["\u8d64\u3044"]=1;
+N5SET["\u8d70\u308b"]=1;
+N5SET["\u8d77\u304d\u308b"]=1;
+N5SET["\u8db3"]=1;
+N5SET["\u8eab\u4f53"]=1;
+N5SET["\u8eca"]=1;
+N5SET["\u8efd\u3044"]=1;
+N5SET["\u8f9b\u3044"]=1;
+N5SET["\u8f9e\u66f8"]=1;
+N5SET["\u8fba"]=1;
+N5SET["\u8fd1\u3044"]=1;
+N5SET["\u8fd1\u304f"]=1;
+N5SET["\u8fd4\u3059"]=1;
+N5SET["\u8fda\u3082"]=1;
+N5SET["\u901f\u3044"]=1;
+N5SET["\u9045\u3044"]=1;
+N5SET["\u904a\u3076"]=1;
+N5SET["\u9053"]=1;
+N5SET["\u9055\u3046"]=1;
+N5SET["\u9060\u3044"]=1;
+N5SET["\u9063\u308b"]=1;
+N5SET["\u90e8\u5c4b"]=1;
+N5SET["\u90f5\u4fbf\u5c40"]=1;
+N5SET["\u91a4\u6cb9"]=1;
+N5SET["\u91cd\u3044"]=1;
+N5SET["\u91ce\u83dc"]=1;
+N5SET["\u91d1\u66dc\u65e5"]=1;
+N5SET["\u925b\u7b46"]=1;
+N5SET["\u9280\u884c"]=1;
+N5SET["\u9375"]=1;
+N5SET["\u9577\u3044"]=1;
+N5SET["\u9580"]=1;
+N5SET["\u9589\u307e\u308b"]=1;
+N5SET["\u9589\u3081\u308b"]=1;
+N5SET["\u958b\u304f"]=1;
+N5SET["\u958b\u3051\u308b"]=1;
+N5SET["\u964d\u308a\u308b"]=1;
+N5SET["\u964d\u308b"]=1;
+N5SET["\u968e\u6bb5"]=1;
+N5SET["\u96a3"]=1;
+N5SET["\u96d1\u8a8c"]=1;
+N5SET["\u96e3\u3057\u3044"]=1;
+N5SET["\u96e8"]=1;
+N5SET["\u96ea"]=1;
+N5SET["\u96f6"]=1;
+N5SET["\u96fb\u6c17"]=1;
+N5SET["\u96fb\u8a71"]=1;
+N5SET["\u96fb\u8eca"]=1;
+N5SET["\u9752"]=1;
+N5SET["\u9752\u3044"]=1;
+N5SET["\u9759\u304b"]=1;
+N5SET["\u9762\u767d\u3044"]=1;
+N5SET["\u9774"]=1;
+N5SET["\u9774\u4e0b"]=1;
+N5SET["\u97f3\u697d"]=1;
+N5SET["\u9802\u304d\u307e\u3059"]=1;
+N5SET["\u982d"]=1;
+N5SET["\u983c\u3080"]=1;
+N5SET["\u98a8"]=1;
+N5SET["\u98a8\u5442"]=1;
+N5SET["\u98a8\u90aa"]=1;
+N5SET["\u98db\u3076"]=1;
+N5SET["\u98db\u884c\u6a5f"]=1;
+N5SET["\u98df\u3079\u308b"]=1;
+N5SET["\u98df\u3079\u7269"]=1;
+N5SET["\u98df\u5802"]=1;
+N5SET["\u98f2\u307f\u7269"]=1;
+N5SET["\u98f2\u3080"]=1;
+N5SET["\u98f4"]=1;
+N5SET["\u99c5"]=1;
+N5SET["\u9ad8\u3044"]=1;
+N5SET["\u9b5a"]=1;
+N5SET["\u9ce5"]=1;
+N5SET["\u9cf4\u304f"]=1;
+N5SET["\u9d8f\u8089"]=1;
+N5SET["\u9ec4\u8272"]=1;
+N5SET["\u9ec4\u8272\u3044"]=1;
+N5SET["\u9ed2"]=1;
+N5SET["\u9ed2\u3044"]=1;
+N5SET["\u9f3b"]=1;
+
+var SEED={"許悅": [{"date": "2026-09-20", "words": ["集める：收集、集合", "運転：駕駛、運轉", "追いかける：追、追趕", "選ぶ：選擇", "行う：實行、進行、舉行", "音：聲響、聲音", "貸す：借出", "借りる：借入", "閉める：關閉（他動詞）", "閉まる：關閉（自動詞）", "引っ越す：搬家", "入院：住院"], "sentence": "アニメの関連グッズを集めます。", "seed": true}, {"date": "2026-09-21", "words": ["遅刻：遲到", "残業：加班", "提出：提出", "返事：回覆", "翻訳：翻譯"], "sentence": "私は今日、報告書を提出しました。", "seed": true}, {"date": "2026-09-22", "words": ["乗り換える：轉乘", "渋滞：塞車", "急行：急行列車", "出発：出發", "レシート：收據"], "sentence": "今日は交通渋滞がひどかった（例文用渋滞）。", "seed": true}, {"date": "2026-09-23", "words": ["最近：最近", "時代：時代", "予約：預約", "締め切り：截止期限", "予定：預定計畫"], "sentence": "この人形は予約注文が必要です。", "seed": true}, {"date": "2026-09-24", "words": ["風邪：感冒", "頭痛：頭痛", "怪我：受傷", "入院：住院", "看護師：護理師"], "sentence": "私の友人は看護師です。", "seed": true}, {"date": "2026-09-25", "words": ["十分：充分", "不便：不方便", "特別：特別", "熱心：熱心", "盛ん：繁榮"], "sentence": "", "seed": true}, {"date": "2026-09-26", "words": ["ずいぶん：非常", "大抵：基本上", "ほとんど：差不多", "すっかり：全部", "やっと：終於"], "sentence": "", "seed": true}, {"date": "2026-09-27", "words": ["集める：收集", "見つける：找到", "迎える：迎接", "褒める：稱讚", "叱る：責備"], "sentence": "", "seed": true}, {"date": "2026-09-28", "words": ["空気：空氣", "近所：附近", "習慣：習慣", "泥棒：小偷", "海岸：海岸", "台風：颱風", "地震：地震", "必ず：一定", "絶対に：絕對", "たまに：偶爾", "例えば：例如", "すると：於是", "それから：然後"], "sentence": "", "seed": true}, {"date": "2026-09-29", "words": ["枕：枕頭", "細胞：細胞", "箱：箱子", "針：針", "影：影子"], "sentence": "誰しも影を持っている", "seed": true}, {"date": "2026-09-30", "words": ["ナイトライト：夜燈", "磁石：磁鐵", "バッジ：徽章", "薬：藥", "カラス：烏鴉"], "sentence": "バッジを買いすぎた", "seed": true}, {"date": "2026-10-01", "words": ["冷蔵庫：冰箱", "絵画：繪畫", "ストロー：吸管", "扇風機：電風扇", "結晶：結晶體"], "sentence": "両親と私は扇風機を買いに行った", "seed": true}, {"date": "2026-10-02", "words": ["枝：樹枝", "森：森林", "雲：雲", "星：星星", "砂：沙子"], "sentence": "", "seed": true}, {"date": "2026-10-03", "words": ["きちんと：整齊地、好好地", "うっかり：不小心、疏忽", "すっかり：完全", "アイディア：主意", "アピール：宣傳、吸引力"], "sentence": "", "seed": true}, {"date": "2026-10-04", "words": ["断る：拒絕", "防ぐ：防止", "翻訳する：翻譯", "分ける：分開", "比べる：比較"], "sentence": "", "seed": true}], "許逸": [{"date": "2026-09-18", "words": ["～と思います：我認為～", "～ほど～：表示程度", "～ようにも～ません：想～也做不到", "～たほうがいいです：～比較好", "～でもいいです：～也可以"], "sentence": "頭が痛くて起きようにも起きられません", "seed": true}, {"date": "2026-09-19", "words": ["宿題：功課", "お菓子：零食", "夏休み：暑假", "傘：雨傘", "美術館：美術館"], "sentence": "お菓子を買ってもいいです", "seed": true}, {"date": "2026-09-20", "words": ["アイスコーヒー：冰咖啡", "みそしる：味噌湯", "天ぷら：天婦羅", "ていしょく：定食", "ココア：可可"], "sentence": "すみません、この天ぷらていしょくはいくらですか？", "seed": true}, {"date": "2026-09-21", "words": ["虫：蟲", "復習：複習", "訓練：訓練", "デパート：百貨公司", "公園：公園"], "sentence": "よく公園に行きます", "seed": true}, {"date": "2026-09-22", "words": ["雨：雨", "夏：夏天", "冬：冬天", "春：春天", "秋：秋天"], "sentence": "私は夏が好きです", "seed": true}, {"date": "2026-09-23", "words": ["役者：演員", "シンガー：歌手", "建築家：建築家", "寿司職人：壽司師傅", "画家：畫家"], "sentence": "彼女は役者として知られています。", "seed": true}, {"date": "2026-09-24", "words": ["大福：大福", "和菓子：和菓子", "かき氷：剉冰", "団子：團子", "ケーキ：蛋糕"], "sentence": "いちごだいふくが食べたいです。", "seed": true}, {"date": "2026-09-25", "words": ["ラムネ：彈珠汽水", "まっちゃラテ：抹茶拿鐵", "カルピス：可爾必思", "あまさけ：甘酒", "コーラ：可樂"], "sentence": "お姉さんは抹茶ラテが好きです。", "seed": true}, {"date": "2026-09-26", "words": ["いちご：草莓", "チョコレート：巧克力", "クッキー：餅乾", "ドーナツ：甜甜圈", "チーズケーキ：起司蛋糕"], "sentence": "そのチーズケーキは甘いですか？", "seed": true}, {"date": "2026-09-27", "words": ["七つ：七個", "パイ：派", "六つ：六個", "五つ：五個", "ケーキ屋：蛋糕店"], "sentence": "このケーキ屋が好きですか", "seed": true}, {"date": "2026-09-28", "words": ["甘い：甜", "辛い：辣", "酸っぱい：酸", "塩っぱい：鹹", "苦い：苦"], "sentence": "このカレーはからいですね。", "seed": true}, {"date": "2026-09-29", "words": ["羊：羊", "ワニ：鱷魚", "ゾウ：象", "熊：熊", "鳥：鳥"], "sentence": "そこにワニがいるんです", "seed": true}, {"date": "2026-09-30", "words": ["にんじん：紅蘿蔔", "カボチャ：南瓜", "なす：茄子", "キャベツ：高麗菜", "ネギ：蔥"], "sentence": "にんじんが嫌いです。", "seed": true}, {"date": "2026-10-01", "words": ["みかん：橘子", "スイカ：西瓜", "いちご：草莓", "バナナ：香蕉", "なし：梨"], "sentence": "1番好きなフルーツはイチゴです。", "seed": true}, {"date": "2026-10-02", "words": ["地下鉄：地鐵", "タクシー：計程車", "船：船", "電車：電車", "バス：巴士"], "sentence": "電車で行きます。", "seed": true}, {"date": "2026-10-03", "words": ["バラ：玫瑰", "さくら：櫻花", "コスモス：波斯菊", "かすみそう：滿天星", "藤：紫藤花"], "sentence": "桜が満開になりました。", "seed": true}, {"date": "2026-10-04", "words": ["カステラ：蜂蜜蛋糕", "マカロン：馬卡龍", "マドレーヌ：瑪德蓮", "カップケーキ：杯子蛋糕", "サブレ：法式奶油酥餅"], "sentence": "カステラが好きです。", "seed": true}]};
+/* ---------- 主邏輯 ---------- */
+var FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdMODBvQKkJIP34Q4fk5vTa2piCdGgj1jaRxNCVki0HFVRTaw/formResponse';
+var ENTRY = {
+  who: 'entry.1178958017',
+  w: ['entry.1136092815','entry.391163408','entry.1774199141','entry.2027776951','entry.531780864'],
+  sent: 'entry.1990945985'
+};
+/* ---------- 測試用表單（GOBI 身份專用，唔污染正式統計） ---------- */
+var TEST_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdDbJwHgWtqiNRo4tBGgnRBs8EqiJsk3Q8vraMdVbfO1hVDFg/formResponse';
+var TEST_ENTRY = {
+  who: 'entry.86094065',
+  w: ['entry.123365139','entry.1461868790','entry.1685949740','entry.309164158','entry.22392966'],
+  sent: 'entry.679032503'
+};
+var TEST_WEEK_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeR-pnHMof0oDiU0qi8N8-dRGNlTAGUy-vQvEoegkUsASeIHQ/formResponse';
+var TEST_WEEK_ENTRY = {
+  who:'entry.1242029914', week:'entry.2038152140', vocab:'entry.1076583862', gram:'entry.593388620',
+  read:'entry.1183263422', rev:'entry.338927138', total:'entry.1230920436', wrong:'entry.1001955378'
+};
+function isTest(){ return child==='GOBI'; }
+/* ---------- 分數後端（Cloudflare Worker + KV，可靠） ---------- */
+var SCORE_API = 'https://jlpt-scores.hoo-c27.workers.dev/submit';
+function postScore(data){
+  try{
+    fetch(SCORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  }catch(e){}
+}
+var child = null, makeupDate = null, quiz = null;
+/* N4 系統字表（ikuchannel 903 字，學習用） */
+var N4VOCAB = [];
+fetch('n4vocab.json').then(function(r){ return r.json(); }).then(function(d){ N4VOCAB = d || []; buildReadMap(); }).catch(function(){});
+/* N5/N3 字表 */
+var N5VOCAB = [], N3VOCAB = [];
+var VERIFIED_R = {};
+fetch('verified-reading.json').then(function(r){ return r.json(); }).then(function(d){ VERIFIED_R = d || {}; buildReadMap(); }).catch(function(){});
+
+fetch('n5vocab.json').then(function(r){ return r.json(); }).then(function(d){ N5VOCAB = d || []; buildReadMap(); }).catch(function(){});
+fetch('n3vocab.json').then(function(r){ return r.json(); }).then(function(d){ N3VOCAB = d || []; buildReadMap(); }).catch(function(){});
+/* 後台已交日子（Worker 同步，補 localStorage 唔齊） */
+var backendHave = {};
+function fetchBackendDates(){
+  if(!child || child==='GOBI'){ backendHave = {}; return; }
+  fetch('https://jlpt-scores.hoo-c27.workers.dev/daily?who='+encodeURIComponent(child))
+    .then(function(r){ return r.json(); })
+    .then(function(dates){
+      backendHave = {};
+      (dates||[]).forEach(function(d){ backendHave[d]=1; });
+      renderMiss();
+    }).catch(function(){});
+  syncWeekScores();
+}
+/* 補送 localStorage 入面未上傳嘅大測驗分數 */
+function syncWeekScores(){
+  if(!child || child==='GOBI') return;
+  var recs = loadWeekRec();
+  Object.keys(recs).forEach(function(wk){
+    var r = recs[wk];
+    if(!r || !r.s) return;
+    postScore({type:'week',who:child,date:wk,
+      vocab:(r.s['語彙']||0)+'/8', gram:(r.s['文法']||0)+'/8',
+      read:(r.s['讀解']||0)+'/4', rev:(r.s['複習']||0)+'/5',
+      total:r.total||'', wrong:''});
+  });
+}
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function dateStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function todayKey(){ return dateStr(new Date()); }
+function yesterdayKey(){ var d=new Date(); d.setDate(d.getDate()-1); return dateStr(d); }
+function shuffle(a){ a=a.slice(); for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
+
+function storeKey(){ return 'jlpt_daily_'+child; }
+function quizKey(){ return 'jlpt_quiz_'+child; }
+function loadAll(){ try{ return JSON.parse(localStorage.getItem(storeKey())||'[]'); }catch(e){ return []; } }
+function saveAll(a){ localStorage.setItem(storeKey(), JSON.stringify(a)); }
+function loadQuizRec(){ try{ return JSON.parse(localStorage.getItem(quizKey())||'[]'); }catch(e){ return []; } }
+function saveQuizRec(r){ var a=loadQuizRec(); a.push(r); localStorage.setItem(quizKey(), JSON.stringify(a)); }
+function findByDate(arr,ds){ for(var i=0;i<arr.length;i++) if(arr[i].date===ds) return arr[i]; return null; }
+function ensureSeed(){
+  if(loadAll().length) return;
+  var s=(typeof SEED!=='undefined')?SEED[child]:null;
+  if(s&&s.length) saveAll(s);
+}
+
+
+$('todayStr').textContent = todayKey();
+
+/* JLPT 考試倒數（連今日計在內） */
+(function(){
+  var exam = new Date(2026, 11, 6); // 2026-12-06 星期日
+  var now = new Date(); now.setHours(0,0,0,0);
+  var diff = Math.ceil((exam - now) / 86400000) + 1;
+  var el = $('countdown');
+  if(diff > 1){
+    el.innerHTML = '距離 JLPT N4 考試（12/6 星期日）<br><span style="white-space:nowrap">仲有 <b>'+diff+'</b> 日</span>';
+  }else if(diff === 1){
+    el.innerHTML = '聽日就係考試日，加油！';
+  }else{
+    el.innerHTML = '考試已經完成，辛苦了！';
+  }
+})();
+
+function pickChild(name){
+  child = name; makeupDate = null;
+  ensureSeed();
+  $('btnYue').className = name==='許悅' ? 'active' : '';
+  $('btnYi').className = name==='許逸' ? 'active' : '';
+  $('btnGobi').className = 'testbtn' + (name==='GOBI' ? ' active' : '');
+  ['missCard','recallCard','quizCard','weekCard','randCard','fullCard','dailyCard','examCard','flashCard','anaCard','mockCard','corrCard','formCard','histCard'].forEach(function(id){ $(id).style.display='block'; });
+  if(name==='GOBI'){
+    fetchGobiPool();
+    $('missCard').style.display='none';
+    $('formCard').style.display='none';
+  }
+  loadCorrections();
+  $('formTitle').textContent = '今日學習';
+  renderMiss(); renderRecall(); renderQuizHist(); renderWeekHist(); loadAnalysis(); renderHist(); renderDailyReview(); renderDailyHist(); renderExamHist(); backDaily(); backExamMock();
+  backQuiz(); backWeekQuiz(); clearForm(); prefillToday();
+  setMsg('',''); $('assess').innerHTML='';
+  fetchBackendDates();
+}
+
+function clearForm(){
+  ['w1','w2','w3','w4','w5','m1','m2','m3','m4','m5','sent'].forEach(function(id){ $(id).value=''; });
+}
+function setMsg(t,cls){ var m=$('msg'); m.textContent=t; m.className='msg '+cls; }
+
+/* ---------- 補交 ---------- */
+function missingDates(){
+  var arr = loadAll();
+  if(!arr.length && !Object.keys(backendHave).length) return [];
+  var have = {}; arr.forEach(function(e){ have[e.date]=1; });
+  for(var k in backendHave) have[k]=1;
+  var allDates = Object.keys(have).sort();
+  if(!allDates.length) return [];
+  var first = allDates[0];
+  var out = [];
+  var d = new Date(first+'T12:00:00'); d.setDate(d.getDate()+1);
+  var today = new Date(todayKey()+'T12:00:00');
+  while(d < today){ var k=dateStr(d); if(!have[k]) out.push(k); d.setDate(d.getDate()+1); }
+  return out;
+}
+function renderMiss(){
+  var ms = missingDates(), body = $('missBody');
+  if(!ms.length){ body.innerHTML='<div class="recall-empty">冇欠交，繼續保持。</div>'; return; }
+  body.innerHTML = '<div class="hint" style="margin-bottom:6px">以下日子未交，撳「補交」補返：</div>' +
+    ms.map(function(d){ return '<div class="miss-row"><span>'+d+'</span><button class="btn2" onclick="startMakeup(\''+d+'\')">補交</button></div>'; }).join('');
+}
+function startMakeup(d){
+  makeupDate = d;
+  $('formTitle').textContent = '補交 '+d;
+  clearForm(); setMsg('',''); $('assess').innerHTML='';
+  $('formCard').scrollIntoView({behavior:'smooth'});
+}
+
+/* ---------- 上次回憶 ---------- */
+function renderRecall(){
+  var arr = loadAll().slice().sort(function(a,b){ return a.date<b.date?1:-1; });
+  var body = $('recallBody');
+  if(!arr.length){ body.innerHTML='<div class="recall-empty">未有記錄，今日開始累積。</div>'; return; }
+  var y = arr[0];
+  var h='<div class="recall-tip">上次（'+esc(y.date)+'）交嘅：</div>';
+  y.words.forEach(function(w){ h+='<div class="word-row">'+esc(w)+'</div>'; });
+  if(y.sentence) h+='<div class="word-row"><b>造句：</b>'+esc(y.sentence)+'</div>';
+  body.innerHTML=h;
+}
+
+/* ---------- 歷史 ---------- */
+function renderHist(){
+  var arr = loadAll().slice().sort(function(a,b){ return a.date<b.date?1:-1; });
+  var body = $('histBody');
+  if(!arr.length){ body.innerHTML='<div class="recall-empty">暫時未有記錄。</div>'; return; }
+  body.innerHTML = arr.map(function(e){
+    return '<div class="hist-item"><div class="hist-date">'+esc(e.date)+'</div>'+
+      '<div class="hist-words">'+e.words.map(esc).join('；')+'</div>'+
+      (e.sentence?'<div class="hist-sent">造句：'+esc(e.sentence)+'</div>':'')+'</div>';
+  }).join('');
+}
+function prefillToday(){
+  var t = findByDate(loadAll(), todayKey());
+  if(t){
+    for(var i=0;i<5;i++){
+      var parts = String(t.words[i]||'').split(/[:：]/);
+      $('w'+(i+1)).value = parts[0]||'';
+      $('m'+(i+1)).value = parts.slice(1).join('：')||'';
+    }
+    $('sent').value = t.sentence||'';
+    setMsg('今日已經提交過，可以修改後再提交。','ok');
+  }
+}
+
+/* ---------- N4 適合度 ---------- */
+function normWord(s){
+  var w = String(s||'').split(/[:：]/)[0];
+  w = w.replace(/（[^）]*）/g,'').replace(/\([^)]*\)/g,'').replace(/\s+/g,'');
+  return w;
+}
+function levelOf(word){
+  var w = normWord(word);
+  if(!w) return '範圍外';
+  if(N4SET[w]) return 'N4';
+  if(N5SET[w]) return '偏易';
+  return '範圍外';
+}
+function badge(lv){
+  var c = lv==='N4' ? 'b-n4' : (lv==='偏易' ? 'b-easy' : 'b-out');
+  return '<span class="badge '+c+'">'+lv+'</span>';
+}
+function assessWords(words){
+  var rows = words.map(function(w){ return {w:w, lv:levelOf(w)}; });
+  var n4 = rows.filter(function(r){ return r.lv==='N4'; }).length;
+  var easy = rows.filter(function(r){ return r.lv==='偏易'; }).length;
+  var h = rows.map(function(r){ return '<div class="word-row">'+esc(r.w)+' '+badge(r.lv)+'</div>'; }).join('');
+  var v;
+  if(n4>=3) v='<div class="msg ok">今日 N4 命中 '+n4+'/5，程度啱，繼續保持。</div>';
+  else if(n4===2) v='<div class="msg ok">今日 N4 命中 2/5，聽日可以試多少少 N4 程度嘅詞。</div>';
+  else v='<div class="msg err">今日 N4 命中 '+n4+'/5，偏離 N4 範圍，聽日試下難啲、貼近 N4 嘅詞。</div>';
+  if(easy>=2) v+='<div class="hint">其中有 '+easy+' 個偏易（N5 程度）。N4 詞彙量先係考試重點。</div>';
+  return h+v;
+}
+
+
+/* ---------- 改錯提醒 ---------- */
+var SHEET_CSV = 'https://docs.google.com/spreadsheets/d/13tkAjIjTtm0V3qRHrboCGKFsN4wZjABbehQ7y_nLGS4/gviz/tq?tqx=out:csv&headers=1';
+function parseCSV(text){
+  var rows=[], row=[], cur='', q=false;
+  for(var i=0;i<text.length;i++){
+    var c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){ cur+='"'; i++; } else q=false; }
+      else cur+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===','){ row.push(cur); cur=''; }
+      else if(c==='\n'||c==='\r'){ if(cur!==''||row.length){ row.push(cur); rows.push(row); row=[]; cur=''; } }
+      else cur+=c;
+    }
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function loadCorrections(){
+  var body=$('corrBody');
+  fetch(SHEET_CSV).then(function(r){ return r.text(); }).then(function(t){
+    var rows=parseCSV(t).slice(1).filter(function(r){ return r[1]===child; });
+    CORR=rows.slice().reverse();
+    if(!rows.length){ body.innerHTML='<div class="recall-empty">暫時未有改錯提醒，繼續保持。</div>'; return; }
+    var latest=rows.slice(-5).reverse();
+    body.innerHTML=latest.map(function(r){
+      return '<div class="hist-item"><div class="hist-date">'+esc(r[0])+'</div>'+
+        '<div class="hist-words">原本：'+esc(r[2])+'</div>'+
+        '<div class="hist-sent"><b>正確：</b>'+esc(r[3])+'</div>'+
+        (r[4]?'<div class="hint">'+esc(r[4])+'</div>':'')+'</div>';
+    }).join('');
+  }).catch(function(){
+    body.innerHTML='<div class="recall-empty">載入失敗，檢查網絡後再試。</div>';
+  });
+}
+
+/* ---------- 提交 ---------- */
+function submitDaily(){
+  var words=[], ok=true;
+  for(var i=1;i<=5;i++){
+    var w=$('w'+i).value.trim(), m=$('m'+i).value.trim();
+    if(!w){ setMsg('生字 '+i+' 未填。','err'); ok=false; break; }
+    if(!m){ setMsg('生字 '+i+' 嘅中文意思未填。','err'); ok=false; break; }
+    words.push(w+'：'+m);
+  }
+  if(!ok) return;
+  var sent=$('sent').value.trim();
+  if(!sent){ setMsg('造句未填。','err'); return; }
+  if(!child){ setMsg('請先揀「我是誰」。','err'); return; }
+
+  var btn=$('submitBtn'); btn.disabled=true;
+  var target = makeupDate || todayKey();
+  var arr = loadAll().filter(function(e){ return e.date!==target; });
+  arr.push({date:target, words:words, sentence:sent});
+  saveAll(arr);
+
+  var p = new URLSearchParams();
+  var FU = isTest()?TEST_FORM_URL:FORM_URL, EN = isTest()?TEST_ENTRY:ENTRY;
+  p.append(EN.who, child);
+  for(var j=0;j<5;j++) p.append(EN.w[j], words[j]);
+  p.append(EN.sent, sent + (makeupDate ? ' [補交'+target+']' : ''));
+  fetch(FU,{method:'POST',mode:'no-cors',body:p}).then(function(){ done(true); }).catch(function(){ done(false); });
+
+  function done(synced){
+    btn.disabled=false;
+    $('assess').innerHTML = assessWords(words);
+    setMsg(synced ? (makeupDate?'補交成功。':'已提交，今晚會有檢查同複習快問。')
+                  : '已喺本機記錄，但同步失敗，今晚檢查可能見唔到，請再提交一次。',
+           synced?'ok':'err');
+    makeupDate=null; $('formTitle').textContent='今日學習';
+    renderMiss(); renderRecall(); renderHist();
+  }
+}
+
+/* ---------- 每日小測驗 ---------- */
+var GOBI_POOL = null; /* null=未載入；GOBI 身份用兩個女生字庫合併 */
+var WORDBANK_CSV = 'https://docs.google.com/spreadsheets/d/1xTDifTOqBoOKSN3a6lNdI2DJzT-TPRz3bsFVh_xSShY/gviz/tq?tqx=out:csv&headers=1';
+function parseCsv(t){
+  var rows=[], row=[], cur='', q=false, i, c;
+  for(i=0;i<t.length;i++){
+    c=t[i];
+    if(q){
+      if(c==='"'){ if(t[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    }else if(c==='"'){ q=true; }
+    else if(c===','){ row.push(cur); cur=''; }
+    else if(c==='\n'||c==='\r'){
+      if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+      row=[]; cur='';
+      if(c==='\r'&&t[i+1]==='\n') i++;
+    }
+    else cur+=c;
+  }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function fetchGobiPool(){
+  var seen={}, pool=[];
+  function add(w,m){
+    w=String(w==null?'':w).trim(); m=String(m==null?'':m).trim();
+    if(w && m && !seen[w]){ seen[w]=1; pool.push({w:w,m:m}); }
+  }
+  ['許悅','許逸'].forEach(function(k){
+    ((typeof SEED!=='undefined')?SEED[k]:null||[]).forEach(function(e){
+      (e.words||[]).forEach(function(x){
+        var parts=String(x).split(/[:：]/);
+        add(normWord(x), parts.length>1?parts.slice(1).join('：').trim():'');
+      });
+    });
+  });
+  GOBI_POOL = pool.slice();
+  fetch(WORDBANK_CSV).then(function(r){ return r.text(); }).then(function(t){
+    parseCsv(t).slice(1).forEach(function(row){ add(row[2], row[3]); });
+    GOBI_POOL = pool;
+  }).catch(function(){ /* 讀唔到表就用 SEED 頂住 */ });
+}
+function poolWords(){
+  if(child==='GOBI' && GOBI_POOL) return GOBI_POOL.slice();
+  var seen={}, pool=[];
+  loadAll().forEach(function(e){
+    e.words.forEach(function(x){
+      var w=normWord(x);
+      var parts=String(x).split(/[:：]/);
+      var m=parts.length>1?parts.slice(1).join('：').trim():'';
+      if(w && m && !seen[w]){ seen[w]=1; pool.push({w:w,m:m,r:readingFor(w)}); }
+    });
+  });
+  /* 加入 N4 系統字表（學習為主：唔只考自己啲字） */
+  if(child!=='GOBI' && N4VOCAB.length){
+    var myWords = {};
+    pool.forEach(function(p){ myWords[p.w]=1; });
+    var n4add = N4VOCAB.filter(function(x){ return !myWords[x.w]; });
+    shuffle(n4add).slice(0,20).forEach(function(x){ pool.push({w:x.w, m:x.m, r:x.r||readingFor(x.w), n4:true}); });
+  }
+  return pool;
+}
+function startQuiz(){
+  var pool=poolWords();
+  $('quizIntro').style.display='none'; $('quizBody').style.display='block';
+  if(pool.length<4){
+    $('quizBody').innerHTML='<div class="recall-empty">學過嘅生字唔夠 4 個，儲多幾日先玩得。</div><button class="btn2" onclick="backQuiz()">返去</button>';
+    return;
+  }
+  var taken=shuffle(pool).slice(0,5);
+  var qs=taken.map(function(p,i){
+    var type='j2c';
+    var others=shuffle(pool.filter(function(x){ return x.w!==p.w; })).slice(0,3);
+    var q='「'+p.w+'」嘅意思係？', opts=[p.m], ans=p.m;
+    others.forEach(function(o){ opts.push(o.m); });
+    opts=shuffle(opts.filter(function(v,ix,arr){ return arr.indexOf(v)===ix; }));
+    return {q:q,opts:opts,ans:ans,w:p.w,m:p.m,r:p.r,type:type,userAns:null,skipped:false};
+  });
+  quiz={qs:qs,idx:0,score:0};
+  renderQ();
+}
+function renderQ(){
+  var q=quiz.qs[quiz.idx];
+  var qDisp = q.type==='j2c' ? '「'+rubyWord(q.w,q.r)+'」嘅意思係？' : (q.type==='yomi' ? '「'+esc(q.w)+'」嘅讀音係？' : rubyText(q.q));
+  $('quizBody').innerHTML='<div class=\"q-progress\">第 '+(quiz.idx+1)+' / '+quiz.qs.length+' 題</div>'+
+    '<div class=\"q-text\">'+qDisp+'</div>'+
+    q.opts.map(function(o,i){ var od = (q.type==='j2c') ? esc(o) : rubyText(o); return '<button class=\"opt\" data-i=\"'+i+'\">'+od+'</button>'; }).join('')+
+    '<div style="text-align:center;margin-top:12px"><button class="btn2" onclick="skipQuiz()">唔識，睇答案學</button></div>';
+  var btns=$('quizBody').querySelectorAll('.opt');
+  btns.forEach(function(b){ b.onclick=function(){ answerQuiz(parseInt(b.getAttribute('data-i'),10)); }; });
+}
+function skipQuiz(){
+  var q=quiz.qs[quiz.idx];
+  q.skipped=true; q.userAns='（唔識）';
+  var btns=$('quizBody').querySelectorAll('.opt');
+  btns.forEach(function(b){ b.disabled=true; });
+  btns.forEach(function(b,bi){ if(q.opts[bi]===q.ans) b.classList.add('ok'); });
+  $('quizBody').insertAdjacentHTML('beforeend','<div class="msg ok" style="margin-top:8px">正確答案：'+esc(q.ans)+'<br>'+esc(q.w)+'：'+esc(q.m)+'</div>');
+  var nb=document.createElement('button'); nb.className='btn2';
+  if(quiz.idx<quiz.qs.length-1){ nb.textContent='下一題'; nb.onclick=nextQuiz; }
+  else{ nb.textContent='睇成績'; nb.onclick=nextQuiz; }
+  $('quizBody').appendChild(nb);
+}
+function answerQuiz(i){
+  var q=quiz.qs[quiz.idx];
+  q.userAns=q.opts[i];
+  var btns=$('quizBody').querySelectorAll('.opt');
+  btns.forEach(function(b){ b.disabled=true; });
+  // 移除唔識掣
+  var skipBtn=$('quizBody').querySelector('button.btn2[onclick="skipQuiz()"]');
+  if(skipBtn) skipBtn.parentElement.remove();
+  if(q.opts[i]===q.ans){ quiz.score++; btns[i].classList.add('ok'); }
+  else{
+    btns[i].classList.add('no');
+    btns.forEach(function(b,bi){ if(q.opts[bi]===q.ans) b.classList.add('ok'); });
+  }
+  var nb=document.createElement('button'); nb.className='btn2';
+  if(quiz.idx<quiz.qs.length-1){
+    nb.textContent='下一題'; nb.onclick=nextQuiz; $('quizBody').appendChild(nb);
+  }else{
+    nb.textContent='交卷緊…'; nb.disabled=true; $('quizBody').appendChild(nb);
+    setTimeout(nextQuiz, 1500);
+  }
+}
+function nextQuiz(){ quiz.idx++; if(quiz.idx>=quiz.qs.length) endQuiz(); else renderQ(); }
+function endQuiz(){
+  saveQuizRec({date:todayKey(),score:quiz.score,total:quiz.qs.length});
+  postScore({type:'quiz',who:child,date:todayKey(),score:quiz.score+'/'+quiz.qs.length});
+  var c = quiz.score===quiz.qs.length ? ['全部啱，記得好穩！','ok']
+        : quiz.score>=3 ? ['唔錯，錯嗰幾題睇下下面回顧，記返佢。','ok']
+        : ['要加油，睇完下面回顧再挑戰過。','err'];
+  var review='<div class="review"><div class="review-title">答案回顧（學習用）</div>';
+  quiz.qs.forEach(function(q,i){
+    var ok = q.userAns===q.ans;
+    var cls = ok?'rok':(q.skipped?'rskip':'rno');
+    var mark = ok?'✓ 啱':(q.skipped?'○ 學咗':'✗ 錯');
+    var rqd = q.type==='j2c' ? '「'+rubyWord(q.w,q.r)+'」嘅意思係？' : (q.type==='yomi' ? '「'+esc(q.w)+'」嘅讀音係？' : rubyText(q.q));
+    review+='<div class="ritem '+cls+'"><div class="rq">第'+(i+1)+'題：'+rqd+'</div>'+
+      '<div>你嘅答案：'+(q.type==='j2c'?esc(q.userAns||'—'):rubyText(q.userAns||'—'))+' <span class="rmark">'+mark+'</span></div>'+
+      (ok?'':'<div>正確答案：<b>'+(q.type==='j2c'?esc(q.ans):rubyText(q.ans))+'</b></div>')+
+      '<div class="rlearn">'+esc(q.w)+'：'+esc(q.m)+'</div></div>';
+  });
+  review+='</div>';
+  $('quizBody').innerHTML='<div class="q-score">今次得分：'+quiz.score+' / '+quiz.qs.length+'</div>'+
+    '<div class="msg '+c[1]+'">'+c[0]+'</div>'+review+'<button class="btn2" onclick="backQuiz()">返去</button>';
+  renderQuizHist();
+}
+function backQuiz(){ $('quizBody').style.display='none'; $('quizIntro').style.display='block'; }
+
+/* 振假名系統 */
+var READMAP = {};
+var _vocabState = {n4:false, n5:false, n3:false, ver:false};
+function buildReadMap(){
+  READMAP = {};
+  var all = [];
+  if(typeof N4VOCAB !== 'undefined' && N4VOCAB.length) all = all.concat(N4VOCAB);
+  if(typeof N5VOCAB !== 'undefined' && N5VOCAB.length) all = all.concat(N5VOCAB);
+  if(typeof N3VOCAB !== 'undefined' && N3VOCAB.length) all = all.concat(N3VOCAB);
+  all.forEach(function(x){ if(x.w && x.r && !READMAP[x.w]) READMAP[x.w] = x.r; });
+  /* 人工核實讀音優先級最高 */
+  if(typeof VERIFIED_R !== 'undefined') Object.keys(VERIFIED_R).forEach(function(w){ READMAP[w] = VERIFIED_R[w]; });
+  _rubyKeys = null;
+  _vocabState = {
+    n4: (typeof N4VOCAB !== 'undefined' && N4VOCAB.length > 0),
+    n5: (typeof N5VOCAB !== 'undefined' && N5VOCAB.length > 0),
+    n3: (typeof N3VOCAB !== 'undefined' && N3VOCAB.length > 0),
+    ver: (typeof VERIFIED_R !== 'undefined' && Object.keys(VERIFIED_R).length > 0)
+  };
+}
+function readingFor(w){
+  var cur = {
+    n4: (typeof N4VOCAB !== 'undefined' && N4VOCAB.length > 0),
+    n5: (typeof N5VOCAB !== 'undefined' && N5VOCAB.length > 0),
+    n3: (typeof N3VOCAB !== 'undefined' && N3VOCAB.length > 0),
+    ver: (typeof VERIFIED_R !== 'undefined' && Object.keys(VERIFIED_R).length > 0)
+  };
+  if(cur.n4!==_vocabState.n4 || cur.n5!==_vocabState.n5 || cur.n3!==_vocabState.n3 || cur.ver!==_vocabState.ver){
+    buildReadMap();
+  }
+  return READMAP[w] || '';
+}
+/* 單詞加振假名 */
+function rubyWord(w, r){
+  r = r || readingFor(w);
+  if(r && r!==w && /[\u4e00-\u9fff]/.test(w)) return '<ruby>'+esc(w)+'<rt>'+esc(r)+'</rt></ruby>';
+  return esc(w);
+}
+/* 句子加振假名（最長匹配） */
+var _rubyKeys = null;
+function rubyText(s){
+  if(!s) return '';
+  s = String(s);
+  if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
+  if(!_rubyKeys){
+    _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
+    _rubyKeys.sort(function(a,b){ return b.length - a.length; });
+  }
+  var out = '', i = 0;
+  while(i < s.length){
+    var matched = false;
+    for(var k = 0; k < _rubyKeys.length; k++){
+      var word = _rubyKeys[k];
+      if(s.substr(i, word.length) === word){
+        out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
+        i += word.length; matched = true; break;
+      }
+    }
+    if(!matched){ out += esc(s[i]); i++; }
+  }
+  return out;
+}
+var flash=null;
+function startFlash(src){
+  var pool=[];
+  if(src==='mine'){
+    if(child==='GOBI' && GOBI_POOL){ pool=GOBI_POOL.slice(); }
+    else{
+      var seen={};
+      loadAll().forEach(function(e){
+        e.words.forEach(function(x){
+          var w=normWord(x);
+          var parts=String(x).split(/[:：]/);
+          var m=parts.length>1?parts.slice(1).join('：').trim():'';
+          if(w && m && !seen[w]){ seen[w]=1; pool.push({w:w,m:m,r:readingFor(w)}); }
+        });
+      });
+    }
+    if(!pool.length){ $('flashBody').innerHTML='<div class="recall-empty">未有學過嘅生字，先交幾日先玩得。</div><button class="btn2" onclick="backFlash()">返去</button>'; $('flashIntro').style.display='none'; $('flashBody').style.display='block'; return; }
+  }else if(src==='n4'){
+    if(!N4VOCAB.length){ $('flashBody').innerHTML='<div class="recall-empty">N4 字表載入緊，等陣再試。</div><button class="btn2" onclick="backFlash()">返去</button>'; $('flashIntro').style.display='none'; $('flashBody').style.display='block'; return; }
+    pool=shuffle(N4VOCAB.slice()).slice(0,20).map(function(x){ return {w:x.w,m:x.m,r:x.r}; });
+  }else if(src==='wrong'){
+    /* 從錯題庫同測驗錯題收集 */
+    var seen2={};
+    (typeof CORR!=='undefined'?CORR:[]).forEach(function(r){ if(r[2]&&r[3]&&!seen2[r[2]]){ seen2[r[2]]=1; pool.push({w:r[2],m:r[3]}); } });
+    if(!pool.length){ $('flashBody').innerHTML='<div class="recall-empty">暫時未有錯過嘅字，繼續保持！</div><button class="btn2" onclick="backFlash()">返去</button>'; $('flashIntro').style.display='none'; $('flashBody').style.display='block'; return; }
+  }
+  flash={deck:shuffle(pool),idx:0,mastered:0,total:pool.length,src:src};
+  $('flashIntro').style.display='none'; $('flashBody').style.display='block';
+  renderFlash();
+}
+function renderFlash(){
+  if(!_rubyKeys) readingFor('');
+  var c=flash.deck[flash.idx];
+  var remain=flash.deck.length-flash.idx;
+  $('flashBody').innerHTML='<div class="fprog">第 '+(flash.idx+1)+' / '+flash.deck.length+' 張 · 已記住 '+flash.mastered+' 張</div>'+
+    '<div class="fcard-wrap"><div class="fcard" id="fcard" onclick="flipFlash()">'+
+    '<div class="fface ffront"><div>'+rubyWord(c.w,c.r)+'</div><div class="fhint">撳我反轉睇意思</div></div>'+
+    '<div class="fface fback"><div>'+esc(c.m)+'</div><div class="fhint">'+rubyWord(c.w,c.r)+'</div></div>'+
+    '</div></div>'+
+    '<div class="fbtns" id="fbtns" style="display:none">'+
+    '<button class="btn2 fbtn-know" onclick="flashKnow(true)">識了 ✓</button>'+
+    '<button class="btn2 fbtn-dunno" onclick="flashKnow(false)">唔識，再嚟</button>'+
+    '</div>'+
+    '<div style="text-align:center;margin-top:12px"><button class="btn2" onclick="backFlash()">完結</button></div>';
+}
+function flipFlash(){
+  $('fcard').classList.add('flipped');
+  $('fbtns').style.display='flex';
+}
+function flashKnow(know){
+  if(know){ flash.mastered++; }
+  else{
+    /* 唔識：放返入 deck 後面，遲啲再見 */
+    var c=flash.deck[flash.idx];
+    var insertAt=Math.min(flash.idx+3+Math.floor(Math.random()*3), flash.deck.length);
+    flash.deck.splice(insertAt,0,c);
+  }
+  flash.idx++;
+  if(flash.idx>=flash.deck.length){
+    var pct=Math.round(flash.mastered/flash.total*100);
+    $('flashBody').innerHTML='<div class="q-score">完成！</div>'+
+      '<div class="msg ok">呢輪記住咗 '+flash.mastered+' / '+flash.total+' 個字（'+pct+'%）<br>唔識嘅會再出現，記住為止。</div>'+
+      '<div style="text-align:center"><button class="btn2" onclick="backFlash()">返去</button></div>';
+  }else{
+    renderFlash();
+  }
+}
+function backFlash(){ $('flashBody').style.display='none'; $('flashIntro').style.display='block'; }
+function renderQuizHist(){
+  var h=loadQuizRec().slice(-5).reverse();
+  $('quizHist').innerHTML = h.length
+    ? '<div class="hint" style="margin-top:10px">最近測驗：</div>'+h.map(function(r){ return '<div class="recall-empty">'+esc(r.date)+'：'+r.score+'/'+r.total+'</div>'; }).join('')
+    : '';
+}
+/* ---------- 本週大測驗 ---------- */
+var WEEK_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdxdPkOEcr0LIXm7vfHT62GRWWHXSM0dNvbjo1v143fPvruJg/formResponse';
+var WEEK_ENTRY = {
+who:'entry.525424664', week:'entry.565126955', vocab:'entry.1729458000', gram:'entry.1116270951',
+read:'entry.827728752', rev:'entry.1341375154', total:'entry.1153192342', wrong:'entry.1240677046'
+};
+/* ---------- 每日小測驗成績 ---------- */
+var QUIZ_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScGAhBE1swquUEn-aVvkCpawrULA53AmSaZohFqCi3Plj4Oiw/formResponse';
+var QUIZ_ENTRY = { who:'entry.2132373282', date:'entry.781996366', score:'entry.1843914702' };
+var TEST_QUIZ_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSdNj8p967W7v9kS2CmG2XsEIjqzML6OFJmk3zul47-nsXvxxg/formResponse';
+var TEST_QUIZ_ENTRY = { who:'entry.1480468810', date:'entry.53550849', score:'entry.111388222' };
+var ANA_CSV = 'https://docs.google.com/spreadsheets/d/13tkAjIjTtm0V3qRHrboCGKFsN4wZjABbehQ7y_nLGS4/gviz/tq?tqx=out:csv&headers=1&sheet=' + encodeURIComponent('週分析');
+var CORR = [];
+
+var GRAM_BANK = [
+{q:'母は毎日私に弁当を＿＿＿。',opts:['作ってくれます','作ってあげます','作ってもらいます','作ってくれません'],ans:0,exp:'別人為「我」做→てくれる'},
+{q:'辞書を＿＿＿、自分の力で考えてみてください。',opts:['見ないで','見なくて','見ないと','見なければ'],ans:0,exp:'〜ないで＝不…而…'},
+{q:'明日は試験ですから、今晩＿＿＿。',opts:['勉強しなければならない','勉強しなくてもいい','勉強してはいけない','勉強するはずだ'],ans:0,exp:'〜なければならない＝必須…'},
+{q:'大切な写真を＿＿＿。',opts:['なくしてしまいました','なくしてみました','なくしておきました','なくすところです'],ans:0,exp:'〜てしまう＝不小心…了（帶遺憾）'},
+{q:'このケーキ、＿＿＿？',opts:['食べてみてください','食べてしまいます','食べておきます','食べたばかりです'],ans:0,exp:'〜てみる＝試著…'},
+{q:'天気がいいと、富士山＿＿＿。',opts:['が見えます','を見ます','が聞こえます','を話せます'],ans:0,exp:'見える＝看得見'},
+{q:'雨＿＿＿ら、試合は中止です。',opts:['が降った','を降った','が降っても','を降れば'],ans:0,exp:'〜たら＝如果…'},
+{q:'＿＿＿も、毎日運動しています。',opts:['忙しくて','忙しいたら','忙しくば','忙しいなくて'],ans:0,exp:'〜ても＝即使…也…'},
+{q:'もっと早く＿＿＿よかった。',opts:['起きれば','起きても','起きるところだった','起きるはずだった'],ans:0,exp:'〜ばよかった＝要是…就好了（後悔）'},
+{q:'弟は母に＿＿＿。',opts:['しかられました','しかりました','しからせました','しかられてあげました'],ans:0,exp:'被動：しかられる＝被罵'},
+{q:'母は私に部屋を＿＿＿。',opts:['掃除させました','掃除されました','掃除してくれました','掃除してもらいました'],ans:0,exp:'使役：〜させる＝叫…做'},
+{q:'天気予報によると、明日は＿＿＿そうです。',opts:['晴れだ','晴れるようだ','晴れるらしい','晴れるはずだ'],ans:0,exp:'〜そうだ（聽說）＝據說…'},
+{q:'彼は＿＿＿疲れているようです。',opts:['とても','とてもそうで','とてもらしいで','とてもはずで'],ans:0,exp:'〜ようだ＝看起來…（推測）'},
+{q:'彼女は今家に＿＿＿はずです。',opts:['いる','いたそうだ','いるようだ','いるところだ'],ans:0,exp:'〜はず＝應該…（有把握的推測）'},
+{q:'週末は山に＿＿＿つもりです。',opts:['登る','登るはずだ','登るようだ','登ったそうだ'],ans:0,exp:'〜つもり＝打算…'},
+{q:'今ご飯を＿＿＿ところです。',opts:['食べている','食べたばかりだ','食べたことがある','食べてしまう'],ans:0,exp:'〜ているところ＝正在…'},
+{q:'さっき昼ご飯を＿＿＿。',opts:['食べたばかりです','食べているところです','食べてみます','食べるはずです'],ans:0,exp:'〜たばかり＝剛剛…'},
+{q:'私は富士山に＿＿＿ことがあります。',opts:['登った','登っているところだ','登るつもりだ','登らせた'],ans:0,exp:'〜たことがある＝曾經…'},
+{q:'今日は傘を＿＿＿もいいです。',opts:['持って行かなくて','持って行かなければなりません','持って行ってはいけません','持って行くところだ'],ans:0,exp:'〜なくてもいい＝不…也可以'},
+{q:'日本語が＿＿＿ようになりました。',opts:['話せる','話すそうだ','話されよう','話してみる'],ans:0,exp:'〜ようになる＝變得會…'},
+{q:'彼は風邪を＿＿＿らしいです。',opts:['ひいた','ひくそうだ','ひくようだ','ひくはずだ'],ans:0,exp:'〜らしい＝好像…（聽聞推測）'},
+{q:'このラーメンは＿＿＿すぎます。',opts:['熱','熱なさ','熱くて','熱すぎることだ'],ans:0,exp:'〜すぎる＝太…'},
+{q:'旅行の前に、切符を＿＿＿。',opts:['買っておきます','買ってみます','買ってしまいます','買ったばかりです'],ans:0,exp:'〜ておく＝預先…'},
+{q:'友達に日本語を＿＿＿。',opts:['教えてもらいました','教えてくれました','教えてあげました','教えられました'],ans:0,exp:'〜てもらう＝請…為我做'}
+];
+
+var READ_BANK = [
+{text:'先週の日曜日、家族で海に行きました。父は車を運転して、私と妹は後ろの席で音楽を聞いていました。海はとてもきれいで、空も青かったです。私たちは泳いだり、貝を拾ったりして遊びました。昼ご飯は近くの店でカレーを食べました。とてもおいしかったです。帰りの車の中で、妹は疲れて寝てしまいました。楽しい一日でした。',
+qs:[
+{q:'この家族は先週の日曜日にどこに行きましたか。',opts:['海','山','動物園','映画館'],ans:0},
+{q:'妹について、正しい文はどれですか。',opts:['帰りの車で寝てしまいました','妹が車を運転しました','妹はカレーが嫌いです','妹は魚をたくさん釣りました'],ans:0}
+]},
+{text:'日本のコンビニはとても便利です。おにぎりやお弁当だけでなく、本や電池も売っています。夜遅くまで開いている店が多いです。私は学校の帰りによくコンビニに寄ります。昨日は友達とアイスを買って、店の前で食べました。店員はいつも「いらっしゃいませ」と言います。日本のコンビニは外国人にも人気があります。',
+qs:[
+{q:'文章によると、コンビニで何を売っていますか。',opts:['おにぎりやお弁当、本、電池など','おにぎりだけ','アイスだけ','本だけ'],ans:0},
+{q:'「私」は昨日コンビニで何をしましたか。',opts:['友達とアイスを買って店の前で食べました','電池を買いました','一人で本を読みました','店員を手伝いました'],ans:0}
+]}
+];
+
+function weekKey(){
+var d=new Date(), onejan=new Date(d.getFullYear(),0,1);
+var w=Math.ceil((((d-onejan)/86400000)+onejan.getDay()+1)/7);
+return d.getFullYear()+'-W'+(w<10?'0':'')+w;
+}
+function weekQuizKey(){ return 'jlpt_weekquiz_'+child;}
+function loadWeekRec(){ try{ return JSON.parse(localStorage.getItem(weekQuizKey())||'{}');}catch(e){ return {};}}
+function saveWeekRec(wk,rec){ var a=loadWeekRec(); a[wk]=rec; localStorage.setItem(weekQuizKey(),JSON.stringify(a));}
+function poolWordsOldest(){
+if(child==='GOBI' && GOBI_POOL) return GOBI_POOL.slice();
+var seen={}, pool=[];
+loadAll().slice().sort(function(a,b){ return a.date<b.date?-1:1;}).forEach(function(e){
+e.words.forEach(function(x){
+var w=normWord(x);
+var parts=String(x).split(/[:：]/);
+var m=parts.length>1?parts.slice(1).join('：').trim():'';
+if(w && m &&!seen[w]){ seen[w]=1; pool.push({w:w,m:m});}
+});
+});
+return pool;
+}
+function mkVocabQ(p,pool,i){
+var type='j2c', q, opts, ans;
+var r = p.r || readingFor(p.w);
+q='「'+p.w+'」嘅意思係？'; opts=[p.m];
+shuffle(pool.filter(function(x){return x.w!==p.w;})).slice(0,3).forEach(function(o){opts.push(o.m);}); ans=p.m;
+opts=shuffle(opts.filter(function(v,ix,a){return a.indexOf(v)===ix;}));
+return {q:q,opts:opts,ans:ans,w:p.w,r:r,type:type};
+}
+function startWeekQuiz(){
+var wk=weekKey(), rec=loadWeekRec();
+$('weekIntro').style.display='none'; $('weekBody').style.display='block';
+if(rec[wk]){
+var redoBtn = isTest() ? '<button class="btn2" onclick="redoWeekQuiz()">再做一次（測試）</button> ' : '';
+$('weekBody').innerHTML='<div class="q-score">'+wk+' 已完成：'+rec[wk].total+'</div>'+
+'<div class="hint" style="text-align:center">語彙 '+rec[wk].s['語彙']+'/8 · 文法 '+rec[wk].s['文法']+'/8 · 讀解 '+rec[wk].s['讀解']+'/4 · 複習 '+rec[wk].s['複習']+'/5</div>'+
+'<div style="text-align:center">'+redoBtn+'<button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
+return;
+}
+var pool=poolWords();
+if(pool.length<8){
+$('weekBody').innerHTML='<div class="recall-empty">生字唔夠 8 個，儲多幾日先玩得大測驗。</div><div style="text-align:center"><button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
+return;
+}
+var used={}, qs=[];
+shuffle(pool).slice(0,8).forEach(function(p,i){ used[p.w]=1; var q=mkVocabQ(p,pool,i); q.sec='語彙'; qs.push(q);});
+shuffle(GRAM_BANK).slice(0,8).forEach(function(g){
+var ansText=g.opts[g.ans];
+qs.push({sec:'文法',q:g.q,opts:shuffle(g.opts.slice()),ans:ansText,exp:g.exp});
+});
+READ_BANK.forEach(function(p){
+p.qs.forEach(function(rq){
+var ansText=rq.opts[rq.ans];
+qs.push({sec:'讀解',passage:p.text,q:rq.q,opts:shuffle(rq.opts.slice()),ans:ansText});
+});
+});
+var revQs=[];
+var cands=CORR.slice(0,6), dpool=[];
+cands.forEach(function(r){ dpool.push(r[2]); dpool.push(r[3]);});
+cands.slice(0,3).forEach(function(r){
+if(revQs.length>=3) return;
+var distract=dpool.filter(function(v){return v!==r[2]&&v!==r[3];}).filter(function(v,ix,a){return a.indexOf(v)===ix;});
+var opts=shuffle([r[3],r[2]].concat(shuffle(distract).slice(0,2)));
+if(opts.length<3) return;
+revQs.push({sec:'複習',q:'「'+r[2]+'」嘅正確寫法係？',opts:opts,ans:r[3]});
+});
+var oldest=poolWordsOldest().filter(function(p){return!used[p.w];}), vi=0;
+while(revQs.length<5 && vi<oldest.length){
+var p=oldest[vi++], q=mkVocabQ(p,pool,revQs.length);
+used[p.w]=1; q.sec='複習'; revQs.push(q);
+}
+revQs.forEach(function(q){ qs.push(q);});
+wq={qs:qs,idx:0,wk:wk,s:{'語彙':0,'文法':0,'讀解':0,'複習':0},wrong:[]};
+renderWeekQ();
+}
+function renderWeekQ(){
+var q=wq.qs[wq.idx];
+var html='<div class="q-progress">'+q.sec+' · 第 '+(wq.idx+1)+' / '+wq.qs.length+' 題</div>';
+if(q.passage) html+='<div class="passage">'+rubyText(q.passage).replace(/\n/g,'<br>')+'</div>';
+var qHtml = (q.type==='j2c' && q.w) ? '「'+rubyWord(q.w,q.r)+'」嘅意思係？' : rubyText(q.q);
+html+='<div class="q-text">'+qHtml+'</div>'+
+q.opts.map(function(o,i){ var od = (q.type==='j2c') ? esc(o) : rubyText(o); return '<button class="opt" data-i="'+i+'">'+od+'</button>';}).join('');
+$('weekBody').innerHTML=html;
+var btns=$('weekBody').querySelectorAll('.opt');
+btns.forEach(function(b){ b.onclick=function(){ answerWeekQ(parseInt(b.getAttribute('data-i'),10));};});
+}
+function answerWeekQ(i){
+var q=wq.qs[wq.idx];
+q.userAns=q.opts[i];
+var btns=$('weekBody').querySelectorAll('.opt');
+btns.forEach(function(b){ b.disabled=true;});
+if(q.opts[i]===q.ans){ wq.s[q.sec]++; btns[i].classList.add('ok');}
+else{
+btns[i].classList.add('no');
+btns.forEach(function(b,bi){ if(q.opts[bi]===q.ans) b.classList.add('ok');});
+wq.wrong.push(''+q.q+' → '+q.ans);
+}
+var nb=document.createElement('button'); nb.className='btn2';
+if(wq.idx<wq.qs.length-1){
+  nb.textContent='下一題'; nb.onclick=nextWeekQ; $('weekBody').appendChild(nb);
+}else{
+  nb.textContent='交卷緊…'; nb.disabled=true; $('weekBody').appendChild(nb);
+  setTimeout(nextWeekQ, 1500);
+}
+}
+function nextWeekQ(){ wq.idx++; if(wq.idx>=wq.qs.length) endWeekQuiz(); else renderWeekQ();}
+function endWeekQuiz(){
+var s=wq.s, total=s['語彙']+s['文法']+s['讀解']+s['複習'];
+saveWeekRec(wq.wk,{total:total+'/25',s:s});
+var p=new URLSearchParams();
+var WFU = isTest()?TEST_WEEK_FORM_URL:WEEK_FORM_URL, WEN = isTest()?TEST_WEEK_ENTRY:WEEK_ENTRY;
+p.append(WEN.who,child); p.append(WEN.week,wq.wk);
+p.append(WEN.vocab,s['語彙']+'/8'); p.append(WEN.gram,s['文法']+'/8');
+p.append(WEN.read,s['讀解']+'/4'); p.append(WEN.rev,s['複習']+'/5');
+p.append(WEN.total,total+'/25');
+p.append(WEN.wrong,wq.wrong.length?wq.wrong.join(' ／ '):'全部啱');
+postScore({type:'week',who:child,date:wq.wk,
+  vocab:s['語彙']+'/8',gram:s['文法']+'/8',read:s['讀解']+'/4',rev:s['複習']+'/5',
+  total:total+'/25',wrong:wq.wrong.join(' ／ ')||'全部啱'});
+var c = total>=20? ['好叻！繼續保持。','ok']: total>=14? ['唔錯，錯嗰啲記低佢。','ok']: ['要加油，睇返錯題再嚟過。','err'];
+var review='<div class="review"><div class="review-title">答案回顧（學習用）</div>';
+wq.qs.forEach(function(q,i){
+  var ok=q.userAns===q.ans;
+  var cls=ok?'rok':'rno';
+  var rqHtml = (q.type==='j2c' && q.w) ? '「'+rubyWord(q.w,q.r)+'」嘅意思係？' : rubyText(q.q);
+  review+='<div class="ritem '+cls+'"><div class="rq">['+q.sec+'] 第'+(i+1)+'題：'+rqHtml+'</div>'+
+    '<div>你嘅答案：'+(q.type==='j2c'?esc(q.userAns||'—'):rubyText(q.userAns||'—'))+' <span class="rmark">'+(ok?'✓ 啱':'✗ 錯')+'</span></div>'+
+    (ok?'':'<div>正確答案：<b>'+(q.type==='j2c'?esc(q.ans):rubyText(q.ans))+'</b></div>')+
+    (q.exp&&!ok?'<div class="rlearn">講解：'+esc(q.exp)+'</div>':'')+'</div>';
+});
+review+='</div>';
+$('weekBody').innerHTML='<div class="q-score">本週得分：'+total+' / 25</div>'+
+'<div class="hint" style="text-align:center">語彙 '+s['語彙']+'/8 · 文法 '+s['文法']+'/8 · 讀解 '+s['讀解']+'/4 · 複習 '+s['複習']+'/5<br>成績已交，星期日會有分析。</div>'+
+'<div class="msg '+c[1]+'">'+c[0]+'</div>'+review+'<div style="text-align:center"><button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
+renderWeekHist();
+}
+function backWeekQuiz(){ $('weekBody').style.display='none'; $('weekIntro').style.display='block';}
+function redoWeekQuiz(){ var wk=weekKey(), rec=loadWeekRec(); delete rec[wk]; localStorage.setItem(weekQuizKey(),JSON.stringify(rec)); startWeekQuiz(); }
+function renderWeekHist(){
+var rec=loadWeekRec(), keys=Object.keys(rec).sort().reverse().slice(0,4);
+$('weekHist').innerHTML = keys.length
+? '<div class="hint" style="margin-top:10px">最近成績：</div>'+keys.map(function(k){ return '<div class="recall-empty">'+esc(k)+'：'+rec[k].total+'</div>';}).join('')
+: '';
+}
+
+/* ---------- N4 隨機練習 ---------- */
+var N4_BANK = null;
+function loadN4Bank(cb){
+  if(N4_BANK){ cb(); return; }
+  fetch('n4_question_bank.json').then(function(r){ return r.json(); }).then(function(j){
+    N4_BANK = j.questions || [];
+    cb();
+  }).catch(function(){ setMsg('題庫載入失敗，請檢查網絡。','err'); });
+}
+function startRandPractice(){
+  loadN4Bank(function(){
+    if(N4_BANK.length < 5){ setMsg('題庫題目不足，請等題庫更新。','err'); return; }
+    var pool = N4_BANK.filter(function(q){ return !q.needs_image; });
+    var picked = [];
+    var idx = pool.map(function(_,i){ return i; });
+    for(var i=0;i<5 && idx.length;i++){
+      var r = Math.floor(Math.random()*idx.length);
+      picked.push(pool[idx.splice(r,1)[0]]);
+    }
+    renderPracticeQuestions(picked, 'rand');
+  });
+}
+function renderPracticeQuestions(qs, mode){
+  var bodyId = mode==='rand' ? 'randBody' : 'fullBody';
+  var introId = mode==='rand' ? 'randIntro' : 'fullIntro';
+  $(introId).style.display='none'; $(bodyId).style.display='block';
+  var html = '<div class="hint">共 '+qs.length+' 題，選好答案後按提交。</div>';
+  qs.forEach(function(q,i){
+    html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question)+'</div>';
+    if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%"></div>';
+    if(q.audio) html += '<div><audio controls src="'+q.audio+'" style="width:100%"></audio></div>';
+    q.options.forEach(function(op,j){
+      html += '<label class="opt"><input type="radio" name="'+mode+'_q'+i+'" value="'+(j+1)+'"> '+esc(op)+'</label>';
+    });
+    html += '<div class="qexplain" id="'+mode+'_exp'+i+'" style="display:none"></div></div>';
+  });
+  html += '<button class="btn2" onclick="submitPractice(\''+mode+'\','+JSON.stringify(qs.map(function(q){return q.id;}))+')">提交答案</button> ';
+  html += '<button class="btn" onclick="backPractice(\''+mode+'\')">返回</button>';
+  $(bodyId).innerHTML = html;
+  $(bodyId).dataset.questions = JSON.stringify(qs);
+}
+function submitPractice(mode, ids){
+  var bodyId = mode==='rand' ? 'randBody' : 'fullBody';
+  var qs = JSON.parse($(bodyId).dataset.questions);
+  var correct = 0, wrong = [];
+  qs.forEach(function(q,i){
+    var sel = document.querySelector('input[name="'+mode+'_q'+i+'"]:checked');
+    var userAns = sel ? parseInt(sel.value) : 0;
+    var isCorrect = (userAns === q.answer);
+    if(isCorrect) correct++;
+    else wrong.push({q:q, userAns:userAns, index:i});
+    var expDiv = $(mode+'_exp'+i);
+    expDiv.style.display='block';
+    expDiv.innerHTML = isCorrect
+      ? '<div class="ok">✓ 答對了！</div>'
+      : '<div class="err">✗ 答錯了。正確答案是 '+q.answer+'. '+(q.explanation?esc(q.explanation):'')+'</div>';
+  });
+  var score = correct + '/' + qs.length;
+  // 記錄成績
+  savePracticeScore(mode, score, wrong.length);
+  // 顯示總結
+  var summary = '<div class="card-sub" style="margin:16px 0">得分：'+score+'（'+Math.round(correct/qs.length*100)+'分）</div>';
+  if(wrong.length>0){
+    summary += '<div class="hint">錯題分析：共錯 '+wrong.length+' 題，已在上面標示正確答案和解釋。</div>';
+  } else {
+    summary += '<div class="ok">全部答對，太厲害了！</div>';
+  }
+  $(bodyId).innerHTML = summary + $(bodyId).innerHTML;
+}
+function savePracticeScore(mode, score, wrongCount){
+  if(!child) return;
+  var key = mode==='rand' ? 'n4_rand_scores' : 'n4_full_scores';
+  var rec = JSON.parse(localStorage.getItem(key)||'{}');
+  var today = todayKey();
+  rec[today+'_'+child] = {score:score, wrong:wrongCount, time:new Date().toISOString()};
+  localStorage.setItem(key, JSON.stringify(rec));
+  // 同步到後端
+  fetch('https://jlpt-scores.hoo-c27.workers.dev/practice-score', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({who:child, mode:mode, date:today, score:score, wrong:wrongCount})
+  }).catch(function(){});
+  renderPracticeHist(mode);
+}
+function renderPracticeHist(mode){
+  var key = mode==='rand' ? 'n4_rand_scores' : 'n4_full_scores';
+  var histId = mode==='rand' ? 'randHist' : 'fullHist';
+  var rec = JSON.parse(localStorage.getItem(key)||'{}');
+  var keys = Object.keys(rec).filter(function(k){ return k.endsWith('_'+child); }).sort().reverse().slice(0,5);
+  $(histId).innerHTML = keys.length
+    ? '<div class="hint" style="margin-top:10px">最近成績：</div>'+keys.map(function(k){
+        return '<div class="recall-empty">'+esc(k.split('_')[0])+'：'+rec[k].score+'</div>';
+      }).join('')
+    : '';
+}
+function backPractice(mode){
+  var bodyId = mode==='rand' ? 'randBody' : 'fullBody';
+  var introId = mode==='rand' ? 'randIntro' : 'fullIntro';
+  $(bodyId).style.display='none'; $(introId).style.display='block';
+  renderPracticeHist(mode);
+}
+function startFullMock(){
+  loadN4Bank(function(){
+    var pool = N4_BANK.filter(function(q){ return !q.needs_image; });
+    if(pool.length < 10){ setMsg('題庫題目不足，請等題庫更新。','err'); return; }
+    // 按部分分組：語彙、文法、讀解
+    var vocab = pool.filter(function(q){ return q.section==='vocab'; });
+    var grammar = pool.filter(function(q){ return q.section==='grammar'; });
+    var reading = pool.filter(function(q){ return q.section==='reading'; });
+    var picked = [].concat(
+      vocab.slice(0, Math.min(10, vocab.length)),
+      grammar.slice(0, Math.min(10, grammar.length)),
+      reading.slice(0, Math.min(5, reading.length))
+    );
+    if(picked.length===0) picked = pool.slice(0, 20);
+    renderPracticeQuestions(picked, 'full');
+  });
+}
+
+/* ---------- 每日練習（平日模式） ---------- */
+var QBANK = null;
+function loadQBank(cb){
+  if(QBANK){ cb(); return; }
+  fetch('question_bank.json').then(function(r){ return r.json(); }).then(function(j){
+    QBANK = j.questions || j;
+    cb();
+  }).catch(function(){ setMsg('題庫載入失敗，請檢查網絡。','err'); });
+}
+// 連題感知抽題：抽中一題，同 group 的全部一起出
+function pickGroupAware(pool, n){
+  var picked = [], usedIds = {};
+  var groups = {}; // group -> [questions]
+  var singles = [];
+  pool.forEach(function(q){
+    if(q.group){ (groups[q.group] = groups[q.group]||[]).push(q); }
+    else singles.push(q);
+  });
+  var groupKeys = Object.keys(groups);
+  // 打亂
+  function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+  shuffle(singles); shuffle(groupKeys);
+  var si = 0, gi = 0;
+  var maxN = 10; // 最多10題，連題唔拆
+  var minN = 5;  // 最少5題
+  while(picked.length < maxN && (si < singles.length || gi < groupKeys.length)){
+    // 隨機決定出單題定成組
+    if(gi < groupKeys.length && (si >= singles.length || Math.random() < 0.3)){
+      var g = groups[groupKeys[gi++]];
+      // 如果加成組會超過10題，而且已經有5題，就唔加呢組
+      if(picked.length >= minN && picked.length + g.length > maxN) continue;
+      g.forEach(function(q){ if(!usedIds[q.id]){ usedIds[q.id]=1; picked.push(q); } });
+    } else if(si < singles.length){
+      var q = singles[si++];
+      if(!usedIds[q.id]){ usedIds[q.id]=1; picked.push(q); }
+    }
+    if(picked.length >= n) break;
+  }
+  return picked; // 唔再 slice，連題唔拆
+}
+function startDailyPractice(){
+  if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  var level = $('dailyLevel').value;
+  loadQBank(function(){
+    var pool = QBANK.filter(function(q){ return q.level===level && !q.needs_image; });
+    if(pool.length < 5){ setMsg('題庫題目不足。','err'); return; }
+    var picked = pickGroupAware(pool, 8); // 5-10題，取8
+    renderDailyQuestions(picked);
+  });
+}
+function renderDailyQuestions(qs){
+  $('dailyIntro').style.display='none'; $('dailyBody').style.display='block';
+  var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
+  qs.forEach(function(q,i){
+    html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> ['+q.level+' '+secName(q.section)+'] '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+    if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
+    if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
+    q.options.forEach(function(op,j){
+      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'"> '+esc(op)+'</label>';
+    });
+    html += '<div class="qexplain" id="daily_exp'+i+'" style="display:none"></div></div>';
+  });
+  html += '<button class="btn2" onclick="submitDaily()">提交答案</button> ';
+  html += '<button class="btn" onclick="backDaily()">返回</button>';
+  $('dailyBody').innerHTML = html;
+  $('dailyBody').dataset.questions = JSON.stringify(qs);
+}
+function secName(s){ return {vocab:'語彙',grammar:'文法',reading:'讀解',listening:'聽解'}[s]||s; }
+function submitDaily(){
+  var qs = JSON.parse($('dailyBody').dataset.questions);
+  var correct = 0, wrongQs = [];
+  qs.forEach(function(q,i){
+    var sel = document.querySelector('input[name="daily_q'+i+'"]:checked');
+    var userAns = sel ? parseInt(sel.value) : 0;
+    var ok = (userAns === q.answer);
+    if(ok) correct++;
+    else wrongQs.push({id:q.id, q:q.question, options:q.options, answer:q.answer, userAns:userAns, explanation:q.explanation||'', section:q.section, level:q.level});
+    var exp = $('daily_exp'+i);
+    exp.style.display='block';
+    exp.innerHTML = ok ? '<div class="ok">✓ 答對了！</div>'
+      : '<div class="err">✗ 答錯了。正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation):'')+'</div>';
+  });
+  saveDailyWrong(wrongQs);
+  var pct = Math.round(correct/qs.length*100);
+  var summary = '<div class="card-sub" style="margin:16px 0">今日得分：'+correct+'/'+qs.length+'（'+pct+'分）</div>';
+  summary += wrongQs.length ? '<div class="hint">錯咗 '+wrongQs.length+' 題，已記錄，聽日會先複習呢啲錯題。</div>' : '<div class="ok">全部答對，好叻！</div>';
+  $('dailyBody').innerHTML = summary + $('dailyBody').innerHTML;
+  renderDailyHist();
+}
+function saveDailyWrong(wrongQs){
+  if(!child || !wrongQs.length) return;
+  var key = 'daily_wrong';
+  var rec = JSON.parse(localStorage.getItem(key)||'{}');
+  var ck = child, today = todayKey();
+  rec[ck] = rec[ck]||{};
+  rec[ck][today] = wrongQs;
+  localStorage.setItem(key, JSON.stringify(rec));
+}
+function getYesterdayWrong(){
+  if(!child) return [];
+  var rec = JSON.parse(localStorage.getItem('daily_wrong')||'{}');
+  var mine = rec[child]||{};
+  var y = new Date(); y.setDate(y.getDate()-1);
+  var yk = dateStr(y);
+  return mine[yk]||[];
+}
+function renderDailyReview(){
+  var w = getYesterdayWrong();
+  if(!w.length){ $('dailyReview').innerHTML=''; return; }
+  var html = '<div class="card-sub" style="margin:10px 0">📝 昨日錯題複習（'+w.length+' 題）：</div>';
+  w.forEach(function(item,i){
+    html += '<div class="qblock"><div class="qtext"><b>'+(i+1)+'.</b> '+esc(item.q).replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="err">你揀咗：'+esc(item.options[item.userAns-1]||'(無作答)')+'<br>正確答案：'+esc(item.options[item.answer-1])+'</div>';
+    if(item.explanation) html += '<div class="hint">💡 '+esc(item.explanation)+'</div>';
+    html += '</div>';
+  });
+  html += '<div class="hint">睇完上面嘅錯題，記住咗先開始今日練習！</div>';
+  $('dailyReview').innerHTML = html;
+}
+function backDaily(){
+  $('dailyBody').style.display='none'; $('dailyIntro').style.display='block';
+  renderDailyReview(); renderDailyHist();
+}
+function renderDailyHist(){
+  var rec = JSON.parse(localStorage.getItem('daily_wrong')||'{}');
+  var mine = (child && rec[child])||{};
+  var keys = Object.keys(mine).sort().reverse().slice(0,5);
+  $('dailyHist').innerHTML = keys.length
+    ? '<div class="hint" style="margin-top:10px">錯題記錄：</div>'+keys.map(function(k){
+        return '<div class="recall-empty">'+esc(k)+'：錯 '+mine[k].length+' 題</div>';
+      }).join('') : '';
+}
+
+/* ---------- 假日模擬考 ---------- */
+// 真實考試時間（分鐘）- 言語知識・讀解合併計時
+var EXAM_TIMES = {
+  N5: {vocab:25, lang_read:50, listening:30},
+  N4: {vocab:30, lang_read:60, listening:35},
+  N3: {vocab:30, lang_read:70, listening:40}
+};
+// section 名稱對應
+function secName(s){
+  if(s==='vocab') return '言語知識（文字・語彙）';
+  if(s==='lang_read') return '言語知識（文法）・読解';
+  if(s==='listening') return '聴解';
+  return s;
+}
+var examTimer = null, examSections = [], examSecIdx = 0, examAnswers = {}, examQsBySec = {};
+function startExamMock(){
+  if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  var level = $('examLevel').value;
+  loadQBank(function(){
+    var pool = QBANK.filter(function(q){ return q.level===level && !q.needs_image; });
+    if(!pool.length){ setMsg('題庫題目不足。','err'); return; }
+    // 三部分：言語知識（文字・語彙）、言語知識（文法）・読解、聴解
+    examSections = ['vocab','lang_read','listening'];
+    examQsBySec = {};
+    examSections.forEach(function(s){
+      var sq;
+      if(s==='vocab'){
+        sq = pool.filter(function(q){ return q.section==='vocab'; });
+      } else if(s==='lang_read'){
+        // 文法＋讀解合併
+        sq = pool.filter(function(q){ return q.section==='grammar' || q.section==='reading'; });
+      } else {
+        sq = pool.filter(function(q){ return q.section==='listening'; });
+      }
+      // 連題整組：按 group 分組後打亂
+      var groups = {}, singles = [];
+      sq.forEach(function(q){ if(q.group){ (groups[q.group]=groups[q.group]||[]).push(q); } else singles.push(q); });
+      var ordered = [];
+      Object.keys(groups).forEach(function(g){ groups[g].forEach(function(q){ ordered.push(q); }); });
+      // 打亂單題
+      for(var i=singles.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=singles[i];singles[i]=singles[j];singles[j]=t; }
+      examQsBySec[s] = ordered.concat(singles);
+    });
+    examSecIdx = 0; examAnswers = {};
+    $('examIntro').style.display='none'; $('examBody').style.display='block';
+    renderMockSection();
+  });
+}
+function renderExamSection(){
+  var level = $('examLevel').value;
+  var sec = examSections[examSecIdx];
+  var qs = examQsBySec[sec];
+  var mins = EXAM_TIMES[level][sec];
+  var html = '<div class="card-sub">第 '+(examSecIdx+1)+'/3 部分：'+secName(sec)+'（'+qs.length+' 題，限時 '+mins+' 分鐘）</div>';
+  html += '<div id="examTimer" style="font-size:24px;font-weight:bold;color:#d32f2f;margin:10px 0"></div>';
+  qs.forEach(function(q,i){
+    var key = sec+'_'+i;
+    html += '<div class="qblock"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+    if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
+    if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio></div>';
+    // 考試途中唔顯示聽力稿，交卷後先睇
+    q.options.forEach(function(op,j){
+      var checked = examAnswers[key]===(j+1) ? ' checked' : '';
+      html += '<label class="opt"><input type="radio" name="mock_'+key+'" value="'+(j+1)+'"'+checked+' onchange="examAnswers[\''+key+'\']='+(j+1)+'"> '+esc(op)+'</label>';
+    });
+    html += '</div>';
+  });
+  if(examSecIdx < 2) html += '<button class="btn2" onclick="nextExamSection()">下一部分</button> ';
+  else html += '<button class="btn2" onclick="submitExamMock()">交卷</button> ';
+  $('examBody').innerHTML = html;
+  // 保存當前部分題目供評分
+  $('examBody').dataset.sec = sec;
+  $('examBody').dataset.qs = JSON.stringify(qs);
+  startMockTimer(mins*60);
+}
+function startExamTimer(seconds){
+  clearInterval(examTimer);
+  var remain = seconds;
+  function tick(){
+    var m = Math.floor(remain/60), s = remain%60;
+    var el = $('examTimer');
+    if(el) el.textContent = '⏰ 剩餘 '+m+':'+(s<10?'0':'')+s;
+    if(remain<=0){ clearInterval(examTimer); setMsg('時間到！自動進入下一部分。','err'); nextExamSection(true); return; }
+    remain--;
+  }
+  tick(); examTimer = setInterval(tick, 1000);
+}
+function nextExamSection(auto){
+  // 保存當前答案
+  var sec = $('examBody').dataset.sec;
+  var qs = JSON.parse($('examBody').dataset.qs);
+  qs.forEach(function(q,i){
+    var sel = document.querySelector('input[name="mock_'+sec+'_'+i+'"]:checked');
+    if(sel) examAnswers[sec+'_'+i] = parseInt(sel.value);
+  });
+  clearInterval(examTimer);
+  if(examSecIdx < 2){ examSecIdx++; renderMockSection(); }
+  else submitExamMock();
+}
+function submitExamMock(){
+  clearInterval(examTimer);
+  // 保存最後一部分答案
+  var sec = $('examBody').dataset.sec;
+  if(sec){
+    var qs = JSON.parse($('examBody').dataset.qs);
+    qs.forEach(function(q,i){
+      var sel = document.querySelector('input[name="mock_'+sec+'_'+i+'"]:checked');
+      if(sel) examAnswers[sec+'_'+i] = parseInt(sel.value);
+    });
+  }
+  var level = $('examLevel').value;
+  var totalCorrect = 0, totalQ = 0, secScores = {}, wrongList = [];
+  examSections.forEach(function(s){
+    var qs = examQsBySec[s]||[];
+    var c = 0;
+    qs.forEach(function(q,i){
+      totalQ++;
+      if(examAnswers[s+'_'+i]===q.answer) c++;
+      else wrongList.push({section:s, q:q, userAns:examAnswers[s+'_'+i]||0});
+    });
+    secScores[s] = c+'/'+qs.length;
+    totalCorrect += c;
+  });
+  var pct = totalQ ? Math.round(totalCorrect/totalQ*100) : 0;
+  var html = '<div class="card-sub" style="margin:16px 0">模擬考完成！總分：'+totalCorrect+'/'+totalQ+'（'+pct+'分）</div>';
+  examSections.forEach(function(s){
+    html += '<div class="recall-empty">'+secName(s)+'：'+secScores[s]+'</div>';
+  });
+  if(wrongList.length){
+    html += '<div class="hint" style="margin-top:10px">錯題（'+wrongList.length+' 題）：</div>';
+    wrongList.slice(0,20).forEach(function(w,i){
+      html += '<div class="qblock"><div class="qtext"><b>'+(i+1)+'.</b> ['+secName(w.section)+'] '+esc(w.q.question).replace(/\n/g,'<br>').substring(0,120)+'...</div>';
+      html += '<div class="err">正確：'+esc(w.q.options[w.q.answer-1])+(w.q.explanation?'<br>'+esc(w.q.explanation):'')+'</div></div>';
+    });
+    if(wrongList.length>20) html += '<div class="hint">…仲有 '+(wrongList.length-20)+' 題錯題</div>';
+  } else html += '<div class="ok">全部答對，勁！</div>';
+  html += '<button class="btn" onclick="backExamMock()">返回</button>';
+  $('examBody').innerHTML = html;
+  // 記錄成績
+  saveExamScore(level, totalCorrect+'/'+totalQ, pct);
+}
+function saveExamScore(level, score, pct){
+  if(!child) return;
+  var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
+  var key = todayKey()+'_'+child+'_'+level;
+  rec[key] = {score:score, pct:pct, time:new Date().toISOString()};
+  localStorage.setItem('exam_scores', JSON.stringify(rec));
+  renderExamHist();
+}
+function backExamMock(){
+  clearInterval(examTimer);
+  $('examBody').style.display='none'; $('examIntro').style.display='block';
+  renderExamHist();
+}
+function renderExamHist(){
+  var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
+  var keys = Object.keys(rec).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).sort().reverse().slice(0,5);
+  $('examHist').innerHTML = keys.length
+    ? '<div class="hint" style="margin-top:10px">最近模擬考：</div>'+keys.map(function(k){
+        var parts = k.split('_');
+        return '<div class="recall-empty">'+esc(parts[0])+' '+esc(parts[2])+'：'+rec[k].score+'</div>';
+      }).join('') : '';
+}
+
+/* ---------- 每週分析 ---------- */
+function loadAnalysis(){
+var body=$('anaBody');
+fetch(ANA_CSV).then(function(r){ return r.text();}).then(function(t){
+var rows=parseCSV(t).slice(1).filter(function(r){ return r[1]===child && r[0];});
+if(!rows.length){ body.innerHTML='<div class="recall-empty">未有分析，逢星期日出。</div>'; return;}
+var r=rows[rows.length-1];
+body.innerHTML='<div class="hist-item"><div class="hist-date">'+esc(r[0])+'</div>'+
+'<div class="q-score" style="padding:4px">總分 '+esc(r[2])+'</div>'+
+'<div class="hist-words">語彙 '+esc(r[3])+' · 文法 '+esc(r[4])+' · 讀解 '+esc(r[5])+' · 複習 '+esc(r[6])+'</div>'+
+'<div class="hist-sent"><b>'+esc(r[7])+'</b></div>'+
+(r[8]?'<div class="hist-words">要加油：'+esc(r[8])+'</div>':'')+
+(r[9]?'<div class="hint">下週行動：'+esc(r[9])+'</div>':'')+'</div>';
+}).catch(function(){ body.innerHTML='<div class="recall-empty">載入失敗，檢查網絡後再試。</div>';});
+}
+
+</script>
+</body>
+</html>

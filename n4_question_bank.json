@@ -1,0 +1,604 @@
+{
+  "meta": {
+    "source": "2018年JLPT N4樣題",
+    "version": "1.0",
+    "total": 35
+  },
+  "questions": [
+    {
+      "id": "n4_2018_v01",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 1,
+      "question": "「楽しかった」的讀音是？\n今日はとても楽しかったですね。",
+      "options": [
+        "いそがしかった",
+        "すずしかった",
+        "たのしかった",
+        "かなしかった"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v02",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 2,
+      "question": "「味」的讀音是？\nわたしはこの味がすきです。",
+      "options": [
+        "かたち",
+        "いろ",
+        "におい",
+        "あじ"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v03",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 3,
+      "question": "「不便」的讀音是？\nこのあたりはちょっと不便ですね。",
+      "options": [
+        "ふべん",
+        "ぶべん",
+        "ふへん",
+        "ぶへん"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v04",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 4,
+      "question": "「切って」的讀音是？\nやさいを切ってください。",
+      "options": [
+        "とって",
+        "きって",
+        "あらって",
+        "もって"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v05",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 5,
+      "question": "「以外」的讀音是？\nはやしさん以外はみんな来ました。",
+      "options": [
+        "にそと",
+        "にがい",
+        "いそと",
+        "いがい"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v06",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 6,
+      "question": "「雲」的讀音是？\nまどからずっと雲を見ていました。",
+      "options": [
+        "ほし",
+        "ゆき",
+        "くも",
+        "そら"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v07",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 7,
+      "question": "「急行」的讀音是？\nその電車は急行ですよ。",
+      "options": [
+        "きゅこ",
+        "きゅこう",
+        "きゅうこ",
+        "きゅうこう"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v08",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 8,
+      "question": "「写さないで」的讀音是？\nこれは写さないでください。",
+      "options": [
+        "おさないで",
+        "うつさないで",
+        "けさないで",
+        "おとさないで"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v09",
+      "section": "vocab",
+      "mondai": 1,
+      "number": 9,
+      "question": "「反対」的讀音是？\nそのいけんには反対です。",
+      "options": [
+        "はんたい",
+        "ほんたい",
+        "はんだい",
+        "ほんだい"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v10",
+      "section": "vocab",
+      "mondai": 2,
+      "number": 10,
+      "question": "「くろい」的漢字寫法是？\nくろい くつしたが ほしいです。",
+      "options": [
+        "白い",
+        "黒い",
+        "赤い",
+        "青い"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v11",
+      "section": "vocab",
+      "mondai": 2,
+      "number": 11,
+      "question": "「けいかく」的漢字寫法是？\nなつやすみの けいかくは まだ きまって いません。",
+      "options": [
+        "計書",
+        "訂画",
+        "計画",
+        "訂書"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v12",
+      "section": "vocab",
+      "mondai": 2,
+      "number": 12,
+      "question": "「いしゃ」的漢字寫法是？\nわたしは いしゃに なりたいです。",
+      "options": [
+        "匠員",
+        "医員",
+        "匠者",
+        "医者"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v13",
+      "section": "vocab",
+      "mondai": 2,
+      "number": 13,
+      "question": "「よる」的漢字寫法是？\nあしたの よる かぞくと 出かけます。",
+      "options": [
+        "夜",
+        "昼",
+        "夕",
+        "朝"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v14",
+      "section": "vocab",
+      "mondai": 2,
+      "number": 14,
+      "question": "「かして」的漢字寫法是？\nかさを かして ください。",
+      "options": [
+        "貨して",
+        "資して",
+        "貸して",
+        "質して"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v15",
+      "section": "vocab",
+      "mondai": 2,
+      "number": 15,
+      "question": "「しあい」的漢字寫法是？\nあしたは サッカーの しあいが あります。",
+      "options": [
+        "誡会",
+        "誡合",
+        "試会",
+        "試合"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v16",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 16,
+      "question": "（　）に入る最適合的詞是？\nさとうさんが けがを したと 聞いて、みんな（　）しました。",
+      "options": [
+        "しんぱい",
+        "けいけん",
+        "しつれい",
+        "おじぎ"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v17",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 17,
+      "question": "（　）に入る最適合的詞是？\nわたしには、しょうらい かしゅに なるという（　）が あります。",
+      "options": [
+        "けしき",
+        "ゆめ",
+        "おもいで",
+        "せわ"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v18",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 18,
+      "question": "（　）に入る最適合的詞是？\nリーさんも こんどの パーティーに（　）来て くださいね。",
+      "options": [
+        "ひじょうに",
+        "ぜひ",
+        "じゅうぶん",
+        "いつも"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v19",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 19,
+      "question": "（　）に入る最適合的詞是？\nこれから きかいの つかいかたを（　）しますから、よく 聞いて ください。",
+      "options": [
+        "じゅんび",
+        "りよう",
+        "せつめい",
+        "せいさん"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v20",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 20,
+      "question": "（　）に入る最適合的詞是？\nはが わるいので、（　）ものは 食べられません。",
+      "options": [
+        "きびしい",
+        "かたい",
+        "はやい",
+        "ふかい"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v21",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 21,
+      "question": "（　）に入る最適合的詞是？\nもりさんを デートに（　）が、行けないと 言われました。",
+      "options": [
+        "さそいました",
+        "つたえました",
+        "あんないしました",
+        "しょうかいしました"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v22",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 22,
+      "question": "（　）に入る最適合的詞是？\nわたしの むすこは、２年で（　）くらい せが 高く なりました。",
+      "options": [
+        "グラム",
+        "ばん",
+        "けん",
+        "センチ"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v23",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 23,
+      "question": "（　）に入る最適合的詞是？\nお店で ２だいの パソコンを（　）、いちばん かるい パソコンを えらびました。",
+      "options": [
+        "かたづけて",
+        "かぞえて",
+        "くらべて",
+        "はらって"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v24",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 24,
+      "question": "（　）に入る最適合的詞是？\nたなかさんの いえの 電気が ついて いませんね。たなかさんは（　）の ようです。",
+      "options": [
+        "うそ",
+        "じゆう",
+        "ちゅうし",
+        "るす"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v25",
+      "section": "vocab",
+      "mondai": 3,
+      "number": 25,
+      "question": "（　）に入る最適合的詞是？\nへやの かぎを さがして いますが、まだ（　）。",
+      "options": [
+        "見つかりません",
+        "つかまえません",
+        "しりません",
+        "さわりません"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v26",
+      "section": "vocab",
+      "mondai": 4,
+      "number": 26,
+      "question": "與下面句子意思最接近的是？\nおとうとは あの きっさてんで アルバイトを して います。",
+      "options": [
+        "おとうとは あの きっさてんで まって います。",
+        "おとうとは あの きっさてんで はたらいて います。",
+        "おとうとは あの きっさてんで コーヒーを 飲んで います。",
+        "おとうとは あの きっさてんで 友だちと 話して います。"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v27",
+      "section": "vocab",
+      "mondai": 4,
+      "number": 27,
+      "question": "與下面句子意思最接近的是？\nわたしは すいえいが すきです。",
+      "options": [
+        "わたしは はしるのが すきです。",
+        "わたしは およぐのが すきです。",
+        "わたしは ごはんを 食べるのが すきです。",
+        "わたしは 本を 読むのが すきです。"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v28",
+      "section": "vocab",
+      "mondai": 4,
+      "number": 28,
+      "question": "與下面句子意思最接近的是？\nそれを 聞いて びっくりしました。",
+      "options": [
+        "それを 聞いて わらいました。",
+        "それを 聞いて こまりました。",
+        "それを 聞いて おこりました。",
+        "それを 聞いて おどろきました。"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v29",
+      "section": "vocab",
+      "mondai": 4,
+      "number": 29,
+      "question": "與下面句子意思最接近的是？\nあの 人は うつくしいですね。",
+      "options": [
+        "あの 人は きれいですね。",
+        "あの 人は 元気ですね。",
+        "あの 人は おもしろいですね。",
+        "あの 人は わかいですね。"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v30",
+      "section": "vocab",
+      "mondai": 4,
+      "number": 30,
+      "question": "與下面句子意思最接近的是？\nこの 国は こめを ゆにゅうして います。",
+      "options": [
+        "この 国は こめを ほかの 国に うって います。",
+        "この 国は こめを ほかの 国から もらって います。",
+        "この 国は こめを ほかの 国から 買って います。",
+        "この 国は こめを ほかの 国に あげて います。"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v31",
+      "section": "vocab",
+      "mondai": 5,
+      "number": 31,
+      "question": "「さいきん」的用法正確的是？",
+      "options": [
+        "さいきん りょうりが できたので、いっしょに 食べましょう。",
+        "さいきん しゅくだいを 出して ください。",
+        "きむらさんは さいきん けっこんした そうです。",
+        "さいきん 電車が 来ますから、いそいで えきに 行きましょう。"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v32",
+      "section": "vocab",
+      "mondai": 5,
+      "number": 32,
+      "question": "「おと」的用法正確的是？",
+      "options": [
+        "ラジオの おとが 大きいので、もう 少し 小さく して ください。",
+        "日本語の おとが じょうずに なりたいので、毎日 たくさん 話します。",
+        "店の 人に 大きな おとで 名前を よばれました。",
+        "すずきさんが ギターで ゆうめいな おとを ひいて くれました。"
+      ],
+      "answer": 1,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v33",
+      "section": "vocab",
+      "mondai": 5,
+      "number": 33,
+      "question": "「けんがく」的用法正確的是？",
+      "options": [
+        "かばんが ほしいので、デパートに 行って けんがくします。",
+        "わからない かんじは じしょで けんがくして ください。",
+        "先生や 友だちと こうじょうを けんがくしました。",
+        "まいばん テレビで ニュースを けんがくして います。"
+      ],
+      "answer": 3,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v34",
+      "section": "vocab",
+      "mondai": 5,
+      "number": 34,
+      "question": "「かざる」的用法正確的是？",
+      "options": [
+        "やまだ先生は テストの おしらせを きょうしつに かざりました。",
+        "おきゃくさんが 来ますから、へやに 花を かざりましょう。",
+        "天気が わるいので、せんたくものは うちの 中に かざります。",
+        "こっちの エアコンは、となりの へやの かべに かざって ください。"
+      ],
+      "answer": 2,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    },
+    {
+      "id": "n4_2018_v35",
+      "section": "vocab",
+      "mondai": 5,
+      "number": 35,
+      "question": "「こうじ」的用法正確的是？",
+      "options": [
+        "はが いたかったので、はいしゃで こうじを して もらいました。",
+        "この セーターは 古いですが、こうじを して、ずっと きて います。",
+        "ほんだなが こわれて しまったので、こうじを しました。",
+        "この みちは こうじを して いるので、とおれません。"
+      ],
+      "answer": 4,
+      "needs_image": false,
+      "source": "2018年JLPT N4樣題",
+      "explanation": ""
+    }
+  ]
+}
