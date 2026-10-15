@@ -186,6 +186,49 @@
     line-height: 1;
   }
 
+
+  .popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  .popup-overlay.show { display: flex; }
+  .popup-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 320px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .popup-box h3 {
+    font-size: 22px;
+    font-weight: 900;
+    margin: 0 0 12px 0;
+    color: #1a7a4a;
+  }
+  .popup-box p {
+    font-size: 16px;
+    color: #555;
+    margin: 0 0 20px 0;
+    line-height: 1.6;
+  }
+  .popup-box button {
+    background: #a3b8d4;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 40px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .popup-box button:active { transform: scale(.97); }
+
 </style>
 
 
@@ -3195,9 +3238,14 @@ function submitDaily(){
     var rec = findByDate(arr2, target);
     if(rec){ rec.synced = synced; saveAll(arr2); }
     $('assess').innerHTML = assessWords(words);
-    setMsg(synced ? (makeupDate?'補交成功！':'已提交！今晚會有檢查同複習快問。')
-                  : '已喺本機記錄，但同步失敗，今晚檢查可能見唔到，請再提交一次。',
-           synced?'ok':'err');
+    if(synced){
+      showPopup(makeupDate?'補交成功！':'已提交！',
+                makeupDate?'已記錄補交。':'今晚會有檢查同複習快問。');
+      setMsg(makeupDate?'補交成功。':'已提交。','ok');
+    }else{
+      showPopup('已記錄', '已喺本機記錄，但同步失敗，請再提交一次。');
+      setMsg('已喺本機記錄，但同步失敗，請再提交一次。','err');
+    }
     makeupDate=null; $('formTitle').textContent='今日學習';
     renderMiss(); renderRecall(); renderHist();
   }
@@ -4246,6 +4294,29 @@ function setRing(id, pct){
     btn.addEventListener('touchend', function(e){ e.preventDefault(); submitDaily(); });
   }
 })();
+</script>
+
+<div class="popup-overlay" id="submitPopup">
+  <div class="popup-box">
+    <h3 id="popupTitle">已提交！</h3>
+    <p id="popupMsg">今晚會有檢查同複習快問。</p>
+    <button onclick="closePopup()">好</button>
+  </div>
+</div>
+
+<script>
+function showPopup(title, msg){
+  $('popupTitle').textContent = title;
+  $('popupMsg').textContent = msg;
+  $('submitPopup').classList.add('show');
+}
+function closePopup(){
+  $('submitPopup').classList.remove('show');
+}
+// 撳背景都閂
+document.addEventListener('click', function(e){
+  if(e.target && e.target.id === 'submitPopup') closePopup();
+});
 </script>
 </body>
 </html>
