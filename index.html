@@ -300,6 +300,12 @@ dy>
       <label></label>
       <input type="hidden" id="examLevel" value="MIX">
     </div>
+    <div style="margin:10px 0">
+      <label style="font-size:16px;margin-right:10px"><input type="checkbox" class="examSec" value="vocab" checked> 言語知識</label>
+      <label style="font-size:16px;margin-right:10px"><input type="checkbox" class="examSec" value="grammar" checked> 文法</label>
+      <label style="font-size:16px;margin-right:10px"><input type="checkbox" class="examSec" value="reading" checked> 讀解</label>
+      <label style="font-size:16px"><input type="checkbox" class="examSec" value="listening" checked> 聽解</label>
+    </div>
     <button class="btn2" onclick="startExamMock()">開始模擬考</button>
     <div id="examHist"></div>
   </div>
@@ -3896,10 +3902,10 @@ function renderDailyHist(){
 /* ---------- 假日模擬考 ---------- */
 // 真實考試時間（分鐘）- 言語知識・讀解合併計時
 var EXAM_TIMES = {
-  N5: {vocab:25, lang_read:50, listening:30},
-  N4: {vocab:30, lang_read:60, listening:35},
-  N3: {vocab:30, lang_read:70, listening:40},
-  MIX: {vocab:30, lang_read:60, listening:35}
+  N5: {vocab:25, grammar:25, reading:25, listening:30},
+  N4: {vocab:30, grammar:30, reading:30, listening:35},
+  N3: {vocab:30, grammar:35, reading:35, listening:40},
+  MIX: {vocab:30, grammar:30, reading:30, listening:35}
 };
 // section 名稱對應
 function secName(s){
@@ -3911,23 +3917,18 @@ function secName(s){
 var examTimer = null, examSections = [], examSecIdx = 0, examAnswers = {}, examQsBySec = {};
 function startExamMock(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
-  var level = $('examLevel').value;
+  var level = $('examLevel') ? $('examLevel').value : 'MIX';
+  // 攞選咗嘅部分
+  var selected = [];
+  document.querySelectorAll('.examSec:checked').forEach(function(cb){ selected.push(cb.value); });
+  if(!selected.length){ setMsg('請至少揀一個部分。','err'); return; }
   loadQBank(function(){
     var pool = QBANK.filter(function(q){ return (level==='MIX' || q.level===level) && !q.needs_image; });
     if(!pool.length){ setMsg('題庫題目不足。','err'); return; }
-    // 三部分：言語知識（文字・語彙）、言語知識（文法）・読解、聴解
-    examSections = ['vocab','lang_read','listening'];
+    examSections = selected;
     examQsBySec = {};
     examSections.forEach(function(s){
-      var sq;
-      if(s==='vocab'){
-        sq = pool.filter(function(q){ return q.section==='vocab'; });
-      } else if(s==='lang_read'){
-        // 文法＋讀解合併
-        sq = pool.filter(function(q){ return q.section==='grammar' || q.section==='reading'; });
-      } else {
-        sq = pool.filter(function(q){ return q.section==='listening'; });
-      }
+      var sq = pool.filter(function(q){ return q.section===s; });
       // 連題整組：按 group 分組後打亂
       var groups = {}, singles = [];
       sq.forEach(function(q){ if(q.group){ (groups[q.group]=groups[q.group]||[]).push(q); } else singles.push(q); });
