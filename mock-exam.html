@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>N4 完整模擬卷</title>
+<link rel="icon" type="image/webp" href="img/logo.webp">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<style>
+* { box-sizing: border-box; }
+body { font-family: "Noto Sans TC", "PingFang TC", sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+.container { max-width: 800px; margin: 0 auto; }
+.card { background: #fff; border-radius: 16px; padding: 24px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+h1 { font-size: 28px; margin: 0 0 10px 0; }
+h2 { font-size: 22px; margin: 0 0 12px 0; }
+.hint { color: #666; font-size: 15px; line-height: 1.6; }
+.btn { display: inline-block; padding: 14px 32px; font-size: 18px; border: none; border-radius: 30px; background: #111; color: #fff; cursor: pointer; margin: 10px 5px 0 0; }
+.btn:hover { opacity: 0.85; }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn2 { background: #4a90d9; }
+.timer { font-size: 32px; font-weight: bold; color: #d32f2f; text-align: center; margin: 16px 0; }
+.qblock { border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px; margin: 12px 0; }
+.qtext { font-size: 17px; line-height: 1.7; margin-bottom: 10px; }
+.opt { display: block; padding: 10px 12px; margin: 6px 0; border: 1px solid #e0e0e0; border-radius: 8px; cursor: pointer; font-size: 16px; }
+.opt:hover { background: #f5f5f5; }
+.opt input { margin-right: 8px; }
+.correct { background: #e8f5e9; border-color: #4caf50; }
+.wrong { background: #ffebee; border-color: #f44336; }
+.explain { background: #fff8e1; border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 15px; line-height: 1.6; }
+.score { font-size: 24px; text-align: center; margin: 20px 0; }
+.section-nav { text-align: center; margin: 20px 0; }
+.progress { text-align: center; color: #666; margin: 10px 0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="card" id="introCard">
+    <h1>📝 N4 完整模擬卷</h1>
+    <div class="hint">
+      和正式 JLPT N4 考試一樣，分三部分計時：<br>
+      • <b>言語知識（文字・語彙）</b>：25 分鐘<br>
+      • <b>言語知識（文法）・読解</b>：55 分鐘<br>
+      • <b>聴解</b>：35 分鐘<br><br>
+      做完一部分可以休息，再按開始做下一部分。<br>
+      交卷後即時顯示答案同講解。
+    </div>
+    <div style="margin-top:16px">
+      <label style="font-size:16px;margin-right:12px">你是：</label>
+      <button class="btn" onclick="selectUser('許悅')">許悅</button>
+      <button class="btn" onclick="selectUser('許逸')">許逸</button>
+      <button class="btn" onclick="selectUser('GOBI')">GOBI</button>
+    </div>
+    <div id="userMsg" style="margin-top:10px;color:#666"></div>
+  </div>
+
+  <div class="card" id="sectionCard" style="display:none">
+    <h2 id="sectionTitle"></h2>
+    <div class="timer" id="timer"></div>
+    <div class="progress" id="progress"></div>
+    <div id="questions"></div>
+    <div class="section-nav">
+      <button class="btn" id="submitBtn" onclick="submitSection()">交卷</button>
+    </div>
+  </div>
+
+  <div class="card" id="breakCard" style="display:none">
+    <h2>休息一下 ☕</h2>
+    <div class="hint" id="breakMsg"></div>
+    <button class="btn btn2" id="nextBtn" onclick="startNextSection()">開始下一部分</button>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <h2>成績</h2>
+    <div class="score" id="finalScore"></div>
+    <div id="review"></div>
+    <button class="btn" onclick="location.href='index.html'">返主頁</button>
+  </div>
+</div>
+
+<script>
+// 從主頁載入題庫
+var QBANK = [];
+var currentUser = null;
+var sections = [
+  { id: 'vocab', name: '言語知識（文字・語彙）', mins: 25, filter: function(q){ return q.section==='vocab'; } },
+  { id: 'gram_read', name: '言語知識（文法）・読解', mins: 55, filter: function(q){ return q.section==='grammar' || q.section==='reading'; } },
+  { id: 'listening', name: '聴解', mins: 35, filter: function(q){ return q.section==='listening'; } },
+];
+var secIdx = 0;
+var secQuestions = [];
+var secAnswers = {};
+var allResults = [];
+var timerInt = null;
+
+function selectUser(name){
+  currentUser = name;
+  document.getElementById('userMsg').textContent = '已選擇：' + name + '，按下面開始。';
+  // 顯示開始按鈕
+  if(!document.getElementById('startBtn')){
+    var b = document.createElement('button');
+    b.id = 'startBtn';
+    b.className = 'btn btn2';
+    b.textContent = '開始模擬考';
+    b.onclick = startMock;
+    document.getElementById('introCard').appendChild(b);
+  }
+}
+
+function loadQBank(cb){
+  if(QBANK.length){ cb(); return; }
+  fetch('question_bank.json').then(function(r){ return r.json(); }).then(function(d){
+    QBANK = d.questions || d;
+    cb();
+  });
+}
+
+function startMock(){
+  if(!currentUser){ alert('請先選擇使用者'); return; }
+  document.getElementById('introCard').style.display = 'none';
+  secIdx = 0;
+  allResults = [];
+  startSection();
+}
+
+function startSection(){
+  var sec = sections[secIdx];
+  document.getElementById('breakCard').style.display = 'none';
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('sectionCard').style.display = 'block';
+  document.getElementById('sectionTitle').textContent = '第 ' + (secIdx+1) + '/3 部分：' + sec.name;
+
+  loadQBank(function(){
+    var pool = QBANK.filter(function(q){ return !q.needs_image && sec.filter(q); });
+    // 隨機選題（語彙20題，文法讀解30題，聽解25題）
+    var count = sec.id==='vocab' ? 20 : (sec.id==='gram_read' ? 30 : 25);
+    secQuestions = shuffle(pool.slice()).slice(0, Math.min(count, pool.length));
+    secAnswers = {};
+    renderQuestions();
+    startTimer(sec.mins * 60);
+  });
+}
+
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+
+function renderQuestions(){
+  var html = '';
+  secQuestions.forEach(function(q, i){
+    html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+    if(q.img) html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
+    if(q.audio) html += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
+    q.options.forEach(function(op, j){
+      html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="secAnswers['+i+']='+ (j+1) +'"> ' + esc(op) + '</label>';
+    });
+    html += '</div>';
+  });
+  document.getElementById('questions').innerHTML = html;
+  document.getElementById('progress').textContent = '共 ' + secQuestions.length + ' 題';
+}
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function startTimer(seconds){
+  clearInterval(timerInt);
+  var remain = seconds;
+  function tick(){
+    var m = Math.floor(remain/60), s = remain%60;
+    document.getElementById('timer').textContent = '⏰ ' + m + ':' + (s<10?'0':'') + s;
+    if(remain<=0){ clearInterval(timerInt); submitSection(true); return; }
+    remain--;
+  }
+  tick();
+  timerInt = setInterval(tick, 1000);
+}
+
+function submitSection(auto){
+  clearInterval(timerInt);
+  var sec = sections[secIdx];
+  var correct = 0;
+  var results = [];
+  secQuestions.forEach(function(q, i){
+    var ua = secAnswers[i] || 0;
+    var ok = (ua === q.answer);
+    if(ok) correct++;
+    results.push({ q: q, userAns: ua, correct: ok });
+  });
+  allResults.push({ sec: sec, correct: correct, total: secQuestions.length, results: results });
+
+  document.getElementById('sectionCard').style.display = 'none';
+
+  if(secIdx < sections.length - 1){
+    document.getElementById('breakMsg').innerHTML = '完成「' + sec.name + '」：' + correct + '/' + secQuestions.length + ' 答對。<br>休息一下，準備下一部分。';
+    document.getElementById('nextBtn').textContent = '開始：' + sections[secIdx+1].name;
+    document.getElementById('breakCard').style.display = 'block';
+  } else {
+    showFinal();
+  }
+}
+
+function startNextSection(){
+  secIdx++;
+  startSection();
+}
+
+function showFinal(){
+  var totalCorrect = 0, totalQ = 0;
+  allResults.forEach(function(r){ totalCorrect += r.correct; totalQ += r.total; });
+  var pct = Math.round(totalCorrect/totalQ*100);
+
+  document.getElementById('breakCard').style.display = 'none';
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('finalScore').innerHTML = '總分：' + totalCorrect + ' / ' + totalQ + ' (' + pct + '%)';
+
+  var html = '';
+  allResults.forEach(function(r){
+    html += '<h3>' + r.sec.name + '：' + r.correct + '/' + r.total + '</h3>';
+    r.results.forEach(function(res, i){
+      var q = res.q;
+      html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+      q.options.forEach(function(op, j){
+        var cls = '';
+        if(j+1 === q.answer) cls = 'correct';
+        else if(j+1 === res.userAns && !res.correct) cls = 'wrong';
+        html += '<div class="opt ' + cls + '">' + (j+1) + '. ' + esc(op) + '</div>';
+      });
+      if(q.explanation) html += '<div class="explain">💡 ' + esc(q.explanation) + '</div>';
+      html += '</div>';
+    });
+  });
+  document.getElementById('review').innerHTML = html;
+
+  // 儲存成績
+  try{
+    var key = 'mockexam_' + currentUser;
+    var hist = JSON.parse(localStorage.getItem(key) || '[]');
+    hist.push({ date: new Date().toISOString().slice(0,10), score: totalCorrect, total: totalQ });
+    localStorage.setItem(key, JSON.stringify(hist));
+  }catch(e){}
+}
+</script>
+</body>
+</html>
