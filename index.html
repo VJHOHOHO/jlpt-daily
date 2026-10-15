@@ -215,6 +215,7 @@
         <option value="N4">N4</option>
         <option value="N3">N3</option>
       </select>
+      <label style="font-size:16px;margin-left:10px"><input type="checkbox" id="includeListening" checked> 包含聽力</label>
     </div>
     <div id="dailyReview"></div>
     <button class="btn2" onclick="startDailyPractice()">開始今日練習</button>
@@ -3688,11 +3689,44 @@ function pickGroupAware(pool, n){
 function startDailyPractice(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
   var level = $('dailyLevel').value;
+  var includeListening = $('includeListening') ? $('includeListening').checked : true;
   loadQBank(function(){
-    var pool = QBANK.filter(function(q){ return (level==='MIX' || q.level===level) && !q.needs_image; });
-    if(pool.length < 5){ setMsg('題庫題目不足。','err'); return; }
-    var picked = pickGroupAware(pool, 5); // 每日5題綜合練習
-    renderDailyQuestions(picked);
+    var pool = QBANK.filter(function(q){
+      if(q.needs_image) return false;
+      if(level!=='MIX' && q.level!==level) return false;
+      if(!includeListening && q.section==='listening') return false;
+      return true;
+    });
+    if(pool.length < 15){ setMsg('題庫題目不足。','err'); return; }
+    // 5題詞彙 + 10題混合（至少5題文法）
+    var vocabPool = pool.filter(function(q){ return q.section==='vocab'; });
+    var otherPool = pool.filter(function(q){ return q.section!=='vocab'; });
+    var grammarPool = pool.filter(function(q){ return q.section==='grammar'; });
+    var picked = [];
+    // 5題詞彙
+    picked = picked.concat(pickGroupAware(vocabPool, 5));
+    // 至少5題文法
+    var gramPicked = pickGroupAware(grammarPool, 5);
+    picked = picked.concat(gramPicked);
+    // 剩餘5題從其他（排除已選）隨機
+    var usedIds = {};
+    picked.forEach(function(q){ usedIds[q.id]=1; });
+    var restPool = otherPool.filter(function(q){ return !usedIds[q.id] && q.section!=='grammar'; });
+    // 如果文法唔夠5題，從rest補
+    var needGram = 5 - gramPicked.length;
+    if(needGram > 0){
+      var moreGram = pickGroupAware(grammarPool.filter(function(q){ return !usedIds[q.id]; }), needGram);
+      moreGram.forEach(function(q){ usedIds[q.id]=1; picked.push(q); });
+    }
+    var rest = pickGroupAware(restPool.filter(function(q){ return !usedIds[q.id]; }), 10 - picked.filter(function(q){ return q.section!=='vocab'; }).length);
+    picked = picked.concat(rest);
+    // 如果仲唔夠15題，隨機補
+    if(picked.length < 15){
+      var allRest = pool.filter(function(q){ return !usedIds[q.id]; });
+      var extra = pickGroupAware(allRest, 15 - picked.length);
+      picked = picked.concat(extra);
+    }
+    renderDailyQuestions(picked.slice(0,15));
   });
 }
 function renderDailyQuestions(qs){
