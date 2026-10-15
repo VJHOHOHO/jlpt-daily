@@ -147,33 +147,24 @@
   .ffront ruby rt { color: #FFD166; }
 </style>
 
+
+<style>
+.main-section { margin: 12px 0; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; }
+.section-title {
+  cursor: pointer; padding: 14px 18px; margin: 0; font-size: 20px;
+  background: #f5f5f5; border-bottom: 1px solid #e0e0e0; user-select: none;
+}
+.section-title:hover { background: #eeeeee; }
+.section-title::after { content: ' ▼'; font-size: 14px; color: #999; }
+.section-title.collapsed::after { content: ' ▶'; }
+.section-content { padding: 10px; }
+.section-content.hidden { display: none; }
+</style>
+
 </head>
-<body>
-<iframe name="gformFrame" style="display:none" title="gform"></iframe>
-
-<h1>日語學習記錄</h1>
-<div class="date" id="todayStr"></div>
-<div class="countdown" id="countdown"></div>
-
-<div class="card" id="whoCard">
-  <h2><span class="kicon">人</span>我是誰</h2>
-  <div class="who">
-    <button id="btnYue" onclick="pickChild('許悅')">許悅</button>
-    <button id="btnYi" onclick="pickChild('許逸')">許逸</button>
-    <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-<div class="main-section">
-<h1 class="section-title">📝 練習</h1>
+<bo<div class="main-section">
+<h2 class="section-title collapsed" onclick="toggleSection(this)">練習</h2>
+<div class="section-content hidden">
 <div class="card" id="dailyCard" style="display:none">
   <h2><span class="kicon">日</span>每日練習</h2>
   <div id="dailyIntro">
@@ -195,9 +186,10 @@
   <div id="dailyBody" style="display:none"></div>
 </div>
 </div>
-
+</div>
 <div class="main-section">
-<h1 class="section-title">✏️ 作業</h1>
+<h2 class="section-title collapsed" onclick="toggleSection(this)">作業</h2>
+<div class="section-content hidden">
 <div class="card" id="formCard" style="display:none">
   <h2 id="formTitle"><span class="kicon">書</span>今日學習</h2>
   <div class="hint">左邊寫生字，右邊寫中文意思，兩個都要填</div>
@@ -216,9 +208,10 @@
   <div id="missBody"></div>
 </div>
 </div>
-
+</div>
 <div class="main-section">
-<h1 class="section-title">🔍 回顧</h1>
+<h2 class="section-title collapsed" onclick="toggleSection(this)">回顧</h2>
+<div class="section-content hidden">
 <div class="card" id="flashCard" style="display:none">
   <h2><span class="kicon">脳</span>Flash Card 背單字</h2>
   <div id="flashIntro">
@@ -248,18 +241,10 @@
   <div class="hint">逢星期日出分析，睇下今週邊方面要加油。</div>
 </div>
 </div>
-
-<div class="main-section">
-<h1 class="section-title">📊 測驗</h1>
-<div class="card" id="quizCard" style="display:none">
-  <h2><span class="kicon">試</span>每日小測驗</h2>
-  <div id="quizIntro">
-    <div class="hint">用你學過嘅生字出 5 題，考下記唔記得。</div>
-    <button class="btn2" onclick="startQuiz()">開始測驗</button>
-    <div id="quizHist"></div>
-  </div>
-  <div id="quizBody" style="display:none"></div>
 </div>
+<div class="main-section">
+<h2 class="section-title collapsed" onclick="toggleSection(this)">測驗</h2>
+<div class="section-content hidden">
 <div class="card" id="weekCard" style="display:none">
   <h2><span class="kicon">級</span>本週大測驗</h2>
   <div id="weekIntro">
@@ -305,6 +290,11 @@
   </div>
   <div id="fullBody" style="display:none"></div>
 </div>
+</div>
+</div>
+<div class="main-section">
+<h2 class="section-title collapsed" onclick="toggleSection(this)">資源</h2>
+<div class="section-content hidden">
 <div class="card" id="mockCard" style="display:none">
   <h2><span class="kicon">模</span>模擬試資源</h2>
   <div class="hint">目標：超越 N4！考前每星期做一回完整模擬卷，練時間分配。</div>
@@ -323,6 +313,43 @@
   <div class="hint">11/14、11/21、11/28 做完整卷，目標 130/180 分以上。</div>
 </div>
 </div>
+</div>
+dy>
+<iframe name="gformFrame" style="display:none" title="gform"></iframe>
+
+<h1>日語學習記錄</h1>
+<div class="date" id="todayStr"></div>
+<div class="countdown" id="countdown"></div>
+
+<div class="card" id="whoCard">
+  <h2><span class="kicon">人</span>我是誰</h2>
+  <div class="who">
+    <button id="btnYue" onclick="pickChild('許悅')">許悅</button>
+    <button id="btnYi" onclick="pickChild('許逸')">許逸</button>
+    <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <div class="card" id="histCard" style="display:none">
   <h2><span class="kicon">史</span>歷史記錄</h2>
   <div id="histBody"></div>
@@ -4010,5 +4037,20 @@ body.innerHTML='<div class="hist-item"><div class="hist-date">'+esc(r[0])+'</div
 }
 
 </script>
+
+<script>
+function toggleSection(el){
+  var content = el.nextElementSibling;
+  if(content && content.classList.contains('section-content')){
+    content.classList.toggle('hidden');
+    el.classList.toggle('collapsed');
+  }
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var first = document.querySelector('.main-section .section-title');
+  if(first) toggleSection(first);
+});
+</script>
+
 </body>
 </html>
