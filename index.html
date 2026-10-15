@@ -203,7 +203,7 @@ dy>
     <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
   </div>
 </div>
-<div class="main-section sec-lianxi">
+<div class="main-section sec-lianxi" style="display:none">
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">練</span><em>練習</em></h2>
 <div class="section-content hidden">
 <div class="card" id="dailyCard">
@@ -223,7 +223,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section sec-zuoye">
+<div class="main-section sec-zuoye" style="display:none">
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">作</span><em>作業</em></h2>
 <div class="section-content hidden">
 <div class="card" id="formCard">
@@ -245,7 +245,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section sec-huigu">
+<div class="main-section sec-huigu" style="display:none">
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">顧</span><em>回顧</em></h2>
 <div class="section-content hidden">
 <div class="card" id="flashCard">
@@ -278,7 +278,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section sec-ceyan">
+<div class="main-section sec-ceyan" style="display:none">
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">測</span><em>測驗</em></h2>
 <div class="section-content hidden">
 <div class="card" id="weekCard">
@@ -315,7 +315,7 @@ dy>
 </div>
 </div>
 </div>
-<div class="main-section sec-ziyuan">
+<div class="main-section sec-ziyuan" style="display:none">
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">資</span><em>資源</em></h2>
 <div class="section-content hidden">
 <div class="card" id="mockCard">
@@ -2907,7 +2907,8 @@ function pickChild(name){
   $('btnYue').className = name==='許悅' ? 'active' : '';
   $('btnYi').className = name==='許逸' ? 'active' : '';
   $('btnGobi').className = 'testbtn' + (name==='GOBI' ? ' active' : '');
-  ['missCard','recallCard','quizCard','weekCard','randCard','fullCard','dailyCard','examCard','flashCard','anaCard','mockCard','corrCard','formCard','histCard'].forEach(function(id){ $(id).style.display='block'; });
+  ['missCard','recallCard','quizCard','weekCard','randCard','fullCard','dailyCard','examCard','flashCard','anaCard','mockCard','corrCard','formCard','histCard'].forEach(function(id){ var el=$(id); if(el) el.style.display='block'; });
+  document.querySelectorAll('.main-section').forEach(function(el){ el.style.display='block'; });
   if(name==='GOBI'){
     fetchGobiPool();
     $('missCard').style.display='none';
