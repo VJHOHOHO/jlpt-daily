@@ -210,8 +210,9 @@
     <div style="margin:10px 0">
       <label>級數：</label>
       <select id="dailyLevel" style="font-size:18px;padding:6px">
+        <option value="MIX" selected>綜合</option>
         <option value="N5">N5</option>
-        <option value="N4" selected>N4</option>
+        <option value="N4">N4</option>
         <option value="N3">N3</option>
       </select>
     </div>
@@ -228,8 +229,9 @@
     <div style="margin:10px 0">
       <label>級數：</label>
       <select id="examLevel" style="font-size:18px;padding:6px">
+        <option value="MIX" selected>綜合</option>
         <option value="N5">N5</option>
-        <option value="N4" selected>N4</option>
+        <option value="N4">N4</option>
         <option value="N3">N3</option>
       </select>
     </div>
@@ -3687,9 +3689,9 @@ function startDailyPractice(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
   var level = $('dailyLevel').value;
   loadQBank(function(){
-    var pool = QBANK.filter(function(q){ return q.level===level && !q.needs_image; });
+    var pool = QBANK.filter(function(q){ return (level==='MIX' || q.level===level) && !q.needs_image; });
     if(pool.length < 5){ setMsg('題庫題目不足。','err'); return; }
-    var picked = pickGroupAware(pool, 8); // 5-10題，取8
+    var picked = pickGroupAware(pool, 5); // 每日5題綜合練習
     renderDailyQuestions(picked);
   });
 }
@@ -3697,7 +3699,7 @@ function renderDailyQuestions(qs){
   $('dailyIntro').style.display='none'; $('dailyBody').style.display='block';
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
-    html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> ['+q.level+' '+secName(q.section)+'] '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
@@ -3781,7 +3783,8 @@ function renderDailyHist(){
 var EXAM_TIMES = {
   N5: {vocab:25, lang_read:50, listening:30},
   N4: {vocab:30, lang_read:60, listening:35},
-  N3: {vocab:30, lang_read:70, listening:40}
+  N3: {vocab:30, lang_read:70, listening:40},
+  MIX: {vocab:30, lang_read:60, listening:35}
 };
 // section 名稱對應
 function secName(s){
@@ -3795,7 +3798,7 @@ function startExamMock(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
   var level = $('examLevel').value;
   loadQBank(function(){
-    var pool = QBANK.filter(function(q){ return q.level===level && !q.needs_image; });
+    var pool = QBANK.filter(function(q){ return (level==='MIX' || q.level===level) && !q.needs_image; });
     if(!pool.length){ setMsg('題庫題目不足。','err'); return; }
     // 三部分：言語知識（文字・語彙）、言語知識（文法）・読解、聴解
     examSections = ['vocab','lang_read','listening'];
