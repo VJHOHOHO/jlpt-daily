@@ -3195,7 +3195,7 @@ function submitDaily(){
     var rec = findByDate(arr2, target);
     if(rec){ rec.synced = synced; saveAll(arr2); }
     $('assess').innerHTML = assessWords(words);
-    setMsg(synced ? (makeupDate?'✅ 補交成功！':'✅ 已提交！今晚會有檢查同複習快問。')
+    setMsg(synced ? (makeupDate?'補交成功！':'已提交！今晚會有檢查同複習快問。')
                   : '已喺本機記錄，但同步失敗，今晚檢查可能見唔到，請再提交一次。',
            synced?'ok':'err');
     makeupDate=null; $('formTitle').textContent='今日學習';
