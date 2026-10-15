@@ -39,11 +39,11 @@
   #corrCard { background: #FFF3D6; }
   #formCard { background: #E9E2FB; }
   #histCard { background: #F5F0E8; }
-  .card h2 { font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+  .card h2 { font-family: "Noto Sans TC", "PingFang TC", sans-serif; font-style: italic;
              font-size: 23px; margin: 0 0 16px; color: #111; font-weight: 900;
              display: flex; align-items: center; gap: 12px; }
   .card h2::before { content: none; }
-  .card h2 .kicon { font-family: "Noto Sans TC", "PingFang TC", sans-serif;
+  .card h2 .kicon { font-style: normal; font-family: "Noto Sans TC", "PingFang TC", sans-serif;
                     font-size: 52px; font-weight: 900; color: #111; line-height: 1;
                     flex-shrink: 0; }
   .who { display: flex; gap: 14px; }
@@ -147,6 +147,45 @@
   ruby rt { font-size: 15px; color: #FFD166; font-weight: 600; }
   .ffront ruby { font-size: 40px; }
   .ffront ruby rt { color: #FFD166; }
+
+  .task-progress {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: 6px;
+    vertical-align: middle;
+    position: relative;
+  }
+  .task-progress svg {
+    width: 18px;
+    height: 18px;
+    transform: rotate(-90deg);
+  }
+  .task-progress .bg {
+    fill: none;
+    stroke: #e0e0e0;
+    stroke-width: 2.5;
+  }
+  .task-progress .fg {
+    fill: none;
+    stroke: #4CAF50;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-dasharray: 44;
+    stroke-dashoffset: 44;
+    transition: stroke-dashoffset 0.6s ease;
+  }
+  .task-progress.completed svg {
+    display: none;
+  }
+  .task-progress.completed::after {
+    content: "👑";
+    font-size: 15px;
+    line-height: 1;
+  }
+
 </style>
 
 
@@ -209,7 +248,7 @@ dy>
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">練</span><em>練習</em></h2>
 <div class="section-content hidden">
 <div class="card" id="dailyCard">
-  <h2><span class="kicon">日</span>每日練習</h2>
+  <h2><span class="kicon">日</span>每日練習<span class="task-progress" data-percent="0" id="prog-daily"></span></h2>
   <div id="dailyIntro">
     <div class="hint">每日 15 題：5 題詞彙重溫＋10 題綜合練習。錯題會記錄，聽日先複習錯題再做新題。</div>
     <div style="margin:10px 0">
@@ -251,7 +290,7 @@ dy>
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">顧</span><em>回顧</em></h2>
 <div class="section-content hidden">
 <div class="card" id="flashCard">
-  <h2><span class="kicon">脳</span>Flash Card 背單字</h2>
+  <h2><span class="kicon">脳</span>Flash Card 背單字<span class="task-progress" data-percent="0" id="prog-flash"></span></h2>
   <div id="flashIntro">
     <div class="hint">學習為主，唔計分。睇住日文諗意思，撳卡反轉對答案。唔識嘅會再出現，直到記住為止。</div>
     <div style="margin:10px 0">
@@ -284,7 +323,7 @@ dy>
 <h2 class="section-title collapsed" onclick="toggleSection(this)"><span class="big-char">測</span><em>測驗</em></h2>
 <div class="section-content hidden">
 <div class="card" id="weekCard">
-  <h2><span class="kicon">級</span>本週大測驗</h2>
+  <h2><span class="kicon">級</span>本週大測驗<span class="task-progress" data-percent="0" id="prog-week"></span></h2>
   <div id="weekIntro">
     <div class="hint">語彙 8 題＋文法 8 題＋讀解 4 題＋複習 5 題，每星期做一次，成績會交去做每週分析。</div>
     <button class="btn2" onclick="startWeekQuiz()">開始測驗</button>
@@ -294,7 +333,7 @@ dy>
 </div>
 
 <div class="card" id="examCard">
-  <h2><span class="kicon">考</span>假日模擬考</h2>
+  <h2><span class="kicon">考</span>假日模擬考<span class="task-progress" data-percent="0" id="prog-exam"></span></h2>
   <div id="examIntro">
     <div class="hint">四部分：語彙 → 文法 → 讀解 → 聽解，按真實考試時間計時。</div>
     <div style="margin:10px 0">
@@ -2936,6 +2975,7 @@ function pickChild(name){
   backQuiz(); backWeekQuiz(); clearForm(); prefillToday();
   setMsg('',''); $('assess').innerHTML='';
   fetchBackendDates();
+  updateProgressRings();
 }
 
 function clearForm(){
@@ -3874,6 +3914,12 @@ function submitDaily(){
       : '<div class="err">✗ 答錯了。正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation):'')+'</div>';
   });
   saveDailyWrong(wrongQs);
+  try{
+    var ds = JSON.parse(localStorage.getItem('daily_scores')||'{}');
+    ds[child+'_'+todayKey()] = {correct:correct, total:qs.length};
+    localStorage.setItem('daily_scores', JSON.stringify(ds));
+  }catch(e){}
+  updateProgressRings();
   var pct = Math.round(correct/qs.length*100);
   var summary = '<div class="card-sub" style="margin:16px 0">今日得分：'+correct+'/'+qs.length+'（'+pct+'分）</div>';
   summary += wrongQs.length ? '<div class="hint">錯咗 '+wrongQs.length+' 題，已記錄，聽日會先複習呢啲錯題。</div>' : '<div class="ok">全部答對，好叻！</div>';
@@ -4113,5 +4159,59 @@ function toggleSection(el){
 // 預設全部展開，用戶可以撳嚟收起
 </script>
 
+<script>
+function renderProgressRings(){
+  document.querySelectorAll('.task-progress').forEach(function(el){
+    var percent = Math.min(100, Math.max(0, parseInt(el.dataset.percent) || 0));
+    var radius = 7;
+    var circumference = 2 * Math.PI * radius;
+    var offset = circumference - (percent / 100) * circumference;
+    el.innerHTML = '<svg viewBox="0 0 18 18">'
+      + '<circle class="bg" cx="9" cy="9" r="'+radius+'"></circle>'
+      + '<circle class="fg" cx="9" cy="9" r="'+radius+'"'
+      + ' style="stroke-dasharray:'+circumference+'; stroke-dashoffset:'+offset+'"></circle></svg>';
+    if (percent >= 100) { el.classList.add('completed'); }
+    else { el.classList.remove('completed'); }
+  });
+}
+function updateProgressRings(){
+  if(!child) return;
+  // 每日練習：最近正確率
+  try{
+    var dr = JSON.parse(localStorage.getItem('daily_scores')||'{}');
+    var dkeys = Object.keys(dr).filter(function(k){ return k.indexOf(child)===0; }).sort().reverse().slice(0,10);
+    if(dkeys.length){
+      var tot=0, cor=0;
+      dkeys.forEach(function(k){ tot+=dr[k].total||0; cor+=dr[k].correct||0; });
+      if(tot>0) setRing('prog-daily', Math.round(cor/tot*100));
+    }
+  }catch(e){}
+  // 模擬考：最近平均
+  try{
+    var er = JSON.parse(localStorage.getItem('exam_scores')||'{}');
+    var ekeys = Object.keys(er).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).sort().reverse().slice(0,5);
+    if(ekeys.length){
+      var sum=0;
+      ekeys.forEach(function(k){ sum+=er[k].pct||0; });
+      setRing('prog-exam', Math.round(sum/ekeys.length));
+    }
+  }catch(e){}
+  // 本週大測驗
+  try{
+    var wr = JSON.parse(localStorage.getItem(weekQuizKey())||'{}');
+    var wkeys = Object.keys(wr).sort().reverse().slice(0,5);
+    if(wkeys.length){
+      var wsum=0, wn=0;
+      wkeys.forEach(function(k){ if(wr[k]&&wr[k].total){ wsum+= (wr[k].correct||0)/(wr[k].total||1)*100; wn++; } });
+      if(wn>0) setRing('prog-week', Math.round(wsum/wn));
+    }
+  }catch(e){}
+  renderProgressRings();
+}
+function setRing(id, pct){
+  var el = document.getElementById(id);
+  if(el) el.dataset.percent = pct;
+}
+</script>
 </body>
 </html>
