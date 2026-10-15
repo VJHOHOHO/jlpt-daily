@@ -152,16 +152,22 @@
 
 
 <style>
-.main-section { margin: 12px 0; border: 1px solid #e0e0e0; border-radius: 12px; overflow: hidden; background: #fff; }
+.main-section { margin: 12px 0; border-radius: 16px; overflow: hidden; }
 .section-title {
-  cursor: pointer; padding: 14px 18px; margin: 0; font-size: 20px;
-  background: #f5f5f5; border-bottom: 1px solid #e0e0e0; user-select: none;
+  cursor: pointer; padding: 16px 20px; margin: 0; font-size: 22px; font-weight: bold;
+  user-select: none; border-radius: 16px;
 }
-.section-title:hover { background: #eeeeee; }
-.section-title::after { content: ' ▼'; font-size: 14px; color: #999; }
+.section-title:hover { filter: brightness(0.97); }
+.section-title::after { content: ' ▼'; font-size: 14px; opacity: 0.6; }
 .section-title.collapsed::after { content: ' ▶'; }
-.section-content { padding: 10px; }
+.section-content { padding: 12px; background: #fff; }
 .section-content.hidden { display: none; }
+/* 每個 section 唔同 pastel 色，對應原本風格 */
+.main-section:nth-of-type(1) .section-title { background: #DDEBFC; color: #2c5aa0; }
+.main-section:nth-of-type(2) .section-title { background: #FFF3D6; color: #8a6d1b; }
+.main-section:nth-of-type(3) .section-title { background: #E9E2FB; color: #5b3fa0; }
+.main-section:nth-of-type(4) .section-title { background: #FDE8EF; color: #a03a5b; }
+.main-section:nth-of-type(5) .section-title { background: #DFF5E9; color: #2a7a4b; }
 </style>
 
 </head>
