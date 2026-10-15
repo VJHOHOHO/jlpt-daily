@@ -204,14 +204,9 @@ dy>
   <div id="dailyIntro">
     <div class="hint">每日 15 題：5 題詞彙重溫＋10 題綜合（N5～N3 隨機，至少5題文法）。錯題會記錄，聽日先複習錯題再做新題。</div>
     <div style="margin:10px 0">
-      <label>級數：</label>
-      <select id="dailyLevel" style="font-size:18px;padding:6px">
-        <option value="MIX" selected>綜合</option>
-        <option value="N5">N5</option>
-        <option value="N4">N4</option>
-        <option value="N3">N3</option>
-      </select>
-      <label style="font-size:16px;margin-left:10px"><input type="checkbox" id="includeListening" checked> 包含聽力</label>
+      <label></label>
+      <label style="font-size:16px"><input type="checkbox" id="includeListening" checked> 包含聽力</label>
+      <input type="hidden" id="dailyLevel" value="MIX">
     </div>
     <div id="dailyReview"></div>
     <button class="btn2" onclick="startDailyPractice()">開始今日練習</button>
@@ -302,13 +297,8 @@ dy>
   <div id="examIntro">
     <div class="hint">四部分：語彙 → 文法 → 讀解 → 聽解，按真實考試時間計時。</div>
     <div style="margin:10px 0">
-      <label>級數：</label>
-      <select id="examLevel" style="font-size:18px;padding:6px">
-        <option value="MIX" selected>綜合</option>
-        <option value="N5">N5</option>
-        <option value="N4">N4</option>
-        <option value="N3">N3</option>
-      </select>
+      <label></label>
+      <input type="hidden" id="examLevel" value="MIX">
     </div>
     <button class="btn2" onclick="startExamMock()">開始模擬考</button>
     <div id="examHist"></div>
