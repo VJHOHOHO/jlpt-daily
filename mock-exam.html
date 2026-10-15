@@ -92,6 +92,14 @@ var secAnswers = {};
 var allResults = [];
 var timerInt = null;
 
+var examLevel = 'MIX';
+// 從 URL 參數攞 level（家長用，例如 mock-exam.html?level=N4）
+try{
+  var pm = new URLSearchParams(window.location.search);
+  var lv = pm.get('level');
+  if(lv && ['N5','N4','N3','MIX'].indexOf(lv)>=0) examLevel = lv;
+}catch(e){}
+
 function selectUser(name){
   currentUser = name;
   document.getElementById('userMsg').textContent = '已選擇：' + name + '，按下面開始。';
@@ -130,10 +138,35 @@ function startSection(){
   document.getElementById('sectionTitle').textContent = '第 ' + (secIdx+1) + '/3 部分：' + sec.name;
 
   loadQBank(function(){
-    var pool = QBANK.filter(function(q){ return !q.needs_image && sec.filter(q); });
-    // 隨機選題（語彙20題，文法讀解30題，聽解25題）
-    var count = sec.id==='vocab' ? 20 : (sec.id==='gram_read' ? 30 : 25);
-    secQuestions = shuffle(pool.slice()).slice(0, Math.min(count, pool.length));
+    var pool = QBANK.filter(function(q){
+      return !q.needs_image && sec.filter(q) && (examLevel==='MIX' || q.level===examLevel);
+    });
+    // 固定題數
+    var target = sec.id==='vocab' ? 20 : (sec.id==='gram_read' ? 30 : 25);
+    // 連題整組：先分組，再隨機選組，唔拆散
+    var groups = {}, singles = [];
+    pool.forEach(function(q){
+      if(q.group){ (groups[q.group]=groups[q.group]||[]).push(q); }
+      else singles.push(q);
+    });
+    // 每組內按順序排
+    Object.keys(groups).forEach(function(g){
+      groups[g].sort(function(a,b){ return (a.qnum||0)-(b.qnum||0); });
+    });
+    var groupList = Object.keys(groups).map(function(g){ return groups[g]; });
+    groupList = shuffle(groupList);
+    singles = shuffle(singles);
+    // 逐組加入，直到夠數（唔會超太多）
+    var picked = [];
+    groupList.forEach(function(g){
+      if(picked.length + g.length <= target + 2) picked = picked.concat(g);
+    });
+    // 用單題補足
+    var need = target - picked.length;
+    if(need > 0) picked = picked.concat(singles.slice(0, need));
+    secQuestions = picked;
+    // 記錄實際 level（家長睇）
+    console.log('Mock exam level:', examLevel, 'section:', sec.id, 'count:', picked.length);
     secAnswers = {};
     renderQuestions();
     startTimer(sec.mins * 60);
