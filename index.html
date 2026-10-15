@@ -3816,15 +3816,19 @@ function startDailyPractice(){
     renderDailyQuestions(picked.slice(0,15));
   });
 }
+var dailyQTimes = {};
 function renderDailyQuestions(qs){
   $('dailyIntro').style.display='none'; $('dailyBody').style.display='block';
+  dailyQTimes = {};
+  var startT = Date.now();
+  qs.forEach(function(q,i){ dailyQTimes[i] = {start: startT, ans: 0}; });
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
     html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
-      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'"> '+esc(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now()"> '+esc(op)+'</label>';
     });
     html += '<div class="qexplain" id="daily_exp'+i+'" style="display:none"></div></div>';
   });
@@ -3836,16 +3840,24 @@ function renderDailyQuestions(qs){
 function secName(s){ return {vocab:'語彙',grammar:'文法',reading:'讀解',listening:'聽解'}[s]||s; }
 function submitDaily(){
   var qs = JSON.parse($('dailyBody').dataset.questions);
-  var correct = 0, wrongQs = [];
+  var correct = 0, wrongQs = [], guessedQs = [];
   qs.forEach(function(q,i){
     var sel = document.querySelector('input[name="daily_q'+i+'"]:checked');
     var userAns = sel ? parseInt(sel.value) : 0;
     var ok = (userAns === q.answer);
+    var t = dailyQTimes[i] || {start:0, ans:0};
+    var elapsed = t.ans ? (t.ans - t.start)/1000 : 999;
+    var guessed = ok && elapsed < 8;
     if(ok) correct++;
-    else wrongQs.push({id:q.id, q:q.question, options:q.options, answer:q.answer, userAns:userAns, explanation:q.explanation||'', section:q.section, level:q.level});
+    if(!ok || guessed){
+      var item = {id:q.id, q:q.question, options:q.options, answer:q.answer, userAns:userAns, explanation:q.explanation||'', section:q.section, level:q.level, guessed:guessed, time:elapsed};
+      wrongQs.push(item);
+      if(guessed) guessedQs.push(item);
+    }
     var exp = $('daily_exp'+i);
     exp.style.display='block';
-    exp.innerHTML = ok ? '<div class="ok">✓ 答對了！</div>'
+    var guessed = ok && ((dailyQTimes[i]||{ans:0}).ans ? (((dailyQTimes[i].ans - dailyQTimes[i].start)/1000) < 8) : false);
+    exp.innerHTML = ok ? (guessed ? '<div class="ok">✓ 答對了！（🎲 '+(((dailyQTimes[i].ans-dailyQTimes[i].start)/1000).toFixed(1))+'秒，可能係猜，建議重溫）</div>' : '<div class="ok">✓ 答對了！</div>')
       : '<div class="err">✗ 答錯了。正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation):'')+'</div>';
   });
   saveDailyWrong(wrongQs);
