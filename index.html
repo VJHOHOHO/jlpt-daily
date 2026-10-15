@@ -2885,6 +2885,13 @@ fetch('n5vocab.json').then(function(r){ return r.json(); }).then(function(d){ N5
 fetch('n3vocab.json').then(function(r){ return r.json(); }).then(function(d){ N3VOCAB = d || []; buildReadMap(); }).catch(function(){});
 /* 後台已交日子（Worker 同步，補 localStorage 唔齊） */
 var backendHave = {};
+function fetchDatabase(){
+  fetch('database.json?v='+Date.now()).then(function(r){ return r.json(); }).then(function(db){
+    try{ localStorage.setItem('dbCache', JSON.stringify(db)); }catch(e){}
+    renderHist();
+    updateProgressRings();
+  }).catch(function(){});
+}
 function fetchBackendDates(){
   if(!child || child==='GOBI'){ backendHave = {}; return; }
   // 先用本地緩存，即時顯示
@@ -2975,6 +2982,7 @@ function pickChild(name){
   backQuiz(); backWeekQuiz(); clearForm(); prefillToday();
   setMsg('',''); $('assess').innerHTML='';
   fetchBackendDates();
+  fetchDatabase();
   updateProgressRings();
 }
 
@@ -3025,7 +3033,21 @@ function renderRecall(){
 
 /* ---------- 歷史 ---------- */
 function renderHist(){
-  var arr = loadAll().slice().sort(function(a,b){ return a.date<b.date?1:-1; });
+  var arr = loadAll().slice();
+  // 從中央資料庫合併
+  try{
+    var dbCache = JSON.parse(localStorage.getItem('dbCache')||'{}');
+    if(dbCache.submissions && dbCache.submissions[child]){
+      dbCache.submissions[child].forEach(function(r){
+        if(r.status && r.status.indexOf('已交')===0){
+          var exists = false;
+          for(var i=0;i<arr.length;i++) if(arr[i].date===r.date) { exists=true; break; }
+          if(!exists) arr.push({date:r.date, words:r.words, sentence:r.sentence, synced:true, fromDB:true});
+        }
+      });
+    }
+  }catch(e){}
+  arr = arr.sort(function(a,b){ return a.date<b.date?1:-1; });
   var body = $('histBody');
   if(!arr.length){ body.innerHTML='<div class="recall-empty">暫時未有記錄。</div>'; return; }
   body.innerHTML = arr.map(function(e){
