@@ -3175,7 +3175,8 @@ function submitDaily(){
   if(!sent){ setMsg('造句未填。','err'); return; }
   if(!child){ setMsg('請先揀「我是誰」。','err'); return; }
 
-  var btn=$('submitBtn'); btn.disabled=true;
+  var btn=$('submitBtn'); btn.disabled=true; btn.textContent='提交中…';
+  setMsg('提交中，請稍候…','');
   var target = makeupDate || todayKey();
   var arr = loadAll().filter(function(e){ return e.date!==target; });
   arr.push({date:target, words:words, sentence:sent});
@@ -3189,12 +3190,12 @@ function submitDaily(){
   fetch(FU,{method:'POST',mode:'no-cors',body:p}).then(function(){ done(true); }).catch(function(){ done(false); });
 
   function done(synced){
-    btn.disabled=false;
+    btn.disabled=false; btn.textContent='提交';
     var arr2 = loadAll();
     var rec = findByDate(arr2, target);
     if(rec){ rec.synced = synced; saveAll(arr2); }
     $('assess').innerHTML = assessWords(words);
-    setMsg(synced ? (makeupDate?'補交成功。':'已提交，今晚會有檢查同複習快問。')
+    setMsg(synced ? (makeupDate?'✅ 補交成功！':'✅ 已提交！今晚會有檢查同複習快問。')
                   : '已喺本機記錄，但同步失敗，今晚檢查可能見唔到，請再提交一次。',
            synced?'ok':'err');
     makeupDate=null; $('formTitle').textContent='今日學習';
