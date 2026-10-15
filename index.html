@@ -164,11 +164,11 @@
 .section-content { padding: 12px; background: #fff; }
 .section-content.hidden { display: none; }
 /* 每個 section 唔同 pastel 色，對應原本風格 */
-.main-section:nth-of-type(1) .section-title { background: #DDEBFC; }
-.main-section:nth-of-type(2) .section-title { background: #FFF3D6; }
-.main-section:nth-of-type(3) .section-title { background: #E9E2FB; }
-.main-section:nth-of-type(4) .section-title { background: #FDE8EF; }
-.main-section:nth-of-type(5) .section-title { background: #DFF5E9; }
+.main-section:nth-of-type(1) .section-title { background: linear-gradient(135deg, #a8d8ff 0%, #d6ecff 100%); }
+.main-section:nth-of-type(2) .section-title { background: linear-gradient(135deg, #ffe8a8 0%, #fff5d6 100%); }
+.main-section:nth-of-type(3) .section-title { background: linear-gradient(135deg, #d0bfff 0%, #e9e2fb 100%); }
+.main-section:nth-of-type(4) .section-title { background: linear-gradient(135deg, #ffb8d0 0%, #fde8ef 100%); }
+.main-section:nth-of-type(5) .section-title { background: linear-gradient(135deg, #a8e6c8 0%, #dff5e9 100%); }
 .main-section .section-title { color: #111; }
 .main-section .section-title .big-char { color: #111; font-size: 36px; font-weight: 900; }
 .main-section .section-title em { color: #111; font-style: italic; }
@@ -198,7 +198,7 @@ dy>
 <div class="main-section">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">練</span><em>練習</em></h2>
 <div class="section-content">
-<div class="card" id="dailyCard" style="display:none">
+<div class="card" id="dailyCard">
   <h2><span class="kicon">日</span>每日練習</h2>
   <div id="dailyIntro">
     <div class="hint">每日 15 題：5 題詞彙重溫＋10 題綜合（N5～N3 隨機，至少5題文法）。錯題會記錄，聽日先複習錯題再做新題。</div>
@@ -223,7 +223,7 @@ dy>
 <div class="main-section">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">作</span><em>作業</em></h2>
 <div class="section-content">
-<div class="card" id="formCard" style="display:none">
+<div class="card" id="formCard">
   <h2 id="formTitle"><span class="kicon">書</span>今日學習</h2>
   <div class="hint">左邊寫生字，右邊寫中文意思，兩個都要填</div>
   <div class="wrow"><span class="wnum">1</span><input type="text" id="w1" placeholder="生字" autocomplete="off"><input type="text" id="m1" placeholder="中文意思" autocomplete="off"></div>
@@ -236,7 +236,7 @@ dy>
   <div id="assess"></div>
   <div class="msg" id="msg"></div>
 </div>
-<div class="card" id="missCard" style="display:none">
+<div class="card" id="missCard">
   <h2><span class="kicon">日</span>未交嘅日子</h2>
   <div id="missBody"></div>
 </div>
@@ -245,7 +245,7 @@ dy>
 <div class="main-section">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">顧</span><em>回顧</em></h2>
 <div class="section-content">
-<div class="card" id="flashCard" style="display:none">
+<div class="card" id="flashCard">
   <h2><span class="kicon">脳</span>Flash Card 背單字</h2>
   <div id="flashIntro">
     <div class="hint">學習為主，唔計分。睇住日文諗意思，撳卡反轉對答案。唔識嘅會再出現，直到記住為止。</div>
@@ -257,18 +257,18 @@ dy>
   </div>
   <div id="flashBody" style="display:none"></div>
 </div>
-<div class="card" id="recallCard" style="display:none">
+<div class="card" id="recallCard">
   <h2><span class="kicon">回</span>上次回憶</h2>
   <div class="card-sub">先回憶，唔好偷睇</div>
   <div id="recallBody"></div>
   <div class="recall-tip">試下唔睇，講返出昨日 5 個生字同造句，講得出先好繼續。</div>
 </div>
-<div class="card" id="corrCard" style="display:none">
+<div class="card" id="corrCard">
   <h2><span class="kicon">正</span>改錯提醒</h2>
   <div id="corrBody"><div class="recall-empty">載入中…</div></div>
   <div class="hint">每晚檢查發現嘅錯處會喺度提醒你。</div>
 </div>
-<div class="card" id="anaCard" style="display:none">
+<div class="card" id="anaCard">
   <h2><span class="kicon">析</span>每週分析</h2>
   <div id="anaBody"><div class="recall-empty">載入中…</div></div>
   <div class="hint">逢星期日出分析，睇下今週邊方面要加油。</div>
@@ -278,7 +278,7 @@ dy>
 <div class="main-section">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">測</span><em>測驗</em></h2>
 <div class="section-content">
-<div class="card" id="weekCard" style="display:none">
+<div class="card" id="weekCard">
   <h2><span class="kicon">級</span>本週大測驗</h2>
   <div id="weekIntro">
     <div class="hint">語彙 8 題＋文法 8 題＋讀解 4 題＋複習 5 題，每星期做一次，成績會交去做每週分析。</div>
@@ -287,7 +287,7 @@ dy>
   </div>
   <div id="weekBody" style="display:none"></div>
 </div>
-<div class="card" id="randCard" style="display:none">
+<div class="card" id="randCard">
   <h2><span class="kicon">隨</span>N4 隨機練習</h2>
   <div id="randIntro">
     <div class="hint">每日隨機 5 題 N4 真題（語彙＋文法＋讀解），做完即時對答案＋講解，成績會記錄。</div>
@@ -296,7 +296,7 @@ dy>
   </div>
   <div id="randBody" style="display:none"></div>
 </div>
-<div class="card" id="examCard" style="display:none">
+<div class="card" id="examCard">
   <h2><span class="kicon">考</span>假日模擬考</h2>
   <div id="examIntro">
     <div class="hint">四部分：語彙 → 文法 → 讀解 → 聽解，按真實考試時間計時。</div>
@@ -314,7 +314,7 @@ dy>
   </div>
   <div id="examBody" style="display:none"></div>
 </div>
-<div class="card" id="fullCard" style="display:none">
+<div class="card" id="fullCard">
   <h2><span class="kicon">卷</span>N4 完整模擬卷</h2>
   <div id="fullIntro">
     <div class="hint">完整 N4 模擬考試（言語知識＋讀解＋聽解），計時完成，成績會記錄並分析錯題。</div>
@@ -328,7 +328,7 @@ dy>
 <div class="main-section">
 <h2 class="section-title" onclick="toggleSection(this)"><span class="big-char">資</span><em>資源</em></h2>
 <div class="section-content">
-<div class="card" id="mockCard" style="display:none">
+<div class="card" id="mockCard">
   <h2><span class="kicon">模</span>模擬試資源</h2>
   <div class="hint">目標：超越 N4！考前每星期做一回完整模擬卷，練時間分配。</div>
   <div class="hist-item">
