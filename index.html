@@ -2848,11 +2848,19 @@ fetch('n3vocab.json').then(function(r){ return r.json(); }).then(function(d){ N3
 var backendHave = {};
 function fetchBackendDates(){
   if(!child || child==='GOBI'){ backendHave = {}; return; }
+  // 先用本地緩存，即時顯示
+  try{
+    var cached = JSON.parse(localStorage.getItem('backendHave_'+child)||'[]');
+    backendHave = {};
+    cached.forEach(function(d){ backendHave[d]=1; });
+    renderMiss();
+  }catch(e){}
   fetch('https://jlpt-scores.hoo-c27.workers.dev/daily?who='+encodeURIComponent(child))
     .then(function(r){ return r.json(); })
     .then(function(dates){
       backendHave = {};
       (dates||[]).forEach(function(d){ backendHave[d]=1; });
+      try{ localStorage.setItem('backendHave_'+child, JSON.stringify(dates||[])); }catch(e){}
       renderMiss();
     }).catch(function(){});
   syncWeekScores();
