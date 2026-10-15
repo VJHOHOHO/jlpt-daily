@@ -86,6 +86,9 @@
   .hist-date { font-weight: 800; font-size: 17px; margin-bottom: 8px; color: #111; }
   .hist-words { font-size: 17px; color: #444; }
   .hist-sent { font-size: 17px; margin-top: 8px; color: #444; }
+  .hist-warn { font-size: 16px; margin-top: 8px; color: #c00; font-weight: 700; }
+  .resubmit-btn { margin-top: 10px; padding: 10px 22px; font-size: 16px; border: none; border-radius: 12px;
+                  background: #4a90d9; color: #fff; font-weight: 700; cursor: pointer; }
   .recall-tip { font-size: 15px; color: #999; margin-top: 12px; }
   .miss-row { padding: 14px 4px; border-bottom: 1px solid rgba(0,0,0,.06); font-size: 18px;
               display: flex; justify-content: space-between; align-items: center; gap: 10px; }
@@ -162,7 +165,27 @@
 </style>
 
 </head>
-<bo<div class="main-section">
+<bo
+
+
+
+
+dy>
+<iframe name="gformFrame" style="display:none" title="gform"></iframe>
+
+<h1>日語學習記錄</h1>
+<div class="date" id="todayStr"></div>
+<div class="countdown" id="countdown"></div>
+
+<div class="card" id="whoCard">
+  <h2><span class="kicon">人</span>我是誰</h2>
+  <div class="who">
+    <button id="btnYue" onclick="pickChild('許悅')">許悅</button>
+    <button id="btnYi" onclick="pickChild('許逸')">許逸</button>
+    <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
+  </div>
+</div>
+<div class="main-section">
 <h2 class="section-title collapsed" onclick="toggleSection(this)">練習</h2>
 <div class="section-content hidden">
 <div class="card" id="dailyCard" style="display:none">
@@ -314,21 +337,7 @@
 </div>
 </div>
 </div>
-dy>
-<iframe name="gformFrame" style="display:none" title="gform"></iframe>
 
-<h1>日語學習記錄</h1>
-<div class="date" id="todayStr"></div>
-<div class="countdown" id="countdown"></div>
-
-<div class="card" id="whoCard">
-  <h2><span class="kicon">人</span>我是誰</h2>
-  <div class="who">
-    <button id="btnYue" onclick="pickChild('許悅')">許悅</button>
-    <button id="btnYi" onclick="pickChild('許逸')">許逸</button>
-    <button id="btnGobi" class="testbtn" onclick="pickChild('GOBI')">GOBI<span class="testtag">測試</span></button>
-  </div>
-</div>
 
 
 
@@ -2850,7 +2859,7 @@ function syncWeekScores(){
     postScore({type:'week',who:child,date:wk,
       vocab:(r.s['語彙']||0)+'/8', gram:(r.s['文法']||0)+'/8',
       read:(r.s['讀解']||0)+'/4', rev:(r.s['複習']||0)+'/5',
-      total:r.total||'', wrong:''});
+      total:r.total||'', wrong:r.wrong||''});
   });
 }
 
@@ -2963,10 +2972,34 @@ function renderHist(){
   var body = $('histBody');
   if(!arr.length){ body.innerHTML='<div class="recall-empty">暫時未有記錄。</div>'; return; }
   body.innerHTML = arr.map(function(e){
+    var extra = '';
+    if(e.synced!==true){
+      if(e.synced===false) extra += '<div class="hist-warn">⚠️ 未同步到後台</div>';
+      extra += '<button class="resubmit-btn" onclick="resubmitDaily(\''+e.date+'\')">再送一次</button>';
+    }
     return '<div class="hist-item"><div class="hist-date">'+esc(e.date)+'</div>'+
       '<div class="hist-words">'+e.words.map(esc).join('；')+'</div>'+
-      (e.sentence?'<div class="hist-sent">造句：'+esc(e.sentence)+'</div>':'')+'</div>';
+      (e.sentence?'<div class="hist-sent">造句：'+esc(e.sentence)+'</div>':'')+extra+'</div>';
   }).join('');
+}
+function resubmitDaily(ds){
+  if(!child){ setMsg('請先揀「我是誰」。','err'); return; }
+  var rec = findByDate(loadAll(), ds);
+  if(!rec) return;
+  var p = new URLSearchParams();
+  var FU = isTest()?TEST_FORM_URL:FORM_URL, EN = isTest()?TEST_ENTRY:ENTRY;
+  p.append(EN.who, child);
+  for(var j=0;j<5;j++) p.append(EN.w[j], rec.words[j]||'');
+  p.append(EN.sent, rec.sentence + (ds!==todayKey() ? ' [補交'+ds+']' : ''));
+  setMsg('傳送中…','');
+  fetch(FU,{method:'POST',mode:'no-cors',body:p}).then(function(){
+    var arr = loadAll(); var r = findByDate(arr, ds);
+    if(r){ r.synced = true; saveAll(arr); }
+    renderHist(); renderMiss();
+    setMsg('已再送一次。','ok');
+  }).catch(function(){
+    setMsg('再送失敗，請檢查網絡後再試。','err');
+  });
 }
 function prefillToday(){
   var t = findByDate(loadAll(), todayKey());
@@ -3078,6 +3111,9 @@ function submitDaily(){
 
   function done(synced){
     btn.disabled=false;
+    var arr2 = loadAll();
+    var rec = findByDate(arr2, target);
+    if(rec){ rec.synced = synced; saveAll(arr2); }
     $('assess').innerHTML = assessWords(words);
     setMsg(synced ? (makeupDate?'補交成功。':'已提交，今晚會有檢查同複習快問。')
                   : '已喺本機記錄，但同步失敗，今晚檢查可能見唔到，請再提交一次。',
@@ -3534,7 +3570,7 @@ if(wq.idx<wq.qs.length-1){
 function nextWeekQ(){ wq.idx++; if(wq.idx>=wq.qs.length) endWeekQuiz(); else renderWeekQ();}
 function endWeekQuiz(){
 var s=wq.s, total=s['語彙']+s['文法']+s['讀解']+s['複習'];
-saveWeekRec(wq.wk,{total:total+'/25',s:s});
+saveWeekRec(wq.wk,{total:total+'/25',s:s,wrong:wq.wrong.join(' ／ ')||'全部啱'});
 var p=new URLSearchParams();
 var WFU = isTest()?TEST_WEEK_FORM_URL:WEEK_FORM_URL, WEN = isTest()?TEST_WEEK_ENTRY:WEEK_ENTRY;
 p.append(WEN.who,child); p.append(WEN.week,wq.wk);
