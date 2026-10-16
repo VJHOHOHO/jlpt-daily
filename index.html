@@ -3982,6 +3982,7 @@ function startDailyPractice(){
   loadQBank(function(){
     var pool = QBANK.filter(function(q){
       if(q.needs_image) return false;
+      if(q.audio_issue) return false;
       if(level!=='MIX' && q.level!==level) return false;
       if(!includeListening && q.section==='listening') return false;
       return true;
