@@ -4285,6 +4285,27 @@ function renderProgressRings(){
 }
 function updateProgressRings(){
   if(!child) return;
+  // GOBI 參考分數（三個人都睇到）
+  fetch('https://jlpt-scores.hoo-c27.workers.dev/scores?type=quiz&who=GOBI')
+    .then(function(r){ return r.json(); })
+    .then(function(scores){
+      if(!scores || !scores.length) return;
+      // 計最近平均
+      var recent = scores.slice(-5);
+      var tot = 0, n = 0;
+      recent.forEach(function(s){
+        var m = String(s.score||'').match(/(\d+)\/(\d+)/);
+        if(m){ tot += parseInt(m[1])/parseInt(m[2])*100; n++; }
+      });
+      if(n>0){
+        var avg = Math.round(tot/n);
+        var el = $('gobiRef');
+        if(el){
+          el.style.display = 'block';
+          el.innerHTML = '參考（GOBI）：近'+n+'次平均 '+avg+'%';
+        }
+      }
+    }).catch(function(){});
   // 每日練習：最近正確率
   try{
     var dr = JSON.parse(localStorage.getItem('daily_scores')||'{}');
@@ -4334,6 +4355,7 @@ function setRing(id, pct){
 })();
 </script>
 
+<div id="gobiRef" style="display:none;background:#e8f5e9;color:#2e7d32;padding:10px;text-align:center;font-weight:700;border-radius:12px;margin:12px 0;font-size:15px;"></div>
 <div class="popup-overlay" id="submitPopup">
   <div class="popup-box">
     <h3 id="popupTitle">已提交！</h3>
