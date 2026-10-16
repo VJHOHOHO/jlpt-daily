@@ -4006,18 +4006,18 @@ function startDailyPractice(){
         setMsg('GOBI 測試模式：'+unverified.length+' 題未驗證優先，其餘隨機。','ok');
       }
     }
-    // 許逸/許悅按弱項派題
+    // 許逸/許悅按弱項派題（加強版）
     else if(child==='許逸' || child==='許悅'){
       try{
         var weakSecs = getWeakSections(child);
         if(weakSecs.length > 0){
-          // 弱項範疇嘅題優先
           var weakPool = pool.filter(function(q){ return weakSecs.indexOf(q.section)>=0; });
           var otherPool = pool.filter(function(q){ return weakSecs.indexOf(q.section)<0; });
-          // 70% 弱項 + 30% 其他
-          if(weakPool.length >= 10){
-            pool = weakPool.concat(otherPool);
-            setMsg('按弱項派題：重點 '+weakSecs.join('、')+'。','ok');
+          // 80% 弱項優先
+          if(weakPool.length >= 12){
+            // 將弱項題放前面，確保優先選到
+            pool = weakPool.concat(weakPool).concat(otherPool);
+            setMsg('按弱項加強派題：重點 '+weakSecs.join('、')+'。','ok');
           }
         }
       }catch(e){}
