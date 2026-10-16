@@ -503,7 +503,7 @@ dy>
       <div class="scope-desc">聽解正確率</div>
     </div>
   </div>
-  <div class="hint" style="margin-top:12px">綠圈係進度，滿咗變小皇冠。GOBI 驗證緊嘅題目會計入。</div>
+  <div class="hint" style="margin-top:12px">綠圈係進度，80% 合格變小皇冠。GOBI 驗證緊嘅題目會計入。</div>
 </div>
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
@@ -4332,7 +4332,7 @@ function renderProgressRings(){
       + '<circle class="bg" cx="9" cy="9" r="'+radius+'"></circle>'
       + '<circle class="fg" cx="9" cy="9" r="'+radius+'"'
       + ' style="stroke-dasharray:'+circumference+'; stroke-dashoffset:'+offset+'"></circle></svg>';
-    if (percent >= 100) { el.classList.add('completed'); }
+    if (percent >= 80) { el.classList.add('completed'); }
     else { el.classList.remove('completed'); }
   });
 }
