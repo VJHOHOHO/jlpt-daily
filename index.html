@@ -186,6 +186,17 @@
     font-size: 15px;
     line-height: 1;
   }
+  .task-progress {
+    width: auto;
+    min-width: 18px;
+  }
+  .task-progress .pct-num {
+    font-size: 11px;
+    font-weight: 700;
+    color: #4CAF50;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
 
 
   .popup-overlay {
@@ -4329,12 +4340,17 @@ function renderProgressRings(){
     var radius = 7;
     var circumference = 2 * Math.PI * radius;
     var offset = circumference - (percent / 100) * circumference;
-    el.innerHTML = '<svg viewBox="0 0 18 18">'
-      + '<circle class="bg" cx="9" cy="9" r="'+radius+'"></circle>'
-      + '<circle class="fg" cx="9" cy="9" r="'+radius+'"'
-      + ' style="stroke-dasharray:'+circumference+'; stroke-dashoffset:'+offset+'"></circle></svg>';
-    if (percent >= 80) { el.classList.add('completed'); }
-    else { el.classList.remove('completed'); }
+    if(percent >= 80){
+      el.classList.add('completed');
+      el.innerHTML = '';
+    }else{
+      el.classList.remove('completed');
+      el.innerHTML = '<svg viewBox="0 0 18 18">'
+        + '<circle class="bg" cx="9" cy="9" r="'+radius+'"></circle>'
+        + '<circle class="fg" cx="9" cy="9" r="'+radius+'"'
+        + ' style="stroke-dasharray:'+circumference+'; stroke-dashoffset:'+offset+'"></circle></svg>'
+        + '<span class="pct-num">'+percent+'%</span>';
+    }
   });
 }
 function updateProgressRings(){
