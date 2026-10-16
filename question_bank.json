@@ -5700,7 +5700,9 @@
       "source": "2018年JLPT N3樣題",
       "explanation": "正確答案是2（DVDを買う）。女方推薦了體操教室、DVD、運動俱樂部三個選項，男方對DVD最感興趣，說「うん、今日にでも（今天就買）」。注意他說想去體操教室但「仕事忙しい」，所以不會選1。",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "audio_issue": true,
+      "audio_note": "Q15: 音檔包含其他題目錄音，待修正"
     },
     {
       "id": "n3_2018_l07",
@@ -5984,7 +5986,9 @@
       "explanation": "正確答案是3。「飯少一點，麻煩了」最禮貌自然。選項1是抱怨太少。選項2是要多一點，方向相反。這題有圖片輔助，請參照原 PDF。",
       "img": "img/n3_l04_q4_rice.png",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "audio_issue": true,
+      "audio_note": "Q12: 音檔前半係例句，待剪接"
     },
     {
       "id": "n3_2018_l20",
