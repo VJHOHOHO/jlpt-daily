@@ -229,6 +229,30 @@
   }
   .popup-box button:active { transform: scale(.97); }
 
+
+  .scope-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .scope-item {
+    background: rgba(255,255,255,.7);
+    border-radius: 16px;
+    padding: 16px;
+    text-align: center;
+  }
+  .scope-item .scope-name {
+    font-size: 17px;
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+  .scope-item .scope-desc {
+    font-size: 13px;
+    color: #666;
+    margin-top: 8px;
+  }
+
 </style>
 
 
@@ -452,6 +476,33 @@ dy>
 <div class="card" id="histCard" style="display:none">
   <h2><span class="kicon">史</span>歷史記錄</h2>
   <div id="histBody"></div>
+</div>
+
+<div class="card" id="scopeCard" style="display:none">
+  <h2><span class="kicon">範</span><em>考試範圍完成度</em></h2>
+  <div class="scope-grid">
+    <div class="scope-item">
+      <div class="scope-name">語彙</div>
+      <span class="task-progress" data-percent="0" id="scope-vocab"></span>
+      <div class="scope-desc">N4 單語掌握度</div>
+    </div>
+    <div class="scope-item">
+      <div class="scope-name">文法</div>
+      <span class="task-progress" data-percent="0" id="scope-grammar"></span>
+      <div class="scope-desc">229 文型掌握度</div>
+    </div>
+    <div class="scope-item">
+      <div class="scope-name">讀解</div>
+      <span class="task-progress" data-percent="0" id="scope-reading"></span>
+      <div class="scope-desc">讀解正確率</div>
+    </div>
+    <div class="scope-item">
+      <div class="scope-name">聽解</div>
+      <span class="task-progress" data-percent="0" id="scope-listening"></span>
+      <div class="scope-desc">聽解正確率</div>
+    </div>
+  </div>
+  <div class="hint" style="margin-top:12px">綠圈係進度，滿咗變小皇冠。GOBI 驗證緊嘅題目會計入。</div>
 </div>
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
@@ -3043,6 +3094,7 @@ function pickChild(name){
   fetchBackendDates();
   fetchDatabase();
   updateProgressRings();
+  updateScopeCard();
 }
 
 function clearForm(){
@@ -4377,6 +4429,28 @@ function closePopup(){
 document.addEventListener('click', function(e){
   if(e.target && e.target.id === 'submitPopup') closePopup();
 });
+</script>
+<script>
+function updateScopeCard(){
+  if(!child) return;
+  $('scopeCard').style.display = 'block';
+  // 從 localStorage 計各範疇正確率
+  try{
+    var ds = JSON.parse(localStorage.getItem('daily_scores')||'{}');
+    // 簡單版：用整體正確率做參考
+    var tot=0, cor=0;
+    Object.keys(ds).forEach(function(k){
+      if(k.indexOf(child)===0){ tot+=ds[k].total||0; cor+=ds[k].correct||0; }
+    });
+    var pct = tot>0 ? Math.round(cor/tot*100) : 0;
+    // 暫時四個範疇用同一進度（之後按範疇細分）
+    ['scope-vocab','scope-grammar','scope-reading','scope-listening'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.dataset.percent = pct;
+    });
+  }catch(e){}
+  renderProgressRings();
+}
 </script>
 </body>
 </html>
