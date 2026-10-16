@@ -183,7 +183,7 @@
   }
   .task-progress.completed::after {
     content: "👑";
-    font-size: 15px;
+    font-size: 36px;
     line-height: 1;
   }
 
@@ -4348,12 +4348,12 @@ function toggleSection(el){
 function renderProgressRings(){
   document.querySelectorAll('.task-progress').forEach(function(el){
     var percent = Math.min(100, Math.max(0, parseInt(el.dataset.percent) || 0));
-    var radius = 7;
+    var radius = 20;
     var circumference = 2 * Math.PI * radius;
     var offset = circumference - (percent / 100) * circumference;
-    el.innerHTML = '<svg viewBox="0 0 18 18">'
-      + '<circle class="bg" cx="9" cy="9" r="'+radius+'"></circle>'
-      + '<circle class="fg" cx="9" cy="9" r="'+radius+'"'
+    el.innerHTML = '<svg viewBox="0 0 48 48">'
+      + '<circle class="bg" cx="24" cy="24" r="'+radius+'"></circle>'
+      + '<circle class="fg" cx="24" cy="24" r="'+radius+'"'
       + ' style="stroke-dasharray:'+circumference+'; stroke-dashoffset:'+offset+'"></circle></svg>';
     if (percent >= 80) { el.classList.add('completed'); }
     else { el.classList.remove('completed'); }
@@ -4457,6 +4457,9 @@ document.addEventListener('click', function(e){
 <script>
 function updateScopeCard(){
   if(!child) return;
+  // 確保元素存在
+  var testEl = document.getElementById('scope-vocab');
+  if(!testEl){ setTimeout(updateScopeCard, 500); return; }
   try{
     // 從練習記錄計各範疇最近 20 題正確率
     var secs = {vocab:[], grammar:[], reading:[], listening:[]};
