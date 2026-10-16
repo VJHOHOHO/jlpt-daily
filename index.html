@@ -4362,7 +4362,7 @@ function updateProgressRings(){
   // 每日練習：最近正確率
   try{
     var dr = JSON.parse(localStorage.getItem('daily_scores')||'{}');
-    var dkeys = Object.keys(dr).filter(function(k){ return k.indexOf(child)===0; }).sort().reverse().slice(0,10);
+    var dkeys = Object.keys(dr).filter(function(k){ return k.indexOf(child)===0; }).sort().reverse().slice(0,20);
     if(dkeys.length){
       var tot=0, cor=0;
       dkeys.forEach(function(k){ tot+=dr[k].total||0; cor+=dr[k].correct||0; });
@@ -4372,7 +4372,7 @@ function updateProgressRings(){
   // 模擬考：最近平均
   try{
     var er = JSON.parse(localStorage.getItem('exam_scores')||'{}');
-    var ekeys = Object.keys(er).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).sort().reverse().slice(0,5);
+    var ekeys = Object.keys(er).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).sort().reverse().slice(0,20);
     if(ekeys.length){
       var sum=0;
       ekeys.forEach(function(k){ sum+=er[k].pct||0; });
