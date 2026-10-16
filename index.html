@@ -3066,7 +3066,7 @@ function pickChild(name){
       var banner = document.createElement('div');
       banner.id = 'gobiBanner';
       banner.style.cssText = 'background:#fff3cd;color:#856404;padding:12px;text-align:center;font-weight:700;border-radius:12px;margin:12px 0;';
-      banner.textContent = '驗證區：題目驗證＋功能驗證中';
+      banner.innerHTML = '驗證區：題目驗證＋功能驗證中<br><button class="btn2" onclick="syncGobiVerified()" style="margin-top:8px;font-size:14px;">上傳已驗證記錄</button><span id="gobiSyncMsg" style="display:block;margin-top:4px;font-size:13px;"></span>';
       var main = document.querySelector('.container') || document.body;
       main.insertBefore(banner, main.firstChild);
     }else{
@@ -4001,11 +4001,26 @@ function startDailyPractice(){
         pool = unverified;
         setMsg('GOBI 測試模式：優先派未驗證題目（剩餘 '+unverified.length+' 題未驗證）。','ok');
       }else if(unverified.length > 0){
-        // 未驗證唔夠15題，全部未驗證 + 隨機已驗證補足
         var verified = pool.filter(function(q){ return q.verified; });
         pool = unverified.concat(verified);
         setMsg('GOBI 測試模式：'+unverified.length+' 題未驗證優先，其餘隨機。','ok');
       }
+    }
+    // 許逸/許悅按弱項派題
+    else if(child==='許逸' || child==='許悅'){
+      try{
+        var weakSecs = getWeakSections(child);
+        if(weakSecs.length > 0){
+          // 弱項範疇嘅題優先
+          var weakPool = pool.filter(function(q){ return weakSecs.indexOf(q.section)>=0; });
+          var otherPool = pool.filter(function(q){ return weakSecs.indexOf(q.section)<0; });
+          // 70% 弱項 + 30% 其他
+          if(weakPool.length >= 10){
+            pool = weakPool.concat(otherPool);
+            setMsg('按弱項派題：重點 '+weakSecs.join('、')+'。','ok');
+          }
+        }
+      }catch(e){}
     }
     if(pool.length < 15){ setMsg('題庫題目不足。','err'); return; }
     // 5題詞彙 + 10題混合（至少5題文法）
@@ -4467,6 +4482,53 @@ function updateScopeCard(){
     });
   }catch(e){}
   renderProgressRings();
+}
+</script>
+<script>
+function syncGobiVerified(){
+  if(child!=='GOBI'){ setMsg('請先選 GOBI。','err'); return; }
+  try{
+    var vlog = JSON.parse(localStorage.getItem('gobi_verified')||'[]');
+    if(vlog.length===0){ $('gobiSyncMsg').textContent='未有已驗證記錄。'; return; }
+    $('gobiSyncMsg').textContent='上傳緊 '+vlog.length+' 題...';
+    fetch('https://jlpt-scores.hoo-c27.workers.dev/gobi-verify', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({verified:vlog, time:new Date().toISOString()})
+    }).then(function(r){ return r.json(); })
+    .then(function(res){
+      $('gobiSyncMsg').textContent='已上傳 '+vlog.length+' 題！';
+      setMsg('已同步 '+vlog.length+' 題驗證記錄。','ok');
+    }).catch(function(){
+      $('gobiSyncMsg').textContent='上傳失敗，請再試。';
+    });
+  }catch(e){ $('gobiSyncMsg').textContent='讀取失敗。'; }
+}
+</script>
+<script>
+function getWeakSections(childName){
+  // 計每個範疇正確率，低過 80% 視為弱項
+  var secs = {vocab:{c:0,t:0}, grammar:{c:0,t:0}, reading:{c:0,t:0}, listening:{c:0,t:0}};
+  ['n4_rand_scores','n4_full_scores'].forEach(function(key){
+    try{
+      var rec = JSON.parse(localStorage.getItem(key)||'{}');
+      Object.keys(rec).forEach(function(k){
+        if(k.indexOf(childName)<0) return;
+        var s = rec[k].sections;
+        if(!s) return;
+        Object.keys(secs).forEach(function(sec){
+          if(s[sec]){ secs[sec].c += s[sec].c; secs[sec].t += s[sec].t; }
+        });
+      });
+    }catch(e){}
+  });
+  var weak = [];
+  Object.keys(secs).forEach(function(sec){
+    if(secs[sec].t >= 5){ // 至少做過 5 題先計
+      var pct = secs[sec].c / secs[sec].t * 100;
+      if(pct < 80) weak.push(sec);
+    }
+  });
+  return weak;
 }
 </script>
 </body>
