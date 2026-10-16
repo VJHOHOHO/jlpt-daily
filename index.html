@@ -3861,8 +3861,16 @@ function submitPractice(mode, ids){
       : '<div class="err">✗ 答錯了。正確答案是 '+q.answer+'. '+(q.explanation?esc(q.explanation):'')+'</div>';
   });
   var score = correct + '/' + qs.length;
-  // 記錄成績
-  savePracticeScore(mode, score, wrong.length);
+  // 分範疇計分
+  var secStats = {vocab:{c:0,t:0}, grammar:{c:0,t:0}, reading:{c:0,t:0}, listening:{c:0,t:0}};
+  qs.forEach(function(q,i){
+    var sel = document.querySelector('input[name="'+mode+'_q'+i+'"]:checked');
+    var userAns = sel ? parseInt(sel.value) : 0;
+    var sec = q.section || 'vocab';
+    if(secStats[sec]){ secStats[sec].t++; if(userAns===q.answer) secStats[sec].c++; }
+  });
+  // 記錄成績（含分範疇）
+  savePracticeScore(mode, score, wrong.length, secStats);
   // GOBI 驗證標記
   if(child==='GOBI'){
     try{
@@ -3881,12 +3889,12 @@ function submitPractice(mode, ids){
   }
   $(bodyId).innerHTML = summary + $(bodyId).innerHTML;
 }
-function savePracticeScore(mode, score, wrongCount){
+function savePracticeScore(mode, score, wrongCount, secStats){
   if(!child) return;
   var key = mode==='rand' ? 'n4_rand_scores' : 'n4_full_scores';
   var rec = JSON.parse(localStorage.getItem(key)||'{}');
   var today = todayKey();
-  rec[today+'_'+child] = {score:score, wrong:wrongCount, time:new Date().toISOString()};
+  rec[today+'_'+child] = {score:score, wrong:wrongCount, time:new Date().toISOString(), sections:secStats||null};
   localStorage.setItem(key, JSON.stringify(rec));
   // 同步到後端
   fetch('https://jlpt-scores.hoo-c27.workers.dev/practice-score', {
@@ -4434,18 +4442,27 @@ document.addEventListener('click', function(e){
 <script>
 function updateScopeCard(){
   if(!child) return;
-  // 從 localStorage 計各範疇正確率
   try{
-    var ds = JSON.parse(localStorage.getItem('daily_scores')||'{}');
-    // 簡單版：用整體正確率做參考
-    var tot=0, cor=0;
-    Object.keys(ds).forEach(function(k){
-      if(k.indexOf(child)===0){ tot+=ds[k].total||0; cor+=ds[k].correct||0; }
+    // 從練習記錄計各範疇最近 20 題正確率
+    var secs = {vocab:[], grammar:[], reading:[], listening:[]};
+    ['n4_rand_scores','n4_full_scores'].forEach(function(key){
+      var rec = JSON.parse(localStorage.getItem(key)||'{}');
+      Object.keys(rec).forEach(function(k){
+        if(k.indexOf(child)<0) return;
+        var s = rec[k].sections;
+        if(!s) return;
+        Object.keys(secs).forEach(function(sec){
+          if(s[sec] && s[sec].t>0) secs[sec].push(s[sec]);
+        });
+      });
     });
-    var pct = tot>0 ? Math.round(cor/tot*100) : 0;
-    // 暫時四個範疇用同一進度（之後按範疇細分）
-    ['scope-vocab','scope-grammar','scope-reading','scope-listening'].forEach(function(id){
-      var el = document.getElementById(id);
+    var map = {'vocab':'scope-vocab','grammar':'scope-grammar','reading':'scope-reading','listening':'scope-listening'};
+    Object.keys(map).forEach(function(sec){
+      var arr = secs[sec].slice(-20);
+      var t=0, c=0;
+      arr.forEach(function(s){ t+=s.t; c+=s.c; });
+      var pct = t>0 ? Math.round(c/t*100) : 0;
+      var el = document.getElementById(map[sec]);
       if(el) el.dataset.percent = pct;
     });
   }catch(e){}
