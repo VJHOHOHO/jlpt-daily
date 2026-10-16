@@ -3008,6 +3008,22 @@ $('todayStr').textContent = todayKey();
 
 function pickChild(name){
   child = name; makeupDate = null;
+  // GOBI 驗證區標示
+  var gobiBanner = $('gobiBanner');
+  if(name==='GOBI'){
+    if(!gobiBanner){
+      var banner = document.createElement('div');
+      banner.id = 'gobiBanner';
+      banner.style.cssText = 'background:#fff3cd;color:#856404;padding:12px;text-align:center;font-weight:700;border-radius:12px;margin:12px 0;';
+      banner.textContent = '驗證區：題目驗證＋功能驗證中';
+      var main = document.querySelector('.container') || document.body;
+      main.insertBefore(banner, main.firstChild);
+    }else{
+      gobiBanner.style.display = 'block';
+    }
+  }else if(gobiBanner){
+    gobiBanner.style.display = 'none';
+  }
   ensureSeed();
   $('btnYue').className = name==='許悅' ? 'active' : '';
   $('btnYi').className = name==='許逸' ? 'active' : '';
@@ -3795,6 +3811,15 @@ function submitPractice(mode, ids){
   var score = correct + '/' + qs.length;
   // 記錄成績
   savePracticeScore(mode, score, wrong.length);
+  // GOBI 驗證標記
+  if(child==='GOBI'){
+    try{
+      var vlog = JSON.parse(localStorage.getItem('gobi_verified')||'[]');
+      qs.forEach(function(q){ if(vlog.indexOf(q.id)<0) vlog.push(q.id); });
+      localStorage.setItem('gobi_verified', JSON.stringify(vlog));
+      setMsg('已標記 '+qs.length+' 題為已驗證（累計 '+vlog.length+' 題）。','ok');
+    }catch(e){}
+  }
   // 顯示總結
   var summary = '<div class="card-sub" style="margin:16px 0">得分：'+score+'（'+Math.round(correct/qs.length*100)+'分）</div>';
   if(wrong.length>0){
@@ -3908,6 +3933,19 @@ function startDailyPractice(){
       if(!includeListening && q.section==='listening') return false;
       return true;
     });
+    // GOBI 優先做未驗證題目
+    if(child==='GOBI'){
+      var unverified = pool.filter(function(q){ return !q.verified; });
+      if(unverified.length >= 15){
+        pool = unverified;
+        setMsg('GOBI 測試模式：優先派未驗證題目（剩餘 '+unverified.length+' 題未驗證）。','ok');
+      }else if(unverified.length > 0){
+        // 未驗證唔夠15題，全部未驗證 + 隨機已驗證補足
+        var verified = pool.filter(function(q){ return q.verified; });
+        pool = unverified.concat(verified);
+        setMsg('GOBI 測試模式：'+unverified.length+' 題未驗證優先，其餘隨機。','ok');
+      }
+    }
     if(pool.length < 15){ setMsg('題庫題目不足。','err'); return; }
     // 5題詞彙 + 10題混合（至少5題文法）
     var vocabPool = pool.filter(function(q){ return q.section==='vocab'; });
