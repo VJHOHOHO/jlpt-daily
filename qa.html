@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>題目 QA 驗收</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;background:#f5f7fa;color:#333;padding:16px;max-width:900px;margin:0 auto}
+h1{font-size:24px;margin:16px 0;text-align:center}
+.controls{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.controls select,.controls button{font-size:16px;padding:10px 16px;margin:4px;border-radius:8px;border:1px solid #ddd}
+.controls button{background:#4a90d9;color:#fff;border:none;cursor:pointer}
+.controls button.active{background:#2c6cb0}
+.controls button.warn{background:#e67e22}
+.stats{font-size:14px;color:#666;margin-top:8px}
+.qcard{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:4px solid #ddd}
+.qcard.ok{border-left-color:#27ae60}
+.qcard.wrong{border-left-color:#e74c3c}
+.qcard.fixed{border-left-color:#f39c12}
+.qid{font-size:12px;color:#999;margin-bottom:4px}
+.qtext{font-size:17px;line-height:1.6;margin-bottom:8px}
+.qtext b{color:#2c3e50}
+.qimg img{max-width:100%;border-radius:8px;margin:8px 0}
+.qopts{margin:8px 0 8px 8px;font-size:15px;line-height:1.8;color:#555}
+.qans{font-size:14px;color:#27ae60;margin:4px 0}
+.qnote{font-size:13px;color:#e67e22;margin:4px 0}
+.qa-row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.qa-row label{font-size:15px;display:flex;align-items:center;gap:6px;cursor:pointer}
+.qa-row input[type=checkbox]{width:20px;height:20px}
+.qa-comment{width:100%;font-size:15px;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:8px;min-height:60px;font-family:inherit}
+.qa-status{font-size:13px;padding:4px 10px;border-radius:12px;margin-left:8px}
+.qa-status.ok{background:#d4edda;color:#155724}
+.qa-status.wrong{background:#f8d7da;color:#721c24}
+.qa-status.fixed{background:#fff3cd;color:#856404}
+.filter-bar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar button{font-size:14px;padding:8px 14px;border-radius:20px;border:1px solid #ddd;background:#fff;cursor:pointer}
+.filter-bar button.active{background:#4a90d9;color:#fff;border-color:#4a90d9}
+.export{margin-top:16px;text-align:center}
+#exportOut{width:100%;min-height:120px;font-size:13px;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:8px;font-family:monospace;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>📝 題目 QA 驗收</h1>
+
+<div class="controls">
+<select id="paperSel">
+<option value="2018-n3">2018 N3</option>
+<option value="2018-n4">2018 N4</option>
+<option value="2018-n5">2018 N5</option>
+<option value="2012-n3" disabled>2012 N3（未完成）</option>
+<option value="2012-n4" disabled>2012 N4（未完成）</option>
+<option value="2012-n5" disabled>2012 N5（未完成）</option>
+</select>
+<div class="filter-bar" style="margin-top:12px">
+<button data-f="all" class="active">全部</button>
+<button data-f="pending">未驗收</button>
+<button data-f="ok">✓ 正確</button>
+<button data-f="wrong">✗ 有問題</button>
+<button data-f="fixed">🔧 已修正待確認</button>
+</div>
+<div class="stats" id="stats"></div>
+</div>
+
+<div id="qlist"></div>
+
+<div class="controls export">
+<button class="warn" onclick="exportWrong()">匯出有問題清單</button>
+<div id="exportOut" style="display:none"></div>
+</div>
+
+<script>
+const QA_KEY = 'qa_status_v1';
+let allQs = [];
+let qaStatus = {};
+let curFilter = 'all';
+let curPaper = '2018-n3';
+
+// 載入 QA 狀態
+try { qaStatus = JSON.parse(localStorage.getItem(QA_KEY) || '{}');} catch(e){ qaStatus = {};}
+function saveQA(){ localStorage.setItem(QA_KEY, JSON.stringify(qaStatus));}
+
+// 載入題庫
+fetch('question_bank.json?v='+Date.now()).then(r=>r.json()).then(db=>{
+allQs = db.questions || [];
+render();
+});
+
+function getPaperQs(){
+const [year, lvl] = curPaper.split('-');
+return allQs.filter(q=>{
+const id = q.id||'';
+return id.includes(year) && (id.startsWith(lvl+'_') || id.startsWith('n'+lvl.slice(1)+'_'));
+}).sort((a,b)=> (a.id||'').localeCompare(b.id||''));
+}
+
+function setQA(qid, status, comment){
+qaStatus[qid] = {status, comment: comment||'', t: Date.now()};
+saveQA(); render();
+}
+
+function render(){
+const qs = getPaperQs();
+const list = document.getElementById('qlist');
+let html = '';
+let cOk=0, cWrong=0, cFixed=0, cPend=0;
+
+qs.forEach(q=>{
+const st = qaStatus[q.id];
+const s = st? st.status: 'pending';
+if(s==='ok')cOk++; else if(s==='wrong')cWrong++; else if(s==='fixed')cFixed++; else cPend++;
+
+if(curFilter!=='all' && s!==curFilter) return;
+// fixed 篩選：顯示資料庫標記為已修正的
+if(curFilter==='fixed' &&!q.qa_fixed && s!=='fixed') return;
+
+const opts = (q.options||[]).map((o,i)=>`<div>${i+1}. ${esc(o)}</div>`).join('');
+const imgHtml = q.img? `<div class="qimg"><img src="${q.img}"></div>`:
+(q.imgs? q.imgs.map(u=>`<div class="qimg"><img src="${u}"></div>`).join(''): '');
+const audioHtml = q.audio? `<div><audio controls src="audio/${q.audio}" style="width:100%"></audio></div>`: '';
+const fixedBadge = q.qa_fixed? '<span class="qa-status fixed">已修正</span>': '';
+const stBadge = s==='ok'? '<span class="qa-status ok">✓ 正確</span>':
+s==='wrong'? '<span class="qa-status wrong">✗ 有問題</span>':
+s==='fixed'? '<span class="qa-status fixed">待確認</span>': '';
+
+html += `<div class="qcard ${s}" id="card-${q.id}">
+<div class="qid">${q.id} ${fixedBadge} ${stBadge}</div>
+<div class="qtext"><b>Q.</b> ${esc(q.question||'').replace(/\n/g,'<br>')}</div>
+${imgHtml}${audioHtml}
+<div class="qopts">${opts}</div>
+<div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
+${q.note?`<div class="qnote">註：${esc(q.note)}</div>`:''}
+<div class="qa-row">
+<label><input type="checkbox" ${s==='ok'?'checked':''}
+onchange="setQA('${q.id}', this.checked?'ok':'pending', qaStatus['${q.id}']?.comment||'')"> 正確</label>
+<label><input type="checkbox" ${s==='wrong'?'checked':''}
+onchange="if(this.checked)setQA('${q.id}','wrong',document.getElementById('c-${q.id}').value);else setQA('${q.id}','pending','')"> 有問題</label>
+</div>
+<textarea class="qa-comment" id="c-${q.id}" placeholder="如果有問題，請說明錯喺邊…"
+onblur="if(qaStatus['${q.id}']?.status==='wrong')setQA('${q.id}','wrong',this.value)">${st?esc(st.comment||''):''}</textarea>
+</div>`;
+});
+
+list.innerHTML = html || '<div class="controls">沒有符合的題目</div>';
+document.getElementById('stats').textContent =
+`共 ${qs.length} 題｜✓ ${cOk}｜✗ ${cWrong}｜🔧 ${cFixed}｜未驗 ${cPend}`;
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+document.getElementById('paperSel').onchange = e=>{ curPaper = e.target.value; render();};
+document.querySelectorAll('.filter-bar button').forEach(b=>{
+b.onclick = ()=>{
+document.querySelectorAll('.filter-bar button').forEach(x=>x.classList.remove('active'));
+b.classList.add('active'); curFilter = b.dataset.f; render();
+};
+});
+
+function exportWrong(){
+const wrong = Object.entries(qaStatus).filter(([k,v])=>v.status==='wrong');
+let out = `有問題題目（${wrong.length} 題）\n${'='.repeat(40)}\n\n`;
+wrong.forEach(([qid, rec])=>{
+const q = allQs.find(x=>x.id===qid);
+out += `\n題目：${(q?.question||'').slice(0,80)}\n問題：${rec.comment||'（未填寫）'}\n\n`;
+});
+const el = document.getElementById('exportOut');
+el.style.display = 'block'; el.textContent = out;
+}
+</script>
+</body>
+</html>
