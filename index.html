@@ -4406,9 +4406,9 @@ function renderExamHist(){
         var parts = k.split('_');
         return '<div class="recall-empty">'+esc(parts[0])+' '+esc(parts[2])+'：'+rec[k].score+'</div>';
       }).join('') : '';
-  // 補送分數按鈕
+  // 補送分數按鈕（放最底，低調）
   if(keys.length && child){
-    histHtml += '<div style="margin-top:8px"><button class="btn2" onclick="resubmitExamScores()">📤 補送分數到後端</button></div>';
+    histHtml += '<div style="margin-top:24px;text-align:center"><button onclick="resubmitExamScores()" style="font-size:12px;padding:6px 12px;background:#f0f0f0;color:#999;border:1px solid #ddd;border-radius:6px;cursor:pointer">補送分數</button></div>';
   }
   $('examHist').innerHTML = histHtml;
 }
