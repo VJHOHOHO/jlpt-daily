@@ -4428,28 +4428,42 @@ function resubmitExamScores(){
   });
   setMsg('已補送 '+sent+' 筆分數','ok');
 }
+function showPopup(msg){
+  var p = document.getElementById('resubmitPopup');
+  if(!p){
+    p = document.createElement('div');
+    p.id = 'resubmitPopup';
+    p.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+    p.innerHTML = '<div style="background:#fff;border-radius:16px;padding:32px;text-align:center;max-width:300px;box-shadow:0 4px 20px rgba(0,0,0,0.2)">'
+      + '<div id="resubmitPopupMsg" style="font-size:18px;margin-bottom:20px"></div>'
+      + '<button onclick="document.getElementById(\'resubmitPopup\').style.display=\'none\'" style="font-size:16px;padding:10px 32px;background:#4a90d9;color:#fff;border:none;border-radius:8px;cursor:pointer">好</button></div>';
+    document.body.appendChild(p);
+  }
+  document.getElementById('resubmitPopupMsg').textContent = msg;
+  p.style.display = 'flex';
+}
 function resubmitAllScores(){
-  if(!child){ setMsg('請先選擇使用者','err'); return; }
-  var sent = 0;
-  // 模擬考
   try{
-    var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
-    Object.keys(rec).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).forEach(function(k){
-      var parts = k.split('_'); var r = rec[k];
-      postScore({type:'mock', who:child, date:parts[0], level:parts[2], total:r.score, pct:r.pct});
-      sent++;
-    });
-  }catch(e){}
-  // 備份分數
-  try{
-    var backup = JSON.parse(localStorage.getItem('score_backup')||'[]');
-    backup.forEach(function(item){
-      if(!item.synced && item.data && item.data.who===child){
-        postScore(item.data); sent++;
-      }
-    });
-  }catch(e){}
-  setMsg(sent ? '已補送 '+sent+' 筆分數' : '沒有可補送的分數', sent?'ok':'err');
+    if(typeof child==='undefined' || !child){ showPopup('請先選擇使用者'); return; }
+    var sent = 0;
+    try{
+      var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
+      Object.keys(rec).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).forEach(function(k){
+        var parts = k.split('_'); var r = rec[k];
+        if(typeof postScore==='function') postScore({type:'mock', who:child, date:parts[0], level:parts[2], total:r.score, pct:r.pct});
+        sent++;
+      });
+    }catch(e){}
+    try{
+      var backup = JSON.parse(localStorage.getItem('score_backup')||'[]');
+      backup.forEach(function(item){
+        if(!item.synced && item.data && item.data.who===child){
+          if(typeof postScore==='function') postScore(item.data); sent++;
+        }
+      });
+    }catch(e){}
+    showPopup(sent ? '送出成功！已補送 '+sent+' 筆分數' : '沒有可補送的分數');
+  }catch(e){ showPopup('出錯：'+e.message); }
 }
 
 /* ---------- 每週分析 ---------- */
