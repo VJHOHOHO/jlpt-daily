@@ -2962,9 +2962,36 @@ function isTest(){ return child==='GOBI'; }
 /* ---------- 分數後端（Cloudflare Worker + KV，可靠） ---------- */
 var SCORE_API = 'https://jlpt-scores.hoo-c27.workers.dev/submit';
 function postScore(data){
+  // 先存本地備份，唔會唔見
   try{
-    fetch(SCORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    var backup = JSON.parse(localStorage.getItem('score_backup')||'[]');
+    backup.push({data:data, time:new Date().toISOString(), synced:false});
+    localStorage.setItem('score_backup', JSON.stringify(backup));
   }catch(e){}
+  // 送後端，失敗會重試 3 次
+  var tries = 0;
+  function attempt(){
+    tries++;
+    fetch(SCORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){
+        if(r.ok){
+          // 標記已同步
+          try{
+            var b = JSON.parse(localStorage.getItem('score_backup')||'[]');
+            b.forEach(function(item){
+              if(JSON.stringify(item.data)===JSON.stringify(data)) item.synced = true;
+            });
+            localStorage.setItem('score_backup', JSON.stringify(b));
+          }catch(e){}
+        }else if(tries < 3){
+          setTimeout(attempt, 2000);
+        }
+      })
+      .catch(function(){
+        if(tries < 3) setTimeout(attempt, 2000);
+      });
+  }
+  attempt();
 }
 var child = null, makeupDate = null, quiz = null;
 /* N4 系統字表（ikuchannel 903 字，學習用） */
