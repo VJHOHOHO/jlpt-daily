@@ -4346,12 +4346,19 @@ function submitExamMock(){
     var qs = examQsBySec[s]||[];
     var c = 0;
     qs.forEach(function(q,i){
+      // 聽力唔計分
+      if(s==='listening'){
+        secScores[s] = '不計分';
+        return;
+      }
       totalQ++;
       if(examAnswers[s+'_'+i]===q.answer) c++;
       else wrongList.push({section:s, q:q, userAns:examAnswers[s+'_'+i]||0});
     });
-    secScores[s] = c+'/'+qs.length;
-    totalCorrect += c;
+    if(s!=='listening'){
+      secScores[s] = c+'/'+qs.length;
+      totalCorrect += c;
+    }
   });
   var pct = totalQ ? Math.round(totalCorrect/totalQ*100) : 0;
   var html = '<div class="card-sub" style="margin:16px 0">模擬考完成！總分：'+totalCorrect+'/'+totalQ+'（'+pct+'分）</div>';
