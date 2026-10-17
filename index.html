@@ -4370,6 +4370,13 @@ function submitExamMock(){
   $('examBody').innerHTML = html;
   // 記錄成績
   saveExamScore(level, totalCorrect+'/'+totalQ, pct);
+  // 送後端
+  if(child){
+    postScore({type:'mock', who:child, date:todayKey(), level:level,
+      total:totalCorrect+'/'+totalQ, pct:pct,
+      vocab:secScores.vocab||'', grammar:secScores.grammar||'',
+      reading:secScores.reading||'', listening:secScores.listening||''});
+  }
 }
 function saveExamScore(level, score, pct){
   if(!child) return;
