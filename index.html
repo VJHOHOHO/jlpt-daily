@@ -4308,6 +4308,35 @@ function renderExamSection(){
   $('examBody').dataset.qs = JSON.stringify(qs);
   startExamTimer(mins*60);
 }
+// 功課自動儲存：打一格存一格
+function autoSaveHomework(){
+  if(!child) return;
+  try{
+    var data = {};
+    for(var i=1;i<=5;i++){
+      var w = document.getElementById('w'+i), m = document.getElementById('m'+i);
+      if(w) data['w'+i] = w.value;
+      if(m) data['m'+i] = m.value;
+    }
+    var s = document.getElementById('sentence');
+    if(s) data.sentence = s.value;
+    data._time = new Date().toISOString();
+    var all = JSON.parse(localStorage.getItem('homework_autosave')||'{}');
+    all[todayKey()+'_'+child] = data;
+    localStorage.setItem('homework_autosave', JSON.stringify(all));
+  }catch(e){}
+}
+// 綁定輸入事件
+document.addEventListener('DOMContentLoaded', function(){
+  for(var i=1;i<=5;i++){
+    ['w','m'].forEach(function(p){
+      var el = document.getElementById(p+i);
+      if(el) el.addEventListener('input', autoSaveHomework);
+    });
+  }
+  var s = document.getElementById('sentence');
+  if(s) s.addEventListener('input', autoSaveHomework);
+});
 function saveQuizAnswer(type, key, val){
   try{
     var backup = JSON.parse(localStorage.getItem('quiz_answers')||'{}');
