@@ -3453,6 +3453,7 @@ function skipQuiz(){
 function answerQuiz(i){
   var q=quiz.qs[quiz.idx];
   q.userAns=q.opts[i];
+  saveQuizAnswer('quiz', 'q'+quiz.idx, i);
   var btns=$('quizBody').querySelectorAll('.opt');
   btns.forEach(function(b){ b.disabled=true; });
   // 移除唔識掣
@@ -3827,6 +3828,7 @@ btns.forEach(function(b){ b.onclick=function(){ answerWeekQ(parseInt(b.getAttrib
 function answerWeekQ(i){
 var q=wq.qs[wq.idx];
 q.userAns=q.opts[i];
+saveQuizAnswer('week', 'q'+wq.idx, i);
 var btns=$('weekBody').querySelectorAll('.opt');
 btns.forEach(function(b){ b.disabled=true;});
 if(q.opts[i]===q.ans){ wq.s[q.sec]++; btns[i].classList.add('ok');}
@@ -4305,6 +4307,19 @@ function renderExamSection(){
   $('examBody').dataset.sec = sec;
   $('examBody').dataset.qs = JSON.stringify(qs);
   startExamTimer(mins*60);
+}
+function saveQuizAnswer(type, key, val){
+  try{
+    var backup = JSON.parse(localStorage.getItem('quiz_answers')||'{}');
+    var bk = todayKey()+'_'+(child||'unknown')+'_'+type;
+    backup[bk] = backup[bk] || {};
+    backup[bk][key] = val;
+    backup[bk]._time = new Date().toISOString();
+    localStorage.setItem('quiz_answers', JSON.stringify(backup));
+  }catch(e){}
+  if(child && typeof postScore==='function'){
+    postScore({type:type+'_answer', who:child, date:todayKey(), key:key, answer:val});
+  }
 }
 function saveExamAnswer(key, val){
   examAnswers[key] = val;
