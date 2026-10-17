@@ -478,6 +478,7 @@ dy>
 <div class="card" id="histCard" style="display:none">
   <h2><span class="kicon">史</span>歷史記錄</h2>
   <div id="histBody"></div>
+  <div style="margin:12px 0;text-align:center"><button onclick="resubmitAllScores()" style="font-size:13px;padding:8px 16px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:8px;cursor:pointer">補送分數</button></div>
   <h3 style="margin:20px 0 12px;font-size:18px;">考試範圍完成度</h3>
   <div class="scope-grid">
     <div class="scope-item">
@@ -4419,13 +4420,36 @@ function resubmitExamScores(){
   if(!keys.length){ setMsg('沒有可補送的分數','err'); return; }
   var sent = 0;
   keys.forEach(function(k){
-    var parts = k.split('_'); // date_child_level
+    var parts = k.split('_');
     var r = rec[k];
     postScore({type:'mock', who:child, date:parts[0], level:parts[2],
       total:r.score, pct:r.pct});
     sent++;
   });
   setMsg('已補送 '+sent+' 筆分數','ok');
+}
+function resubmitAllScores(){
+  if(!child){ setMsg('請先選擇使用者','err'); return; }
+  var sent = 0;
+  // 模擬考
+  try{
+    var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
+    Object.keys(rec).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).forEach(function(k){
+      var parts = k.split('_'); var r = rec[k];
+      postScore({type:'mock', who:child, date:parts[0], level:parts[2], total:r.score, pct:r.pct});
+      sent++;
+    });
+  }catch(e){}
+  // 備份分數
+  try{
+    var backup = JSON.parse(localStorage.getItem('score_backup')||'[]');
+    backup.forEach(function(item){
+      if(!item.synced && item.data && item.data.who===child){
+        postScore(item.data); sent++;
+      }
+    });
+  }catch(e){}
+  setMsg(sent ? '已補送 '+sent+' 筆分數' : '沒有可補送的分數', sent?'ok':'err');
 }
 
 /* ---------- 每週分析 ---------- */
