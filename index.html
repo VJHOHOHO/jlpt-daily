@@ -4401,11 +4401,31 @@ function backExamMock(){
 function renderExamHist(){
   var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
   var keys = Object.keys(rec).filter(function(k){ return k.indexOf('_'+child+'_')>0; }).sort().reverse().slice(0,5);
-  $('examHist').innerHTML = keys.length
+  var histHtml = keys.length
     ? '<div class="hint" style="margin-top:10px">最近模擬考：</div>'+keys.map(function(k){
         var parts = k.split('_');
         return '<div class="recall-empty">'+esc(parts[0])+' '+esc(parts[2])+'：'+rec[k].score+'</div>';
       }).join('') : '';
+  // 補送分數按鈕
+  if(keys.length && child){
+    histHtml += '<div style="margin-top:8px"><button class="btn2" onclick="resubmitExamScores()">📤 補送分數到後端</button></div>';
+  }
+  $('examHist').innerHTML = histHtml;
+}
+function resubmitExamScores(){
+  if(!child){ setMsg('請先選擇使用者','err'); return; }
+  var rec = JSON.parse(localStorage.getItem('exam_scores')||'{}');
+  var keys = Object.keys(rec).filter(function(k){ return k.indexOf('_'+child+'_')>0; });
+  if(!keys.length){ setMsg('沒有可補送的分數','err'); return; }
+  var sent = 0;
+  keys.forEach(function(k){
+    var parts = k.split('_'); // date_child_level
+    var r = rec[k];
+    postScore({type:'mock', who:child, date:parts[0], level:parts[2],
+      total:r.score, pct:r.pct});
+    sent++;
+  });
+  setMsg('已補送 '+sent+' 筆分數','ok');
 }
 
 /* ---------- 每週分析 ---------- */
