@@ -4294,7 +4294,7 @@ function renderExamSection(){
     // 考試途中唔顯示聽力稿，交卷後先睇
     q.options.forEach(function(op,j){
       var checked = examAnswers[key]===(j+1) ? ' checked' : '';
-      html += '<label class="opt"><input type="radio" name="mock_'+key+'" value="'+(j+1)+'"'+checked+' onchange="examAnswers[\''+key+'\']='+(j+1)+'"> '+esc(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="mock_'+key+'" value="'+(j+1)+'"'+checked+' onchange="saveExamAnswer(\''+key+'\','+(j+1)+')"> '+esc(op)+'</label>';
     });
     html += '</div>';
   });
@@ -4305,6 +4305,22 @@ function renderExamSection(){
   $('examBody').dataset.sec = sec;
   $('examBody').dataset.qs = JSON.stringify(qs);
   startExamTimer(mins*60);
+}
+function saveExamAnswer(key, val){
+  examAnswers[key] = val;
+  // 即時存 localStorage
+  try{
+    var backup = JSON.parse(localStorage.getItem('exam_answers')||'{}');
+    var bk = todayKey()+'_'+(child||'unknown');
+    backup[bk] = backup[bk] || {};
+    backup[bk][key] = val;
+    backup[bk]._time = new Date().toISOString();
+    localStorage.setItem('exam_answers', JSON.stringify(backup));
+  }catch(e){}
+  // 即時送後端
+  if(child){
+    postScore({type:'mock_answer', who:child, date:todayKey(), key:key, answer:val});
+  }
 }
 function startExamTimer(seconds){
   clearInterval(examTimer);
