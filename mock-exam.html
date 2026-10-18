@@ -81,6 +81,33 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
 // 從主頁載入題庫
 var QBANK = [];
 var currentUser = null;
+/* ---------- 分數後端（同 index.html 一樣：Cloudflare Worker + KV，可靠） ---------- */
+var SCORE_API = 'https://jlpt-scores.hoo-c27.workers.dev/submit';
+function postScore(data){
+  try{
+    var backup = JSON.parse(localStorage.getItem('score_backup')||'[]');
+    backup.push({data:data, time:new Date().toISOString(), synced:false});
+    localStorage.setItem('score_backup', JSON.stringify(backup));
+  }catch(e){}
+  var tries = 0;
+  function attempt(){
+    tries++;
+    fetch(SCORE_API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
+      .then(function(r){
+        if(r.ok){
+          try{
+            var b = JSON.parse(localStorage.getItem('score_backup')||'[]');
+            b.forEach(function(item){
+              if(JSON.stringify(item.data)===JSON.stringify(data)) item.synced = true;
+            });
+            localStorage.setItem('score_backup', JSON.stringify(b));
+          }catch(e){}
+        }else if(tries < 3){ setTimeout(attempt, 2000); }
+      })
+      .catch(function(){ if(tries < 3) setTimeout(attempt, 2000); });
+  }
+  attempt();
+}
 var sections = [
   { id: 'vocab', name: '言語知識（文字・語彙）', mins: 25, filter: function(q){ return q.section==='vocab'; } },
   { id: 'gram_read', name: '言語知識（文法）・読解', mins: 55, filter: function(q){ return q.section==='grammar' || q.section==='reading'; } },
@@ -214,6 +241,14 @@ function answerQ(i, val){
   if(elapsed < 8){
     console.log('Q'+(i+1)+' 可能係猜 ('+elapsed.toFixed(1)+'s)');
   }
+  // 逐題即時送後端：做一題，後端就收到一題
+  try{
+    var q = secQuestions[i] || {};
+    postScore({type:'mock_answer', who:currentUser||'unknown',
+      date:new Date().toISOString().slice(0,10),
+      key:(q.id||('mock_q'+i)), answer:val,
+      section:(sections[secIdx]||{}).id||'', level:examLevel});
+  }catch(e){}
 }
 
 function startTimer(seconds){
@@ -264,6 +299,13 @@ function showFinal(){
   var totalCorrect = 0, totalQ = 0;
   allResults.forEach(function(r){ totalCorrect += r.correct; totalQ += r.total; });
   var pct = Math.round(totalCorrect/totalQ*100);
+
+  // 交卷總分都送後端一份（逐題已送，呢個係總結）
+  try{
+    postScore({type:'mock_final', who:currentUser||'unknown',
+      date:new Date().toISOString().slice(0,10),
+      key:'mock_final', score:totalCorrect, total:totalQ, level:examLevel});
+  }catch(e){}
 
   document.getElementById('breakCard').style.display = 'none';
   document.getElementById('resultCard').style.display = 'block';
