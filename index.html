@@ -145,7 +145,7 @@
   .fbtns { display: flex; gap: 14px; justify-content: center; margin-top: 18px; }
   .fbtn-know { background: #1a1a1a !important; color: #fff !important; }
   .fbtn-dunno { background: #fff !important; color: #111 !important; border: 3px solid #111 !important; }
-  ruby rt { font-size: 0.5em; color: #333; font-weight: 400; }
+  ruby rt { font-size: 0.5em; color: #333; font-weight: 300; }
   ruby { font-size: 1em; font-weight: inherit; ruby-align: center; }
   .qtext ruby, .q-text ruby { font-size: 1em; font-weight: inherit; }
   .opt ruby { font-weight: inherit; }
@@ -528,7 +528,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v16</div>
+<div class="src" style="opacity:0.5">v20261019-v17</div>
 
 <script>
 var N4SET={};
@@ -3572,19 +3572,31 @@ function rubyText(s){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
   }
-  var out = '', i = 0;
-  while(i < s.length){
-    var matched = false;
-    for(var k = 0; k < _rubyKeys.length; k++){
-      var word = _rubyKeys[k];
-      if(s.substr(i, word.length) === word){
-        out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
-        i += word.length; matched = true; break;
-      }
+  // 按標點/括號分段，只對含假名嘅段加振假名（中文唔加）
+  var segments = s.split(/([「」『』（）()？?。、])/);
+  var result = '';
+  for(var si=0; si<segments.length; si++){
+    var seg = segments[si];
+    if(!seg) continue;
+    if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
+      result += esc(seg);
+      continue;
     }
-    if(!matched){ out += esc(s[i]); i++; }
+    var out = '', i = 0;
+    while(i < seg.length){
+      var matched = false;
+      for(var k = 0; k < _rubyKeys.length; k++){
+        var word = _rubyKeys[k];
+        if(seg.substr(i, word.length) === word){
+          out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
+          i += word.length; matched = true; break;
+        }
+      }
+      if(!matched){ out += esc(seg[i]); i++; }
+    }
+    result += out;
   }
-  return out;
+  return result;
 }
 var flash=null;
 function startFlash(src){
