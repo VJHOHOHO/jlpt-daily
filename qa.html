@@ -133,6 +133,23 @@ let curPaper = '2018-n3';
 // 載入 QA 狀態
 try { qaStatus = JSON.parse(localStorage.getItem(QA_KEY) || '{}');} catch(e){ qaStatus = {};}
 function saveQA(){ localStorage.setItem(QA_KEY, JSON.stringify(qaStatus));}
+// QA 即送後端
+function postQA(qid, status, comment){
+  try{
+    fetch('https://jlpt-scores.hoo-c27.workers.dev/submit', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        type: 'qa_result',
+        who: 'GOBI',
+        date: new Date().toISOString().slice(0,10),
+        key: qid,
+        answer: status,
+        comment: comment||''
+      })
+    }).catch(function(e){});
+  }catch(e){}
+}
 
 // 載入題庫
 fetch('question_bank.json?v='+Date.now()).then(r=>r.json()).then(db=>{
@@ -150,7 +167,9 @@ return id.includes(year) && (id.startsWith(lvl+'_') || id.startsWith('n'+lvl.sli
 
 function setQA(qid, status, comment){
 qaStatus[qid] = {status, comment: comment||'', t: Date.now()};
-saveQA(); render();
+saveQA();
+postQA(qid, status, comment); // 即送後端
+render();
 }
 
 function render(){
