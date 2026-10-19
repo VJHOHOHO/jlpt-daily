@@ -38,7 +38,61 @@ h1{font-size:24px;margin:16px 0;text-align:center}
 .filter-bar button.active{background:#4a90d9;color:#fff;border-color:#4a90d9}
 .export{margin-top:16px;text-align:center}
 #exportOut{width:100%;min-height:120px;font-size:13px;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:8px;font-family:monospace;white-space:pre-wrap}
+
+ruby { ruby-align: center; }
+ruby rt { font-size: 0.6em; color: #666; }
+.qtext { font-weight: 700; }
+.qtext rt { font-weight: 400; }
 </style>
+
+<script src="readmap-extra.js"></script>
+<script>
+var READMAP = {};
+if(typeof READMAP_EXTRA !== 'undefined'){
+  for(var k in READMAP_EXTRA) READMAP[k] = READMAP_EXTRA[k];
+}
+// 從 kanjireading.json 載入（可選）
+var _rubyKeys = null;
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function rubyText(s, skipWord){
+  if(!s) return '';
+  s = String(s);
+  if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
+  if(!_rubyKeys){
+    _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
+    _rubyKeys.sort(function(a,b){ return b.length - a.length; });
+  }
+  var segments = s.split(/([「」『』（）()？?。、])/);
+  var result = '';
+  for(var si=0; si<segments.length; si++){
+    var seg = segments[si];
+    if(!seg) continue;
+    if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
+      result += esc(seg);
+      continue;
+    }
+    var out = '', i = 0;
+    while(i < seg.length){
+      var matched = false;
+      for(var k = 0; k < _rubyKeys.length; k++){
+        var word = _rubyKeys[k];
+        if(skipWord && word === skipWord) continue;
+        if(seg.substr(i, word.length) === word){
+          out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
+          i += word.length; matched = true; break;
+        }
+      }
+      if(!matched){ out += esc(seg[i]); i++; }
+    }
+    result += out;
+  }
+  return result;
+}
+function getReadingTarget(question){
+  var m = String(question||'').match(/「([^」]+)」的讀音是？/);
+  return m ? m[1] : null;
+}
+</script>
 </head>
 <body>
 <h1>📝 題目 QA 驗收</h1>
@@ -125,7 +179,7 @@ s==='fixed'? '<span class="qa-status fixed">待確認</span>': '';
 
 html += `<div class="qcard ${s}" id="card-${q.id}">
 <div class="qid">${q.id} ${fixedBadge} ${stBadge}</div>
-<div class="qtext"><b>Q.</b> ${esc(q.question||'').replace(/\n/g,'<br>')}</div>
+<div class="qtext"><b>Q.</b> ${rubyText(q.question||'', getReadingTarget(q.question)).replace(/\n/g,'<br>')}</div>
 ${imgHtml}${audioHtml}
 <div class="qopts">${opts}</div>
 <div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
