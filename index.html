@@ -304,8 +304,9 @@
   src: url('furifont-sans.woff2') format('woff2');
   font-weight: 400 900;
 }
-/* 日文用系統字型＋ruby 振假名（讀音人工核實） */
+/* 日文用 Furifont（內置振假名，簡化維護） */
 .q-text, .qtext, .opt, .qexplain, .passage {
+  font-family: 'Furifont Sans', "PingFang TC", "Microsoft JhengHei", sans-serif;
   line-height: 1.9;
 }
 /* 中文一律黑體 */
@@ -528,7 +529,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v8</div>
+<div class="src" style="opacity:0.5">v20261019-v9</div>
 
 <script>
 var N4SET={};
