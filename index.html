@@ -3432,7 +3432,8 @@ function startQuiz(){
 function renderQ(){
   var q=quiz.qs[quiz.idx];
   var qDisp = q.type==='j2c' ? '「'+rubyWord(q.w,q.r)+'」嘅意思係？' : (q.type==='yomi' ? '「'+esc(q.w)+'」嘅讀音係？' : rubyText(q.q));
-  $('quizBody').innerHTML='<div class=\"q-progress\">第 '+(quiz.idx+1)+' / '+quiz.qs.length+' 題</div>'+
+  var qidHtml = q.id ? '<div style="color:#ccc;font-size:12px">['+esc(q.id)+']</div>' : (q.w ? '<div style="color:#ccc;font-size:12px">['+esc(q.w)+']</div>' : '');
+  $('quizBody').innerHTML='<div class=\"q-progress\">第 '+(quiz.idx+1)+' / '+quiz.qs.length+' 題</div>'+qidHtml+
     '<div class=\"q-text\">'+qDisp+'</div>'+
     q.opts.map(function(o,i){ var od = (q.type==='j2c') ? esc(o) : rubyText(o); return '<button class=\"opt\" data-i=\"'+i+'\">'+od+'</button>'; }).join('')+
     '<div style="text-align:center;margin-top:12px"><button class="btn2" onclick="skipQuiz()">唔識，睇答案學</button></div>';
@@ -3817,7 +3818,7 @@ renderWeekQ();
 }
 function renderWeekQ(){
 var q=wq.qs[wq.idx];
-var html='<div class="q-progress">'+q.sec+' · 第 '+(wq.idx+1)+' / '+wq.qs.length+' 題</div>';
+var html='<div class="q-progress">'+q.sec+' · 第 '+(wq.idx+1)+' / '+wq.qs.length+' 題</div>'+(q.id?'<div style="color:#ccc;font-size:12px">['+esc(q.id)+']</div>':'');
 if(q.passage) html+='<div class="passage">'+rubyText(q.passage).replace(/\n/g,'<br>')+'</div>';
 var qHtml = (q.type==='j2c' && q.w) ? '「'+rubyWord(q.w,q.r)+'」嘅意思係？' : rubyText(q.q);
 html+='<div class="q-text">'+qHtml+'</div>'+
