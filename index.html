@@ -536,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v25</div>
+<div class="src" style="opacity:0.5">v20261019-v26</div>
 
 <script>
 var N4SET={};
@@ -3571,9 +3571,11 @@ function rubyWord(w, r){
 /* 句子加振假名（最長匹配） */
 var _rubyKeys = null;
 var USE_FURIFONT = false;
-function rubyText(s){
+var _rubySkip = null; // 讀音題要跳過嘅目標詞
+function rubyText(s, skipWord){
   if(USE_FURIFONT) return esc(s||'');
   if(!s) return '';
+  var skip = skipWord || _rubySkip;
   s = String(s);
   if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
   if(!_rubyKeys){
@@ -3595,6 +3597,7 @@ function rubyText(s){
       var matched = false;
       for(var k = 0; k < _rubyKeys.length; k++){
         var word = _rubyKeys[k];
+        if(skip && word === skip) continue; // 跳過讀音題目標詞
         if(seg.substr(i, word.length) === word){
           out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
           i += word.length; matched = true; break;
@@ -3606,6 +3609,12 @@ function rubyText(s){
   }
   return result;
 }
+
+function getReadingTarget(question){
+  var m = String(question||'').match(/「([^」]+)」的讀音是？/);
+  return m ? m[1] : null;
+}
+
 var flash=null;
 function startFlash(src){
   var pool=[];
@@ -4191,7 +4200,8 @@ function renderDailyQuestions(qs){
   qs.forEach(function(q,i){ dailyQTimes[i] = {start: startT, ans: 0}; });
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
-    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question).replace(/\n/g,'<br>')+'</div>';
+    var _skip = getReadingTarget(q.question);
+    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question, _skip).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
