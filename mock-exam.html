@@ -30,12 +30,22 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
 .score { font-size: 24px; text-align: center; margin: 20px 0; }
 .section-nav { text-align: center; margin: 20px 0; }
 .progress { text-align: center; color: #666; margin: 10px 0; }
+
+  ruby { font-size: 1em; font-weight: inherit; ruby-align: center; ruby-position: over; }
+  ruby rt {
+    font-size: 0.5em; color: #222; font-weight: 300; line-height: 1;
+    text-align: center; display: block; width: 100%;
+  }
+  .qtext, .opt { font-weight: 700; }
+  .qtext *, .opt * { font-weight: 700 !important; }
+  .qtext rt, .opt rt { font-weight: 300 !important; }
+
 </style>
 </head>
 <body>
 <div class="container">
   <div class="card" id="introCard">
-    <h1>N4 完整模擬卷</h1>
+    <h1>N4 完整模擬卷</h1><div style="text-align:center;color:#999;font-size:12px">v20261019-v24</div>
     <div class="hint">
       和正式 JLPT N4 考試一樣，分三部分計時：<br>
       • <b>言語知識（文字・語彙）</b>：25 分鐘<br>
@@ -218,11 +228,11 @@ function renderQuestions(){
   var html = '';
   secQuestions.forEach(function(q, i){
     qStartTimes[i] = Date.now();
-    html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+    html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question).replace(/\n/g,'<br>') + '</div>';
     if(q.img) html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
     if(q.audio) html += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
-      html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + esc(op) + '</label>';
+      html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + rubyText(op) + '</label>';
     });
     html += '</div>';
   });
@@ -316,12 +326,12 @@ function showFinal(){
     html += '<h3>' + r.sec.name + '：' + r.correct + '/' + r.total + '</h3>';
     r.results.forEach(function(res, i){
       var q = res.q;
-      html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+      html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question).replace(/\n/g,'<br>') + '</div>';
       q.options.forEach(function(op, j){
         var cls = '';
         if(j+1 === q.answer) cls = 'correct';
         else if(j+1 === res.userAns && !res.correct) cls = 'wrong';
-        html += '<div class="opt ' + cls + '">' + (j+1) + '. ' + esc(op) + '</div>';
+        html += '<div class="opt ' + cls + '">' + (j+1) + '. ' + rubyText(op) + '</div>';
       });
       if(res.guessed) html += '<div class="explain" style="background:#fff3e0">🎲 猜對！用咗 ' + res.time.toFixed(1) + ' 秒，建議重溫。</div>';
       if(!res.correct) html += '<div class="explain" style="background:#ffebee">❌ 答錯，加入錯題本加強。</div>';
@@ -349,6 +359,50 @@ function showFinal(){
     });
     localStorage.setItem(wrongKey, JSON.stringify(wrongs));
   }catch(e){}
+}
+</script>
+
+<script src="readmap-extra.js"></script>
+<script>
+// 簡化版 rubyText（用 READMAP_EXTRA）
+var READMAP = {};
+if(typeof READMAP_EXTRA !== 'undefined'){
+  for(var k in READMAP_EXTRA) READMAP[k] = READMAP_EXTRA[k];
+}
+function rubyText(s){
+  if(USE_FURIFONT) return esc(s||'');
+  if(!s) return '';
+  s = String(s);
+  if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
+  if(!_rubyKeys){
+    _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
+    _rubyKeys.sort(function(a,b){ return b.length - a.length; });
+  }
+  // 按標點/括號分段，只對含假名嘅段加振假名（中文唔加）
+  var segments = s.split(/([「」『』（）()？?。、])/);
+  var result = '';
+  for(var si=0; si<segments.length; si++){
+    var seg = segments[si];
+    if(!seg) continue;
+    if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
+      result += esc(seg);
+      continue;
+    }
+    var out = '', i = 0;
+    while(i < seg.length){
+      var matched = false;
+      for(var k = 0; k < _rubyKeys.length; k++){
+        var word = _rubyKeys[k];
+        if(seg.substr(i, word.length) === word){
+          out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
+          i += word.length; matched = true; break;
+        }
+      }
+      if(!matched){ out += esc(seg[i]); i++; }
+    }
+    result += out;
+  }
+  return result;
 }
 </script>
 </body>
