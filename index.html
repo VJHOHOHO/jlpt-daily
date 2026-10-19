@@ -146,8 +146,9 @@
   .fbtn-know { background: #1a1a1a !important; color: #fff !important; }
   .fbtn-dunno { background: #fff !important; color: #111 !important; border: 3px solid #111 !important; }
   ruby rt { font-size: 15px; color: #FFD166; font-weight: 600; }
-  ruby { font-size: 1em; ruby-align: center; }
-  .qtext ruby, .q-text ruby { font-size: 1em; }
+  ruby { font-size: 1em; font-weight: inherit; ruby-align: center; }
+  .qtext ruby, .q-text ruby { font-size: 1em; font-weight: inherit; }
+  .opt ruby { font-weight: inherit; }
   .ffront ruby { font-size: 40px; }
   .ffront ruby rt { color: #FFD166; }
 
@@ -294,6 +295,7 @@
 <style>#histCard { background: #eaeff5; border-radius: 16px; }</style>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<script src="readmap-extra.js"></script>
 </head>
 <bo
 
@@ -3513,6 +3515,8 @@ function buildReadMap(){
   all.forEach(function(x){ if(x.w && x.r && !READMAP[x.w]) READMAP[x.w] = x.r; });
   /* 人工核實讀音優先級最高 */
   if(typeof VERIFIED_R !== 'undefined') Object.keys(VERIFIED_R).forEach(function(w){ READMAP[w] = VERIFIED_R[w]; });
+  /* 題庫補充讀音（唔覆蓋已有） */
+  if(typeof READMAP_EXTRA !== 'undefined') Object.keys(READMAP_EXTRA).forEach(function(w){ if(!READMAP[w]) READMAP[w] = READMAP_EXTRA[w]; });
   _rubyKeys = null;
   _vocabState = {
     n4: (typeof N4VOCAB !== 'undefined' && N4VOCAB.length > 0),
