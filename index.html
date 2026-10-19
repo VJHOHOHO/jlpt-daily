@@ -4291,7 +4291,7 @@ function renderExamSection(){
   html += '<div id="examTimer" style="font-size:24px;font-weight:bold;color:#d32f2f;margin:10px 0"></div>';
   qs.forEach(function(q,i){
     var key = sec+'_'+i;
-    html += '<div class="qblock"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="qblock"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio></div>';
     // 考試途中唔顯示聽力稿，交卷後先睇
@@ -4432,7 +4432,7 @@ function submitExamMock(){
     wrongList.forEach(function(w,i){
       var q = w.q;
       html += '<div class="qblock" style="margin:12px 0;padding:12px;background:#fff;border-radius:8px">';
-      html += '<div class="qtext"><b>'+(i+1)+'.</b> ['+secName(w.section)+']<br>'+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+      html += '<div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>'+(i+1)+'.</b> ['+secName(w.section)+']<br>'+esc(q.question).replace(/\n/g,'<br>')+'</div>';
       // 四個選項，標示用家揀咗咩＋正確答案
       html += '<div style="margin:8px 0">';
       q.options.forEach(function(op,oi){
