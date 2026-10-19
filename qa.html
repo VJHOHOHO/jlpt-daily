@@ -72,11 +72,17 @@ function rubyText(s, skipWord){
       continue;
     }
     var out = '', i = 0;
+    var hasTarget = skipWord && seg.indexOf(skipWord) >= 0;
     while(i < seg.length){
+      if(hasTarget && seg.substr(i, skipWord.length) === skipWord){
+        out += '<u>'+esc(skipWord)+'</u>';
+        i += skipWord.length;
+        continue;
+      }
       var matched = false;
       for(var k = 0; k < _rubyKeys.length; k++){
         var word = _rubyKeys[k];
-        if(skipWord && word === skipWord) continue;
+        if(skipWord && (word === skipWord || skipWord.indexOf(word) === 0)) continue;
         if(seg.substr(i, word.length) === word){
           out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
           i += word.length; matched = true; break;
