@@ -4146,11 +4146,11 @@ function renderDailyQuestions(qs){
   qs.forEach(function(q,i){ dailyQTimes[i] = {start: startT, ans: 0}; });
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
-    html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
-      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now()"> '+esc(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+esc(op)+'</label>';
     });
     html += '<div class="qexplain" id="daily_exp'+i+'" style="display:none"></div></div>';
   });
@@ -4158,6 +4158,13 @@ function renderDailyQuestions(qs){
   html += '<button class="btn" onclick="backDaily()">返回</button>';
   $('dailyBody').innerHTML = html;
   $('dailyBody').dataset.questions = JSON.stringify(qs);
+}
+function saveDailyQAnswer(i, val){
+  try{
+    var qs = JSON.parse($('dailyBody').dataset.questions || '[]');
+    var q = qs[i];
+    if(q && q.id) saveQuizAnswer('daily20', q.id, val);
+  }catch(e){}
 }
 function secName(s){ return {vocab:'語彙',grammar:'文法',reading:'讀解',listening:'聽解'}[s]||s; }
 function submitDailyPractice(){
