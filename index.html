@@ -529,7 +529,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v9</div>
+<div class="src" style="opacity:0.5">v20261019-v10</div>
 
 <script>
 var N4SET={};
@@ -3563,7 +3563,9 @@ function rubyWord(w, r){
 }
 /* 句子加振假名（最長匹配） */
 var _rubyKeys = null;
+var USE_FURIFONT = true;
 function rubyText(s){
+  if(USE_FURIFONT) return esc(s||'');
   if(!s) return '';
   s = String(s);
   if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
