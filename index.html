@@ -528,7 +528,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v13</div>
+<div class="src" style="opacity:0.5">v20261019-v14</div>
 
 <script>
 var N4SET={};
@@ -4343,7 +4343,7 @@ function renderExamSection(){
   startExamTimer(mins*60);
 }
 // 功課自動儲存：打一格存一格
-function autoSaveHomework(){
+function autoSaveHomework(changedField){
   if(!child) return;
   try{
     var data = {};
@@ -4359,17 +4359,33 @@ function autoSaveHomework(){
     all[todayKey()+'_'+child] = data;
     localStorage.setItem('homework_autosave', JSON.stringify(all));
   }catch(e){}
+  // 打字即送後端（同練習一樣）
+  if(changedField && typeof postScore==='function'){
+    var el = document.getElementById(changedField);
+    var val = el ? el.value : '';
+    // 唔送空值
+    if(val && val.trim()){
+      postScore({type:'homework_field', who:child, date:todayKey(), key:changedField, answer:val.trim()});
+    }
+  }
+  // 順便重送隊列
+  if(typeof retryAnswerQueue==='function') retryAnswerQueue();
 }
 // 綁定輸入事件
+var _hwTimer = {};
 document.addEventListener('DOMContentLoaded', function(){
-  for(var i=1;i<=5;i++){
-    ['w','m'].forEach(function(p){
-      var el = document.getElementById(p+i);
-      if(el) el.addEventListener('input', autoSaveHomework);
+  function bindHw(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('input', function(){
+      autoSaveHomework(); // 即存本地
+      // debounce 1.5 秒後送後端
+      if(_hwTimer[id]) clearTimeout(_hwTimer[id]);
+      _hwTimer[id] = setTimeout(function(){ autoSaveHomework(id); }, 1500);
     });
   }
-  var s = document.getElementById('sentence');
-  if(s) s.addEventListener('input', autoSaveHomework);
+  for(var i=1;i<=5;i++){ bindHw('w'+i); bindHw('m'+i); }
+  bindHw('sentence');
 });
 function saveQuizAnswer(type, key, val){
   var payload = null;
