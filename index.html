@@ -528,7 +528,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v12</div>
+<div class="src" style="opacity:0.5">v20261019-v13</div>
 
 <script>
 var N4SET={};
@@ -4171,11 +4171,11 @@ function renderDailyQuestions(qs){
   qs.forEach(function(q,i){ dailyQTimes[i] = {start: startT, ans: 0}; });
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
-    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
-      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+esc(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+rubyText(op)+'</label>';
     });
     html += '<div class="qexplain" id="daily_exp'+i+'" style="display:none"></div></div>';
   });
