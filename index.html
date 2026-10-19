@@ -309,8 +309,12 @@
   line-height: 1.9;
   font-weight: 700;
 }
-.q-text ruby, .qtext ruby, .opt ruby, .passage ruby {
-  font-weight: 700;
+.q-text, .qtext, .opt, .qexplain, .passage,
+.q-text *, .qtext *, .opt *, .qexplain *, .passage * {
+  font-weight: 700 !important;
+}
+.q-text rt, .qtext rt, .opt rt, .passage rt {
+  font-weight: 300 !important;
 }
 /* 中文一律黑體 */
 :lang(zh), [lang="zh"] {
@@ -532,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v20</div>
+<div class="src" style="opacity:0.5">v20261019-v21</div>
 
 <script>
 var N4SET={};
