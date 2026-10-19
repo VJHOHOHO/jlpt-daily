@@ -509,7 +509,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-perq</div>
+<div class="src" style="opacity:0.5">v20261019-perq2</div>
 
 <script>
 var N4SET={};
@@ -4349,6 +4349,8 @@ document.addEventListener('DOMContentLoaded', function(){
   if(s) s.addEventListener('input', autoSaveHomework);
 });
 function saveQuizAnswer(type, key, val){
+  var payload = null;
+  if(child) payload = {type:type+'_answer', who:child, date:todayKey(), key:key, answer:val};
   try{
     var backup = JSON.parse(localStorage.getItem('quiz_answers')||'{}');
     var bk = todayKey()+'_'+(child||'unknown')+'_'+type;
@@ -4357,9 +4359,29 @@ function saveQuizAnswer(type, key, val){
     backup[bk]._time = new Date().toISOString();
     localStorage.setItem('quiz_answers', JSON.stringify(backup));
   }catch(e){}
-  if(child && typeof postScore==='function'){
-    postScore({type:type+'_answer', who:child, date:todayKey(), key:key, answer:val});
+  // 先試重送舊隊列，再送今次
+  retryAnswerQueue();
+  if(payload && typeof postScore==='function'){
+    postScore(payload);
+  } else if(payload){
+    // postScore 未 ready，入隊等下次
+    queueAnswer(payload);
   }
+}
+function queueAnswer(payload){
+  try{
+    var q = JSON.parse(localStorage.getItem('answer_queue')||'[]');
+    q.push(payload);
+    localStorage.setItem('answer_queue', JSON.stringify(q));
+  }catch(e){}
+}
+function retryAnswerQueue(){
+  try{
+    var q = JSON.parse(localStorage.getItem('answer_queue')||'[]');
+    if(!q.length || typeof postScore!=='function') return;
+    localStorage.setItem('answer_queue', '[]');
+    q.forEach(function(p){ postScore(p); });
+  }catch(e){}
 }
 function saveExamAnswer(key, val){
   examAnswers[key] = val;
