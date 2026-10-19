@@ -536,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v26</div>
+<div class="src" style="opacity:0.5">v20261019-v27</div>
 
 <script>
 var N4SET={};
@@ -3597,7 +3597,7 @@ function rubyText(s, skipWord){
       var matched = false;
       for(var k = 0; k < _rubyKeys.length; k++){
         var word = _rubyKeys[k];
-        if(skip && word === skip) continue; // 跳過讀音題目標詞
+        if(skip && (word === skip || skip.indexOf(word) === 0)) continue; // 跳過讀音題目標詞及其子串
         if(seg.substr(i, word.length) === word){
           out += '<ruby>'+esc(word)+'<rt>'+esc(READMAP[word])+'</rt></ruby>';
           i += word.length; matched = true; break;
