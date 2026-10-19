@@ -3037,12 +3037,16 @@ fetch('n5vocab.json').then(function(r){ return r.json(); }).then(function(d){ N5
 fetch('n3vocab.json').then(function(r){ return r.json(); }).then(function(d){ N3VOCAB = d || []; buildReadMap(); }).catch(function(){});
 /* 後台已交日子（Worker 同步，補 localStorage 唔齊） */
 var backendHave = {};
+var dbFresh = false; // 今次入站 database.json 有冇成功拎到（資料庫先係真相來源）
 function fetchDatabase(){
+  // 每次入站都拎新資料，唔用瀏覽器緩存（2026-10-19：用戶要求每次進站都獲取）
   fetch('database.json?v='+Date.now()).then(function(r){ return r.json(); }).then(function(db){
     try{ localStorage.setItem('dbCache', JSON.stringify(db)); }catch(e){}
+    dbFresh = true;
     renderHist();
+    renderMiss(); // 中央資料庫返嚟後重算未交日子（2026-10-19 修：之前淨係靠本機＋worker）
     updateProgressRings();
-  }).catch(function(){});
+  }).catch(function(){ dbFresh = false; renderMiss(); });
 }
 function fetchBackendDates(){
   if(!child || child==='GOBI'){ backendHave = {}; return; }
@@ -3163,9 +3167,24 @@ function setMsg(t,cls){ var m=$('msg'); m.textContent=t; m.className='msg '+cls;
 /* ---------- 補交 ---------- */
 function missingDates(){
   var arr = loadAll();
-  if(!arr.length && !Object.keys(backendHave).length) return [];
+  // 中央資料庫（database.json → localStorage dbCache）都要計入已交，唔只靠本機 localStorage＋worker；
+  // 轉機／清 cache 之後，本機係空但中央有記錄，唔應該成個月都顯示未交（2026-10-19 修）
+  // 資料庫先係真相來源：每次入站都重新拎 database.json（見 fetchDatabase）
+  var dbHave = {};
+  var hasDbCache = false;
+  try{
+    var dbc = JSON.parse(localStorage.getItem('dbCache')||'{}');
+    if(dbc.submissions && dbc.submissions[child]){
+      hasDbCache = true;
+      dbc.submissions[child].forEach(function(r){ if(r && r.date) dbHave[r.date]=1; });
+    }
+  }catch(e){}
+  // 拎唔到資料庫、又冇任何本地／後端記錄：唔知，唔好扮「冇欠交」
+  if(!dbFresh && !hasDbCache && !arr.length && !Object.keys(backendHave).length) return null;
+  if(!arr.length && !Object.keys(backendHave).length && !Object.keys(dbHave).length) return [];
   var have = {}; arr.forEach(function(e){ have[e.date]=1; });
   for(var k in backendHave) have[k]=1;
+  for(var k in dbHave) have[k]=1;
   var allDates = Object.keys(have).sort();
   if(!allDates.length) return [];
   var first = allDates[0];
@@ -3177,6 +3196,7 @@ function missingDates(){
 }
 function renderMiss(){
   var ms = missingDates(), body = $('missBody');
+  if(ms === null){ body.innerHTML='<div class="hint">資料更新失敗，請檢查網絡後重新整理。</div>'; return; }
   if(!ms.length){ body.innerHTML='<div class="recall-empty">冇欠交，繼續保持。</div>'; return; }
   body.innerHTML = '<div class="hint" style="margin-bottom:6px">以下日子未交，撳「補交」補返：</div>' +
     ms.map(function(d){ return '<div class="miss-row"><span>'+d+'</span><button class="btn2" onclick="startMakeup(\''+d+'\')">補交</button></div>'; }).join('');
