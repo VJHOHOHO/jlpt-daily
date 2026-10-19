@@ -304,13 +304,9 @@
   src: url('furifont-sans.woff2') format('woff2');
   font-weight: 400 900;
 }
-/* 日文用 Furifont（內置振假名，簡化維護） */
+/* 日文用系統字型＋ruby 振假名（穩定可靠） */
 .q-text, .qtext, .opt, .qexplain, .passage {
-  font-family: 'Furifont Sans', "PingFang TC", "Microsoft JhengHei", sans-serif;
   line-height: 1.9;
-  font-feature-settings: "liga" 1;
-  font-variant-ligatures: common-ligatures;
-  text-rendering: optimizeLegibility;
 }
 /* 中文一律黑體 */
 :lang(zh), [lang="zh"] {
@@ -532,7 +528,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v11</div>
+<div class="src" style="opacity:0.5">v20261019-v12</div>
 
 <script>
 var N4SET={};
@@ -3566,7 +3562,7 @@ function rubyWord(w, r){
 }
 /* 句子加振假名（最長匹配） */
 var _rubyKeys = null;
-var USE_FURIFONT = true;
+var USE_FURIFONT = false;
 function rubyText(s){
   if(USE_FURIFONT) return esc(s||'');
   if(!s) return '';
