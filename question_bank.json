@@ -26,7 +26,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「楽しい」的讀音是「たのしい」，所以「楽しかった」讀作「たのしかった」。「いそがしかった」是「忙しかった」（很忙）、「すずしかった」是「涼しかった」（很涼爽）、「かなしかった」是「悲しかった」（很難過），字和意思都不一樣。"
     },
     {
       "id": "n4_2018_v02",
@@ -45,7 +46,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「味」讀作「あじ」，意思是味道。「かたち」是「形」（形狀）、「いろ」是「色」（顏色）、「におい」是「匂い」（氣味），都是不同的字。記住：味道 = あじ。"
     },
     {
       "id": "n4_2018_v03",
@@ -64,7 +66,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「不便」讀作「ふべん」，意思是不方便。「不」讀「ふ」不是「ぶ」，「便」讀「べん」不是「へん」。「ぶべん」「ふへん」「ぶへん」這些讀法都不存在，要注意清音和濁音。"
     },
     {
       "id": "n4_2018_v04",
@@ -83,7 +86,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「切る」（切）讀作「きる」，て形是「きって」，有促音。「とって」是「取る」（拿）、「あらって」是「洗って」（洗）、「もって」是「持って」（拿著），都是別的動詞。記住：切って = きって。"
     },
     {
       "id": "n4_2018_v05",
@@ -102,7 +106,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「以外」讀作「いがい」，意思是「除了〜之外」。「以」讀「い」、「外」讀「がい」。「にそと」「にがい」「いそと」都是亂拼的讀法，不存在。"
     },
     {
       "id": "n4_2018_v06",
@@ -121,7 +126,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「雲」讀作「くも」，意思是雲。「ほし」是「星」（星星）、「ゆき」是「雪」（雪）、「そら」是「空」（天空），都是別的字。記住：雲 = くも。"
     },
     {
       "id": "n4_2018_v07",
@@ -140,7 +146,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「急行」讀作「きゅうこう」，意思是快車。「急」和「行」都是長音：きゅう、こう。「きゅこ」「きゅうこ」「きゅこう」都少了長音，讀法不存在。記住：兩個都是長音，きゅうこう。"
     },
     {
       "id": "n4_2018_v08",
@@ -159,7 +166,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「写す」讀作「うつす」，意思有抄寫也有拍照，否定形是「うつさないで」。「おさないで」是「押さないで」（不要按）、「けさないで」是「消さないで」（不要擦掉）、「おとさないで」是「落とさないで」（不要掉落），都是別的動詞。"
     },
     {
       "id": "n4_2018_v09",
@@ -178,7 +186,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「反対」讀作「はんたい」，意思是反對。「反」讀「はん」、「対」讀「たい」。「ほんたい」「はんだい」「ほんだい」的讀法都不存在。注意「対」讀たい，不是だい。"
     },
     {
       "id": "n4_2018_v10",
@@ -197,7 +206,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「くろい」（黑色的）漢字寫作「黒い」。「白い」（しろい）是白色、「赤い」（あかい）是紅色、「青い」（あおい）是藍色，都是別的顏色。記住：黑色的 = 黒い。"
     },
     {
       "id": "n4_2018_v11",
@@ -216,7 +226,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「けいかく」（計畫）漢字寫作「計画」。「計書」「訂画」「訂書」都不是正確的詞。「計」是計算、計劃，「画」在這裡有劃分、謀劃的意思，合起來就是計畫。"
     },
     {
       "id": "n4_2018_v12",
@@ -235,7 +246,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「いしゃ」（醫生）漢字寫作「医者」。「匠」是工匠的意思，「員」是成員的意思，都用錯了。「医」是醫療，「者」是人，合起來就是醫生：医者。"
     },
     {
       "id": "n4_2018_v13",
@@ -254,7 +266,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「よる」（晚上）漢字寫作「夜」。「昼」（ひる）是白天、「夕」（ゆう）是傍晚、「朝」（あさ）是早上，都是別的時間。記住：晚上 = 夜。"
     },
     {
       "id": "n4_2018_v14",
@@ -273,7 +286,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「かす」是把東西借給別人的意思，て形「かして」漢字寫作「貸して」。「貨」是貨物、「資」是資金、「質」是品質，都不對。記住：借給別人（自己是出借方）= 貸す。"
     },
     {
       "id": "n4_2018_v15",
@@ -292,7 +306,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「しあい」（比賽）漢字寫作「試合」。「試」是考試、嘗試的意思，「誡」是告誡的意思，「試会」「誡会」「誡合」都不是正確的詞。記住：比賽 = 試合。"
     },
     {
       "id": "n4_2018_v16",
@@ -311,7 +326,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "聽到佐藤先生受傷了，大家很「しんぱい」（擔心）。「けいけん」（經驗）、「しつれい」（失禮）、「おじぎ」（鞠躬）放在這句裡意思都不通。聽到朋友受傷，自然的反應就是擔心。"
     },
     {
       "id": "n4_2018_v17",
@@ -330,7 +346,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「將來想當歌手」這樣的心願就是「ゆめ」（夢想）。「けしき」（風景）、「おもいで」（回憶）、「せわ」（照顧）都不合語境。記住：「〜になるというゆめがある」= 有成為〜的夢想。"
     },
     {
       "id": "n4_2018_v18",
@@ -349,7 +366,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "邀請李先生來參加派對，要用「ぜひ」（務必、一定）。「ひじょうに」（非常）是形容程度的，「じゅうぶん」（充分）、「いつも」（總是）放在這裡都不自然。邀請別人時說「ぜひ来てください」= 請務必來。"
     },
     {
       "id": "n4_2018_v19",
@@ -368,7 +386,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "接下來要教大家機器的使用方法，所以是「せつめい」（說明）。「じゅんび」（準備）、「りよう」（利用）、「せいさん」（生產）都不合語境。記住：「つかいかたをせつめいします」= 說明使用方法。"
     },
     {
       "id": "n4_2018_v20",
@@ -387,7 +406,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "牙齒不好，所以「かたい」（硬的）東西吃不了。「きびしい」（嚴格）、「はやい」（快）、「ふかい」（深）都不能用來形容食物好不好咬。記住：咬不動的食物 = かたいもの。"
     },
     {
       "id": "n4_2018_v21",
@@ -406,7 +426,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "邀請森先生去約會，要用「さそう」（邀請）。「つたえる」（傳達訊息）、「あんないする」（嚮導、帶路）、「しょうかいする」（介紹）都不合語境。記住：「デートにさそう」= 邀請去約會。"
     },
     {
       "id": "n4_2018_v22",
@@ -425,7 +446,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "兩年內長高了多少，要用長度單位「センチ」（公分）。「グラム」（克）是重量單位，「ばん」「けん」是數東西的量詞，都不能量身高。記住：身高用センチ。"
     },
     {
       "id": "n4_2018_v23",
@@ -444,7 +466,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "在店裡看了兩台電腦，選了最輕的一台，所以是「くらべる」（比較）。「かたづける」（收拾）、「かぞえる」（數）、「はらう」（付錢）都不合語境。比較之後才做選擇：くらべて、えらびました。"
     },
     {
       "id": "n4_2018_v24",
@@ -463,7 +486,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "田中家的燈沒亮，所以他好像「るす」（不在家）。「うそ」（謊言）、「じゆう」（自由）、「ちゅうし」（中止）都不合語境。記住：るす = 人不在家。"
     },
     {
       "id": "n4_2018_v25",
@@ -482,7 +506,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "房間的鑰匙還沒找到，要用「みつかる」（被找到）的否定形「見つかりません」。「つかまえる」（抓住）是用手抓東西，「しる」（知道）、「さわる」（觸摸）意思都不對。找東西用：みつかる／みつからない。"
     },
     {
       "id": "n4_2018_v26",
@@ -501,7 +526,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「アルバイトをしています」（在打工）和「はたらいています」（在工作）意思最接近。「まっています」（在等）、「コーヒーを飲んでいます」（在喝咖啡）、「話しています」（在聊天）都不是打工的意思。記住：アルバイト = 打工，和はたらく意思相近。"
     },
     {
       "id": "n4_2018_v27",
@@ -520,7 +546,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「すいえい」（游泳）和「およぐ」（游泳這個動作）意思是同一個。「はしる」（跑步）、「ごはんを食べる」（吃飯）、「本を読む」（看書）都是別的活動。記住：すいえい = およぐこと。"
     },
     {
       "id": "n4_2018_v28",
@@ -539,7 +566,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「びっくりしました」（嚇了一跳）和「おどろきました」（感到驚訝）意思最接近。「わらいました」（笑了）、「こまりました」（感到困擾）、「おこりました」（生氣了）表達的情緒都不對。記住：びっくり = おどろく。"
     },
     {
       "id": "n4_2018_v29",
@@ -558,7 +586,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「うつくしい」（美麗）和「きれい」（漂亮）意思最接近。「元気」（有精神）、「おもしろい」（有趣）、「わかい」（年輕）都不是美麗的意思。記住：うつくしい = きれい。"
     },
     {
       "id": "n4_2018_v30",
@@ -577,7 +606,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「ゆにゅう」（進口）就是從別的國家買東西進來。「うっています」（在賣）、「もらっています」（收到）、「あげています」（給別人）方向都反了。記住：ゆにゅう = 從外國買入，ゆしゅつ = 賣到外國去。"
     },
     {
       "id": "n4_2018_v31",
@@ -596,7 +626,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「さいきん」（最近）要用在說最近發生的事情。選項3「聽說木村先生最近結婚了」才對。選項1「さいきん料理做好了」不自然，剛做好的事應該說「たったいま」；選項2是命令句，不能加さいきん；選項4「電車快來了」是將要發生的事，不能用さいきん。記住：さいきん後面接已經發生的事。"
     },
     {
       "id": "n4_2018_v32",
@@ -615,7 +646,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「おと」（聲音）指耳朵聽到的聲音。選項1「收音機的聲音太大」才對。選項2「日語的聲音想變好」不對，應該用「発音」或「会話」；選項3「用很大的聲音被叫名字」不對，應該用「声」；選項4「有名的聲音」不對，應該用「曲」（曲子）。記住：耳朵聽到的 = おと，嘴巴發出來的 = こえ。"
     },
     {
       "id": "n4_2018_v33",
@@ -634,7 +666,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「けんがく」（參觀見學）指去工廠、設施等地方實地參觀學習。選項3「和老師朋友去參觀工廠」才對。選項1「去百貨公司見學」不對，買東西不叫見學；選項2「查字典」應該用「しらべる」；選項4「看電視新聞」應該用「みる」。記住：けんがく = 去現場參觀學習。"
     },
     {
       "id": "n4_2018_v34",
@@ -653,7 +686,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「かざる」（裝飾）指把花等漂亮的東西擺出來，讓空間變好看。選項2「在房間插花裝飾」才對。選項1「貼通知」應該用「はる」；選項3「把洗好的衣服晾在室內」應該用「ほす」；選項4「把冷氣裝在牆上」應該用「つける」。記住：かざる = 擺飾品讓空間變漂亮。"
     },
     {
       "id": "n4_2018_v35",
@@ -672,7 +706,8 @@
       "source": "2018年JLPT N4樣題",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "explanation": "「こうじ」（工程）指道路施工等土木建築方面的工程。選項4「這條路在施工，所以不能通過」才對。選項1「在牙醫做工程」不對，應該用「ちりょう」（治療）；選項2「修補毛衣」應該用「なおす」；選項3「書店壞了所以施工」不自然，修理應該用「しゅうり」。記住：こうじ = 土木、建築方面的工程。"
     },
     {
       "id": "n4_2018_g01",
