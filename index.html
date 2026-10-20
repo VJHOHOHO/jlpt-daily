@@ -536,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261019-v28</div>
+<div class="src" style="opacity:0.5">v20261020-v29</div>
 
 <script>
 var N4SET={};
@@ -2992,6 +2992,7 @@ var TEST_WEEK_ENTRY = {
 function isTest(){ return child==='GOBI'; }
 /* ---------- 分數後端（Cloudflare Worker + KV，可靠） ---------- */
 var SCORE_API = 'https://jlpt-scores.hoo-c27.workers.dev/submit';
+var WORKER_API = 'https://jlpt-scores.hoo-c27.workers.dev';
 function postScore(data){
   // 先存本地備份，唔會唔見
   try{
@@ -3254,13 +3255,8 @@ function resubmitDaily(ds){
   if(!child){ setMsg('請先揀「我是誰」。','err'); return; }
   var rec = findByDate(loadAll(), ds);
   if(!rec) return;
-  var p = new URLSearchParams();
-  var FU = isTest()?TEST_FORM_URL:FORM_URL, EN = isTest()?TEST_ENTRY:ENTRY;
-  p.append(EN.who, child);
-  for(var j=0;j<5;j++) p.append(EN.w[j], rec.words[j]||'');
-  p.append(EN.sent, rec.sentence + (ds!==todayKey() ? ' [補交'+ds+']' : ''));
   setMsg('傳送中…','');
-  fetch(FU,{method:'POST',mode:'no-cors',body:p}).then(function(){
+  fetch(WORKER_API+'/daily-full',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:child,date:ds,words:rec.words,sentence:rec.sentence})}).then(function(r){ if(!r.ok) throw 0; return r; }).then(function(){
     var arr = loadAll(); var r = findByDate(arr, ds);
     if(r){ r.synced = true; saveAll(arr); }
     renderHist(); renderMiss();
@@ -3334,16 +3330,16 @@ function parseCSV(text){
 }
 function loadCorrections(){
   var body=$('corrBody');
-  fetch(SHEET_CSV).then(function(r){ return r.text(); }).then(function(t){
-    var rows=parseCSV(t).slice(1).filter(function(r){ return r[1]===child; });
+  fetch(WORKER_API+'/corrections').then(function(r){ return r.json(); }).then(function(all){
+    var rows=(all||[]).filter(function(x){ return x.who===child; });
     CORR=rows.slice().reverse();
     if(!rows.length){ body.innerHTML='<div class="recall-empty">暫時未有改錯提醒，繼續保持。</div>'; return; }
     var latest=rows.slice(-5).reverse();
-    body.innerHTML=latest.map(function(r){
-      return '<div class="hist-item"><div class="hist-date">'+esc(r[0])+'</div>'+
-        '<div class="hist-words">原本：'+esc(r[2])+'</div>'+
-        '<div class="hist-sent"><b>正確：</b>'+esc(r[3])+'</div>'+
-        (r[4]?'<div class="hint">'+esc(r[4])+'</div>':'')+'</div>';
+    body.innerHTML=latest.map(function(x){
+      return '<div class="hist-item"><div class="hist-date">'+esc(x.date)+'</div>'+
+        '<div class="hist-words">原本：'+esc(x.orig)+'</div>'+
+        '<div class="hist-sent"><b>正確：</b>'+esc(x.correct)+'</div>'+
+        (x.note?'<div class="hint">'+esc(x.note)+'</div>':'')+'</div>';
     }).join('');
   }).catch(function(){
     body.innerHTML='<div class="recall-empty">載入失敗，檢查網絡後再試。</div>';
@@ -3371,12 +3367,7 @@ function submitDaily(){
   arr.push({date:target, words:words, sentence:sent});
   saveAll(arr);
 
-  var p = new URLSearchParams();
-  var FU = isTest()?TEST_FORM_URL:FORM_URL, EN = isTest()?TEST_ENTRY:ENTRY;
-  p.append(EN.who, child);
-  for(var j=0;j<5;j++) p.append(EN.w[j], words[j]);
-  p.append(EN.sent, sent + (makeupDate ? ' [補交'+target+']' : ''));
-  fetch(FU,{method:'POST',mode:'no-cors',body:p}).then(function(){ done(true); }).catch(function(){ done(false); });
+  fetch(WORKER_API+'/daily-full',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:child,date:target,words:words,sentence:sent})}).then(function(r){ done(r.ok); }).catch(function(){ done(false); });
 
   function done(synced){
     btn.disabled=false; btn.textContent='提交';
@@ -3434,8 +3425,8 @@ function fetchGobiPool(){
     });
   });
   GOBI_POOL = pool.slice();
-  fetch(WORDBANK_CSV).then(function(r){ return r.text(); }).then(function(t){
-    parseCsv(t).slice(1).forEach(function(row){ add(row[2], row[3]); });
+  fetch(WORKER_API+'/vocab').then(function(r){ return r.json(); }).then(function(all){
+    (all||[]).forEach(function(x){ add(x.word, x.meaning); });
     GOBI_POOL = pool;
   }).catch(function(){ /* 讀唔到表就用 SEED 頂住 */ });
 }
@@ -4673,16 +4664,16 @@ function resubmitAllScores(){
 /* ---------- 每週分析 ---------- */
 function loadAnalysis(){
 var body=$('anaBody');
-fetch(ANA_CSV).then(function(r){ return r.text();}).then(function(t){
-var rows=parseCSV(t).slice(1).filter(function(r){ return r[1]===child && r[0];});
+fetch(WORKER_API+'/weekly-analysis').then(function(r){ return r.json();}).then(function(all){
+var rows=(all||[]).filter(function(x){ return x.who===child && x.week;});
 if(!rows.length){ body.innerHTML='<div class="recall-empty">未有分析，逢星期日出。</div>'; return;}
 var r=rows[rows.length-1];
-body.innerHTML='<div class="hist-item"><div class="hist-date">'+esc(r[0])+'</div>'+
-'<div class="q-score" style="padding:4px">總分 '+esc(r[2])+'</div>'+
-'<div class="hist-words">語彙 '+esc(r[3])+' · 文法 '+esc(r[4])+' · 讀解 '+esc(r[5])+' · 複習 '+esc(r[6])+'</div>'+
-'<div class="hist-sent"><b>'+esc(r[7])+'</b></div>'+
-(r[8]?'<div class="hist-words">要加油：'+esc(r[8])+'</div>':'')+
-(r[9]?'<div class="hint">下週行動：'+esc(r[9])+'</div>':'')+'</div>';
+body.innerHTML='<div class="hist-item"><div class="hist-date">'+esc(r.week)+'</div>'+
+'<div class="q-score" style="padding:4px">總分 '+esc(r.total)+'</div>'+
+'<div class="hist-words">語彙 '+esc(r.vocab)+' · 文法 '+esc(r.grammar)+' · 讀解 '+esc(r.reading)+' · 複習 '+esc(r.review)+'</div>'+
+'<div class="hist-sent"><b>'+esc(r.judge)+'</b></div>'+
+(r.weakness?'<div class="hist-words">要加油：'+esc(r.weakness)+'</div>':'')+
+(r.action?'<div class="hint">下週行動：'+esc(r.action)+'</div>':'')+'</div>';
 }).catch(function(){ body.innerHTML='<div class="recall-empty">載入失敗，檢查網絡後再試。</div>';});
 }
 
