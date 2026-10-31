@@ -155,7 +155,7 @@ function getReadingTarget(question){
 <option value="2018-n3">2018 N3</option>
 <option value="2018-n4">2018 N4</option>
 <option value="2018-n5">2018 N5</option>
-<option value="2012-n3" disabled>2012 N3（未完成）</option>
+<option value="2012-n3">2012 N3</option>
 <option value="2012-n4" disabled>2012 N4（未完成）</option>
 <option value="2012-n5" disabled>2012 N5（未完成）</option>
 </select>
@@ -205,8 +205,8 @@ function postQA(qid, status, comment){
 }
 
 // 載入題庫
-fetch('question_bank.json?v='+Date.now()).then(r=>r.json()).then(db=>{
-allQs = db.questions || [];
+Promise.all([fetch('question_bank.json?v='+Date.now()).then(r=>r.json()), fetch('question_bank_2012.json?v='+Date.now()).then(r=>r.json()).catch(()=>null)]).then(([db, db2])=>{
+allQs = (db.questions || []).concat((db2 && db2.questions) || []);
 render();
 // 同步後端 QA 標記（換裝置／重開都睇得返）
 fetch('https://jlpt-scores.hoo-c27.workers.dev/scores?type=qa_result').then(r=>r.json()).then(recs=>{
