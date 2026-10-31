@@ -46,7 +46,7 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
 <body>
 <div class="container">
   <div class="card" id="introCard">
-    <h1>N4 完整模擬卷</h1><div style="text-align:center;color:#999;font-size:12px">v20261019-v24</div>
+    <h1>N4 完整模擬卷</h1><div style="text-align:center;color:#999;font-size:12px">v20261031-v25</div>
     <div class="hint">
       和正式 JLPT N4 考試一樣，分三部分計時：<br>
       • <b>言語知識（文字・語彙）</b>：25 分鐘<br>
@@ -162,10 +162,22 @@ function selectUser(name){
 
 function loadQBank(cb){
   if(QBANK.length){ cb(); return; }
-  fetch('question_bank.json').then(function(r){ return r.json(); }).then(function(d){
-    QBANK = d.questions || d;
-    cb();
-  });
+  var tries = 0;
+  function attempt(){
+    tries++;
+    fetch('question_bank.json', {cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(d){
+      QBANK = d.questions || d;
+      if(!QBANK.length) throw new Error('empty bank');
+      cb();
+    }).catch(function(e){
+      if(tries < 3){ setTimeout(attempt, 1500); return; }
+      var q = document.getElementById('questions');
+      if(q) q.innerHTML = '<div style="color:#d32f2f;font-size:17px;line-height:1.8">\u26a0\ufe0f 題庫載入失敗，請檢查網絡後 <a href="javascript:location.reload()">按此重新載入</a>。</div>';
+      var p = document.getElementById('progress');
+      if(p) p.textContent = '題庫載入失敗';
+    });
+  }
+  attempt();
 }
 
 function startMock(){
@@ -247,6 +259,10 @@ function startSection(){
       });
       picked = picked.concat(shuffleSeeded(rest, rand).slice(0, target - picked.length));
     }
+    if(!picked.length){
+      document.getElementById('questions').innerHTML = '<div style="color:#d32f2f;font-size:17px;line-height:1.8">\u26a0\ufe0f 這一部分暫時抽不到題目，請 <a href="javascript:location.reload()">重新載入</a> 再試。</div>';
+      return;
+    }
     secQuestions = picked;
     // 記錄實際 level（家長睇）
     console.log('Mock exam level:', examLevel, 'section:', sec.id, 'count:', picked.length);
@@ -266,13 +282,24 @@ function renderQuestions(){
   var html = '';
   secQuestions.forEach(function(q, i){
     qStartTimes[i] = Date.now();
-    html += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
-    if(q.img && q.section!=='reading') html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
-    if(q.audio) html += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
+    var block = '';
+    try {
+    block += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
+    if(q.img && q.section!=='reading') block += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
+    if(q.audio) block += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
-      html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + optRuby(q, op, true) + '</label>';
+      block += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + optRuby(q, op, true) + '</label>';
     });
-    html += '</div>';
+    block += '</div>';
+    } catch(e) {
+      block = '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+      if(q.audio) block += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
+      q.options.forEach(function(op, j){
+        block += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + esc(op) + '</label>';
+      });
+      block += '</div>';
+    }
+    html += block;
   });
   document.getElementById('questions').innerHTML = html;
   document.getElementById('progress').textContent = '共 ' + secQuestions.length + ' 題';
