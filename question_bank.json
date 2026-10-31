@@ -2132,7 +2132,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「書く」的て形是「書いて（かいて）」。「聞いて（きいて）」是聽的意思，意思不同。動詞て形要背熟。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v03",
@@ -2153,7 +2154,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「中」在這裡讀「なか」（裡面）。「外（そと）」是外面，意思相反。はこの中＝箱子裡面。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v04",
@@ -2174,7 +2176,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「小さい」讀「ちいさい」，注意是「ちい」不是「ち」。小さい的反義詞是大きい（おおきい）。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v05",
@@ -2195,7 +2198,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「火曜日」讀「かようび」（星期二）。星期幾的讀音要背熟：日（にち）、月（げつ）、火（か）、水（すい）、木（もく）、金（きん）、土（ど）。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v06",
@@ -2216,7 +2220,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「空」讀「そら」（天空）。「海（うみ）」是大海，「庭（にわ）」是庭院，意思都不一樣。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v07",
@@ -2237,7 +2242,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「百人」讀「ひゃくにん」。數字＋人：ひゃくにん（百人）、せんにん（千人）。注意濁音變化。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v08",
@@ -2258,7 +2264,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「魚」讀「さかな」。「猫（ねこ）」「鳥（とり）」「犬（いぬ）」都是動物，但漢字完全不同。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v09",
@@ -2279,7 +2286,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「半分」讀「はんぶん」。「半」的讀音是「はん」，「分」在這裡讀「ぶん」。一半的意思。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v10",
@@ -2300,7 +2308,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「間」在這裡讀「あいだ」（之間）。銀行和超市之間有一條小路。「隣（となり）」是旁邊，意思不同。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v11",
@@ -2321,7 +2330,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「三つ」讀「みっつ」。數東西的個數：ひとつ、ふたつ、みっつ、よっつ…。注意促音「っ」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v12",
@@ -2342,7 +2352,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「元気」讀「げんき」（精神好、有活力）。「電気（でんき）」是電，「天気（てんき）」是天氣，不要搞混。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v13",
@@ -2363,7 +2374,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "外來語「ワイシャツ」（襯衫）用片假名寫。注意是「ワ」不是「ウ」，是「ツ」不是「ソ」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v14",
@@ -2384,7 +2396,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「かわ」在這裡是「川」（河川）的意思。「花（はな）」是花，「山（やま）」是山。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v15",
@@ -2405,7 +2418,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「がっこう」寫作「学校」。「学」不能寫成「宇」，「校」不能寫成「枚」。漢字不要寫錯。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v16",
@@ -2426,7 +2440,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「みてください」的「みて」寫作「見て」（看）。「見る」的漢字是「見」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v17",
@@ -2447,7 +2462,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "這裡的「たかい」是「高い」（貴的）。「安い（やすい）」是便宜，反義詞。看前後文判斷意思。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v18",
@@ -2468,7 +2484,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「かいしゃ」寫作「会社」（公司）。「会」不能寫成「公」，「社」不能寫成「仕」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v19",
@@ -2489,7 +2506,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「いわないで」的原形是「言う（いう）」（說），寫作「言わないで」。「行く」是去，「立つ」是站。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v20",
@@ -2510,7 +2528,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "「らいげつ」寫作「来月」（下個月）。「来」是「來」，「今」是「今」。下個月＝来月。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_v21",
@@ -3203,7 +3222,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "正確語序：兄の子どもと（和哥哥的孩子一起）。「の」表示所屬（哥哥的孩子），「と」表示一起行動的對象。★的位置是「と」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_g19",
@@ -3224,7 +3244,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "正確語序：まるくて色がきれいでした（圓圓的、顏色很漂亮）。「が」標示主語（色）。「まるくて」是丸い的て形，用來連接形容詞。★的位置是「が」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_g20",
@@ -3245,7 +3266,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "正確語序：駅の近くにある本屋で（在車站附近的書店）。「近くにある」修飾「本屋」。★的位置是「ある」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_g21",
@@ -3266,7 +3288,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "正確語序：先週ともだちにもらった外国のこうちゃ（上週跟朋友拿到的外國茶）。「に」表示對象，「もらった」修飾茶。★的位置是「もらった」。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_g22",
@@ -3435,7 +3458,8 @@
    "explanation": "這題需要看 memo 原圖。根據官方答案，ボゴさん首先要做的是「中西さんにお金をもらいます」（向中西先生拿錢）。做 memo 類題目時，要注意動作的順序：「はじめに」（首先）問的是第一步，不是最後的結果。",
    "img": "img/n5_r03_memo.png",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_r04",
@@ -3456,7 +3480,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "文章說昨晚因為踢足球太累，「今日のかんじテストのべんきょうができませんでした」（今天的漢字測驗沒辦法讀書），所以今天早上7點起床趕快讀書。答案是選項2。選項1是昨天做的事，不是今天早起的原因；選項3、4是起床後做的事，不是起床的原因。注意「どうして」（為什麼）問的是原因，要找「から」（因為）前面的理由。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_r05",
@@ -3477,7 +3502,8 @@
    "source": "2018年JLPT N5樣題",
    "explanation": "文章最後說「テストは今日ではなくて、あしたでした」（測驗不是今天，是明天），所以チンさん搞錯的是「テストがある日」（測驗的日期）。答案是選項3。選項1、2是他讀的課本沒錯；選項4教室也沒錯。看到「まちがえました」要往前找到底是什麼搞錯了。",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_r06",
@@ -3499,7 +3525,8 @@
    "explanation": "條件：①花田駅或糸川駅出發 ②500円以下 ③時間越短越好。①是寺西駅出發，不符合。②550円超過預算。剩下③（450円、40分）和④（430円、35分），④更便宜更快。答案是④。",
    "img": "img/n5_r06_directions.png",
    "verified": false,
-   "verified_by": null
+   "verified_by": null,
+   "qa_fixed": true
   },
   {
    "id": "n5_2018_l01",
