@@ -1134,7 +1134,7 @@
       "section": "grammar",
       "mondai": 3,
       "number": 21,
-      "question": "私のしゅみは水泳です。毎週プールで泳いでいます。（　　　　）、半年前までは泳ぐことができませんでした。日本に来る前に住んでいた所には海もプールもなかったのです。",
+      "question": "下の文章は、留学生の作文です。\n（　21　）に入る最もよいものを選びなさい。\n（文章は画像を見てください）",
       "options": [
         "それに",
         "だから",
@@ -1148,14 +1148,15 @@
       "group": "n4_2018_g_passage1",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "img": "img/n4_g21_passage.png"
     },
     {
       "id": "n4_2018_g22",
       "section": "grammar",
       "mondai": 3,
       "number": 22,
-      "question": "半年前、夏休みに日本人のともだちと海に行きました。ともだちは遠くまで泳いでいきました。けれども、私（　　　　）泳げませんでした。",
+      "question": "下の文章は、留学生の作文です。\n（　22　）に入る最もよいものを選びなさい。\n（文章は画像を見てください）",
       "options": [
         "は",
         "なら",
@@ -1169,14 +1170,15 @@
       "group": "n4_2018_g_passage1",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "img": "img/n4_g21_passage.png"
     },
     {
       "id": "n4_2018_g23",
       "section": "grammar",
       "mondai": 3,
       "number": 23,
-      "question": "次の週から町のプールで泳ぐ練習を始めました。水泳の上手なともだちに泳ぎ方を（　　　　）。",
+      "question": "下の文章は、留学生の作文です。\n（　23　）に入る最もよいものを選びなさい。\n（文章は画像を見てください）",
       "options": [
         "教えていました",
         "教えてあげました",
@@ -1190,14 +1192,15 @@
       "group": "n4_2018_g_passage1",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "img": "img/n4_g21_passage.png"
     },
     {
       "id": "n4_2018_g24",
       "section": "grammar",
       "mondai": 3,
       "number": 24,
-      "question": "難しかったですが、毎週ともだちと練習しました。それで少しずつ（　　　　）。",
+      "question": "下の文章は、留学生の作文です。\n（　24　）に入る最もよいものを選びなさい。\n（文章は画像を見てください）",
       "options": [
         "泳いでおきました",
         "泳げるようになりました",
@@ -1211,14 +1214,15 @@
       "group": "n4_2018_g_passage1",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "img": "img/n4_g21_passage.png"
     },
     {
       "id": "n4_2018_g25",
       "section": "grammar",
       "mondai": 3,
       "number": 25,
-      "question": "泳ぐのはとても楽しいです。次に海に行くまでにたくさん（　　　　）。",
+      "question": "下の文章は、留学生の作文です。\n（　25　）に入る最もよいものを選びなさい。\n（文章は画像を見てください）",
       "options": [
         "練習するためです",
         "練習したようです",
@@ -1232,7 +1236,8 @@
       "group": "n4_2018_g_passage1",
       "level": "N4",
       "verified": false,
-      "verified_by": null
+      "verified_by": null,
+      "img": "img/n4_g21_passage.png"
     },
     {
       "answer": 4,
