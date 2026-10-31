@@ -265,8 +265,8 @@ function renderQuestions(){
   var html = '';
   secQuestions.forEach(function(q, i){
     qStartTimes[i] = Date.now();
-    html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
-    if(q.img) html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
+    html += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
+    if(q.img && q.section!=='reading') html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
     if(q.audio) html += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
       html += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + rubyText(op) + '</label>';
@@ -363,7 +363,7 @@ function showFinal(){
     html += '<h3>' + r.sec.name + '：' + r.correct + '/' + r.total + '</h3>';
     r.results.forEach(function(res, i){
       var q = res.q;
-      html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
+      html += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
       q.options.forEach(function(op, j){
         var cls = '';
         if(j+1 === q.answer) cls = 'correct';
@@ -399,7 +399,7 @@ function showFinal(){
 }
 </script>
 
-<script src="readmap-extra.js?v=20261031"></script>
+<script src="readmap-extra.js?v=20261031c"></script>
 <script>
 // 簡化版 rubyText（用 READMAP_EXTRA）
 var READMAP = {};
@@ -412,10 +412,13 @@ function getReadingTarget(question){
   return m ? m[1] : null;
 }
 function rubyText(s, skipWord, plain){
-  if(USE_FURIFONT) return esc(s||'');
+  if(USE_FURIFONT) return esc(String(s||'').replace(/⟦([^⟧]+)⟧/g, '$1'));
   if(!s) return '';
   s = String(s);
-  if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
+  var _marks = [];
+  s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
+  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
+  if(!/[\u4e00-\u9fff]/.test(s)) return _restoreMarks(esc(s));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
@@ -427,7 +430,10 @@ function rubyText(s, skipWord, plain){
     var seg = segments[si];
     if(!seg) continue;
     if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
-      result += esc(seg);
+      var segHtml = esc(seg);
+      if(!plain && READMAP[seg]) segHtml = '<ruby>' + esc(seg) + '<rt>' + esc(READMAP[seg]) + '</rt></ruby>';
+      if(skipWord && seg === skipWord) segHtml = '<span style="color:#d32f2f;font-weight:bold">' + segHtml + '</span>';
+      result += segHtml;
       continue;
     }
     var out = '', i = 0;
@@ -439,7 +445,13 @@ function rubyText(s, skipWord, plain){
           var STOPC = 'はがをにへとやのでは、。！？';
           while(endT < seg.length && /[\u3041-\u3096]/.test(seg[endT]) && STOPC.indexOf(seg[endT]) < 0) endT++;
         }
-        out += '<span style="color:#d32f2f;font-weight:bold">'+esc(seg.substring(i, endT))+'</span>';
+        var spanTxt = seg.substring(i, endT);
+        var spanHtml = esc(spanTxt);
+        if(!plain){
+          if(READMAP[spanTxt]) spanHtml = '<ruby>' + esc(spanTxt) + '<rt>' + esc(READMAP[spanTxt]) + '</rt></ruby>';
+          else if(READMAP[skipWord] && spanTxt.indexOf(skipWord) === 0) spanHtml = '<ruby>' + esc(skipWord) + '<rt>' + esc(READMAP[skipWord]) + '</rt></ruby>' + esc(spanTxt.substring(skipWord.length));
+        }
+        out += '<span style="color:#d32f2f;font-weight:bold">' + spanHtml + '</span>';
         i = endT;
         continue;
       }
@@ -456,7 +468,7 @@ function rubyText(s, skipWord, plain){
     }
     result += out;
   }
-  return result;
+  return _restoreMarks(result);
 }
 </script>
 </body>
