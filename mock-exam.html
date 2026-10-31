@@ -418,6 +418,7 @@ function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
 }
+function _starWrap(h){ return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
 function rubyText(s, skipWord, plain){
   if(USE_FURIFONT) return esc(String(s||'').replace(/⟦([^⟧]+)⟧/g, '$1'));
   if(!s) return '';
@@ -425,7 +426,7 @@ function rubyText(s, skipWord, plain){
   var _marks = [];
   s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
   function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
-  if(!/[\u4e00-\u9fff]/.test(s)) return _restoreMarks(esc(s));
+  if(!/[\u4e00-\u9fff]/.test(s)) return _starWrap(_restoreMarks(esc(s)));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
@@ -475,7 +476,7 @@ function rubyText(s, skipWord, plain){
     }
     result += out;
   }
-  return _restoreMarks(result);
+  return _starWrap(_restoreMarks(result));
 }
 </script>
 </body>
