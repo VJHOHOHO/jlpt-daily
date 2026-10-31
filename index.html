@@ -297,7 +297,7 @@
 <style>#histCard { background: #eaeff5; border-radius: 16px; }</style>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<script src="readmap-extra.js?v=20261031"></script>
+<script src="readmap-extra.js?v=20261031c"></script>
 <style>
 @font-face {
   font-family: 'Furifont Sans';
@@ -3584,11 +3584,14 @@ var _rubyKeys = null;
 var USE_FURIFONT = false;
 var _rubySkip = null; // 讀音題要跳過嘅目標詞
 function rubyText(s, skipWord, plain){
-  if(USE_FURIFONT) return esc(s||'');
+  if(USE_FURIFONT) return esc(String(s||'').replace(/⟦([^⟧]+)⟧/g, '$1'));
   if(!s) return '';
   var skip = skipWord || _rubySkip;
   s = String(s);
-  if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
+  var _marks = [];
+  s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
+  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
+  if(!/[\u4e00-\u9fff]/.test(s)) return _restoreMarks(esc(s));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
@@ -3600,7 +3603,10 @@ function rubyText(s, skipWord, plain){
     var seg = segments[si];
     if(!seg) continue;
     if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
-      result += esc(seg);
+      var segHtml = esc(seg);
+      if(!plain && READMAP[seg]) segHtml = '<ruby>' + esc(seg) + '<rt>' + esc(READMAP[seg]) + '</rt></ruby>';
+      if(skip && seg === skip) segHtml = '<span style="color:#d32f2f;font-weight:bold">' + segHtml + '</span>';
+      result += segHtml;
       continue;
     }
     var out = '', i = 0;
@@ -3614,7 +3620,13 @@ function rubyText(s, skipWord, plain){
           var STOPC = 'はがをにへとやのでは、。！？';
           while(endT < seg.length && /[\u3041-\u3096]/.test(seg[endT]) && STOPC.indexOf(seg[endT]) < 0) endT++;
         }
-        out += '<span style="color:#d32f2f;font-weight:bold">'+esc(seg.substring(i, endT))+'</span>';
+        var spanTxt = seg.substring(i, endT);
+        var spanHtml = esc(spanTxt);
+        if(!plain){
+          if(READMAP[spanTxt]) spanHtml = '<ruby>' + esc(spanTxt) + '<rt>' + esc(READMAP[spanTxt]) + '</rt></ruby>';
+          else if(READMAP[skip] && spanTxt.indexOf(skip) === 0) spanHtml = '<ruby>' + esc(skip) + '<rt>' + esc(READMAP[skip]) + '</rt></ruby>' + esc(spanTxt.substring(skip.length));
+        }
+        out += '<span style="color:#d32f2f;font-weight:bold">' + spanHtml + '</span>';
         i = endT;
         continue;
       }
@@ -3631,7 +3643,7 @@ function rubyText(s, skipWord, plain){
     }
     result += out;
   }
-  return result;
+  return _restoreMarks(result);
 }
 
 function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
@@ -3994,8 +4006,8 @@ function renderPracticeQuestions(qs, mode){
   $(introId).style.display='none'; $(bodyId).style.display='block';
   var html = '<div class="hint">共 '+qs.length+' 題，選好答案後按提交。</div>';
   qs.forEach(function(q,i){
-    html += '<div class="qblock" data-qid="'+q.id+'"><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question)+'</div>';
-    if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%"></div>';
+    html += '<div class="qblock" data-qid="'+q.id+'">' + (q.img && q.section==='reading' ? '<div><img src="'+q.img+'" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(String(q.question||'').replace(/⟦([^⟧]+)⟧/g,'$1'))+'</div>';
+    if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%"></div>';
     if(q.audio) html += '<div><audio controls src="'+q.audio+'" style="width:100%"></audio></div>';
     q.options.forEach(function(op,j){
       html += '<label class="opt"><input type="radio" name="'+mode+'_q'+i+'" value="'+(j+1)+'"> '+esc(op)+'</label>';
@@ -4226,8 +4238,8 @@ function renderDailyQuestions(qs){
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
     var _skip = getReadingTarget(q.question);
-    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question, _skip, isReadingQ(q.question)).replace(/\n/g,'<br>')+'</div>';
-    if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
+    html += '<div class="qblock" data-qid="'+q.id+'">' + (q.img && q.section==='reading' ? '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>' : '') + '<div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question, _skip, isReadingQ(q.question)).replace(/\n/g,'<br>')+'</div>';
+    if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
       html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+rubyText(op)+'</label>';
@@ -4379,8 +4391,8 @@ function renderExamSection(){
   html += '<div id="examTimer" style="font-size:24px;font-weight:bold;color:#d32f2f;margin:10px 0"></div>';
   qs.forEach(function(q,i){
     var key = sec+'_'+i;
-    html += '<div class="qblock"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(q.question).replace(/\n/g,'<br>')+'</div>';
-    if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
+    html += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>' : '') + '<div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(String(q.question||'').replace(/⟦([^⟧]+)⟧/g,'$1')).replace(/\n/g,'<br>')+'</div>';
+    if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio></div>';
     // 考試途中唔顯示聽力稿，交卷後先睇
     q.options.forEach(function(op,j){
@@ -4558,7 +4570,7 @@ function submitExamMock(){
     wrongList.forEach(function(w,i){
       var q = w.q;
       html += '<div class="qblock" style="margin:12px 0;padding:12px;background:#fff;border-radius:8px">';
-      html += '<div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>'+(i+1)+'.</b> ['+secName(w.section)+']<br>'+esc(q.question).replace(/\n/g,'<br>')+'</div>';
+      html += '<div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>'+(i+1)+'.</b> ['+secName(w.section)+']<br>'+esc(String(q.question||'').replace(/⟦([^⟧]+)⟧/g,'$1')).replace(/\n/g,'<br>')+'</div>';
       // 四個選項，標示用家揀咗咩＋正確答案
       html += '<div style="margin:8px 0">';
       q.options.forEach(function(op,oi){
