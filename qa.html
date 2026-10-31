@@ -158,6 +158,9 @@ function getReadingTarget(question){
 <option value="2012-n3">2012 N3</option>
 <option value="2012-n4">2012 N4</option>
 <option value="2012-n5" disabled>2012 N5（未完成）</option>
+<option value="2009-n5">2009 N5</option>
+<option value="2009-n4" disabled>2009 N4（未完成）</option>
+<option value="2009-n3" disabled>2009 N3（未完成）</option>
 </select>
 <div class="filter-bar" style="margin-top:12px">
 <button data-f="all" class="active">全部</button>
@@ -205,8 +208,8 @@ function postQA(qid, status, comment){
 }
 
 // 載入題庫
-Promise.all([fetch('question_bank.json?v='+Date.now()).then(r=>r.json()), fetch('question_bank_2012.json?v='+Date.now()).then(r=>r.json()).catch(()=>null)]).then(([db, db2])=>{
-allQs = (db.questions || []).concat((db2 && db2.questions) || []);
+Promise.all([fetch('question_bank.json?v='+Date.now()).then(r=>r.json()), fetch('question_bank_2012.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_2009.json?v='+Date.now()).then(r=>r.json()).catch(()=>null)]).then(([db, db2, db3])=>{
+allQs = (db.questions || []).concat((db2 && db2.questions) || []).concat((db3 && db3.questions) || []);
 render();
 // 同步後端 QA 標記（換裝置／重開都睇得返）
 fetch('https://jlpt-scores.hoo-c27.workers.dev/scores?type=qa_result').then(r=>r.json()).then(recs=>{
