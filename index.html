@@ -299,7 +299,7 @@
 <style>#histCard { background: #eaeff5; border-radius: 16px; }</style>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-<script src="readmap-extra.js?v=20261031d"></script>
+<script src="readmap-extra.js?v=20261101a"></script>
 <style>
 @font-face {
   font-family: 'Furifont Sans';
@@ -3594,7 +3594,7 @@ function rubyText(s, skipWord, plain){
   var _marks = [];
   s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
   function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
-  if(!/[\u4e00-\u9fff]/.test(s)) return _starWrap(_restoreMarks(esc(s)));
+  if(!skipWord && !/[\u4e00-\u9fff]/.test(s)) return _starWrap(_restoreMarks(esc(s)));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
@@ -3617,8 +3617,18 @@ function rubyText(s, skipWord, plain){
     var hasTarget = skip && seg.indexOf(skip) >= 0;
     while(i < seg.length){
       // 如果係目標詞，加底線唔加振假名
-      if(hasTarget && seg.substr(i, skip.length) === skip){
-        var endT = i + skip.length;
+      var _mLen = 0;
+      if(skip){
+        if(seg.substr(i, skip.length) === skip) _mLen = skip.length;
+        else if(skip.length >= 3 && skip.charAt(skip.length - 1) === 'る'){
+          var _stem = skip.slice(0, -1) + 'り', _base = skip.slice(0, -1);
+          if(seg.substr(i, _stem.length) === _stem) _mLen = _stem.length;
+          else if(_base && seg.substr(i, _base.length) === _base) _mLen = _base.length;
+          if(_mLen){ var _e2 = i + _mLen, _EXT = 'ましすせいたてっょゅうれなさ'; while(_e2 < seg.length && _EXT.indexOf(seg[_e2]) >= 0) _e2++; _mLen = _e2 - i; }
+        }
+      }
+      if(_mLen){
+        var endT = i + _mLen;
         if(skip.length === 1 && /[\u4e00-\u9fff]/.test(skip)){
           var STOPC = 'はがをにへとやのでは、。！？';
           while(endT < seg.length && /[\u3041-\u3096]/.test(seg[endT]) && STOPC.indexOf(seg[endT]) < 0) endT++;
@@ -3654,10 +3664,12 @@ function optRuby(q, o, useRuby){
   if(typeof USE_FURIFONT !== 'undefined' && USE_FURIFONT) return esc(o);
   var m = String((q && q.question) || '').match(/「([^」]+)」的漢字(寫法)?是？/);
   if(m) return esc(o); // 漢字題：選項唔加振假名（問漢字本身，加讀音＝洩底）
+  var um = String((q && q.question) || '').match(/「([^」]+)」的用法/);
+  if(um && useRuby) return rubyText(o, um[1]); // 用法題：選項入面目標詞紅字加底線（同原卷）
   return useRuby ? rubyText(o) : esc(o);
 }
 function getReadingTarget(question){
-  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的意思)/);
+  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的意思|的用法正確的是？)/);
   return m ? m[1] : null;
 }
 
