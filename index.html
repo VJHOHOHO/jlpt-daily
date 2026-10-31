@@ -3609,8 +3609,13 @@ function rubyText(s, skipWord){
     while(i < seg.length){
       // 如果係目標詞，加底線唔加振假名
       if(hasTarget && seg.substr(i, skip.length) === skip){
-        out += '<u>'+esc(skip)+'</u>';
-        i += skip.length;
+        var endT = i + skip.length;
+        if(skip.length === 1 && /[\u4e00-\u9fff]/.test(skip)){
+          var STOPC = 'はがをにへとやのでは、。！？';
+          while(endT < seg.length && /[\u3041-\u3096]/.test(seg[endT]) && STOPC.indexOf(seg[endT]) < 0) endT++;
+        }
+        out += '<span style="color:#d32f2f;font-weight:bold">'+esc(seg.substring(i, endT))+'</span>';
+        i = endT;
         continue;
       }
       var matched = false;
@@ -3630,7 +3635,7 @@ function rubyText(s, skipWord){
 }
 
 function getReadingTarget(question){
-  var m = String(question||'').match(/「([^」]+)」的讀音是？/);
+  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
 }
 
