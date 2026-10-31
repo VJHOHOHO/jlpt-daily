@@ -34,6 +34,7 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
 
   ruby { font-size: 1em; font-weight: inherit; ruby-align: center; ruby-position: over; }
   ruby rt { font-size: 0.5em; color: #222; font-weight: 300; line-height: 1; }
+  .slot { display: inline-block; white-space: nowrap; }
   .qtext, .opt { font-weight: 700; }
   .qtext *, .opt * { font-weight: 700 !important; }
   .qtext rt, .opt rt { font-weight: 300 !important; }
@@ -43,7 +44,7 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
 <body>
 <div class="container">
   <div class="card" id="introCard">
-    <h1>N4 完整模擬卷</h1><div style="text-align:center;color:#999;font-size:12px">v20261031-v26</div>
+    <h1>N4 完整模擬卷</h1><div style="text-align:center;color:#999;font-size:12px">v20261031-v27</div>
     <div class="hint">
       和正式 JLPT N4 考試一樣，分三部分計時：<br>
       • <b>言語知識（文字・語彙）</b>：25 分鐘<br>
@@ -289,7 +290,7 @@ function renderQuestions(){
     });
     block += '</div>';
     } catch(e) {
-      block = '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+      block = '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + _starWrap(esc(q.question)).replace(/\n/g,'<br>') + '</div>';
       if(q.audio) block += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
       q.options.forEach(function(op, j){
         block += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + esc(op) + '</label>';
@@ -444,7 +445,7 @@ function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的意思)/);
   return m ? m[1] : null;
 }
-function _starWrap(h){ return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
+function _starWrap(h){ h = h.replace(/[＿★]+/g, function(m){ return m.indexOf('＿') >= 0 ? '<span class="slot">' + m + '</span>' : m; }); return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
 function rubyText(s, skipWord, plain){
   if(USE_FURIFONT) return esc(String(s||'').replace(/⟦([^⟧]+)⟧/g, '$1'));
   if(!s) return '';
