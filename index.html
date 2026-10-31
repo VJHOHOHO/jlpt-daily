@@ -3692,7 +3692,7 @@ function optRuby(q, o, useRuby){
   return useRuby ? rubyText(o) : esc(o);
 }
 function getReadingTarget(question){
-  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的意思|的用法正確的是？)/);
+  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的片假名寫法是？|的意思|的用法正確的是？)/);
   return m ? m[1] : null;
 }
 
