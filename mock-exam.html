@@ -403,6 +403,8 @@ function showFinal(){
 <script src="readmap-extra.js?v=20261031d"></script>
 <script>
 // 簡化版 rubyText（用 READMAP_EXTRA）
+var USE_FURIFONT = false;
+var _rubyKeys = null;
 var READMAP = {};
 if(typeof READMAP_EXTRA !== 'undefined'){
   for(var k in READMAP_EXTRA) READMAP[k] = READMAP_EXTRA[k];
