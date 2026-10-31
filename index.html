@@ -3651,7 +3651,7 @@ function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String
 function optRuby(q, o, useRuby){
   if(typeof USE_FURIFONT !== 'undefined' && USE_FURIFONT) return esc(o);
   var m = String((q && q.question) || '').match(/「([^」]+)」的漢字(寫法)?是？/);
-  if(m) return '<ruby>' + esc(o) + '<rt>' + esc(m[1]) + '</rt></ruby>';
+  if(m) return esc(o); // 漢字題：選項唔加振假名（問漢字本身，加讀音＝洩底）
   return useRuby ? rubyText(o) : esc(o);
 }
 function getReadingTarget(question){
