@@ -3583,7 +3583,7 @@ function rubyWord(w, r){
 var _rubyKeys = null;
 var USE_FURIFONT = false;
 var _rubySkip = null; // 讀音題要跳過嘅目標詞
-function rubyText(s, skipWord){
+function rubyText(s, skipWord, plain){
   if(USE_FURIFONT) return esc(s||'');
   if(!s) return '';
   var skip = skipWord || _rubySkip;
@@ -3619,7 +3619,7 @@ function rubyText(s, skipWord){
         continue;
       }
       var matched = false;
-      for(var k = 0; k < _rubyKeys.length; k++){
+      if(!plain) for(var k = 0; k < _rubyKeys.length; k++){
         var word = _rubyKeys[k];
         if(skip && (word === skip || skip.indexOf(word) === 0)) continue; // 跳過讀音題目標詞及其子串
         if(seg.substr(i, word.length) === word){
@@ -3634,6 +3634,7 @@ function rubyText(s, skipWord){
   return result;
 }
 
+function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
 function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
@@ -4225,7 +4226,7 @@ function renderDailyQuestions(qs){
   var html = '<div class="hint">今日練習：共 '+qs.length+' 題，做好按提交。</div>';
   qs.forEach(function(q,i){
     var _skip = getReadingTarget(q.question);
-    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question, _skip).replace(/\n/g,'<br>')+'</div>';
+    html += '<div class="qblock" data-qid="'+q.id+'"><div style="color:#ccc;font-size:12px">['+(q.id||'')+']</div><div class="qtext"><b>Q'+(i+1)+'.</b> '+rubyText(q.question, _skip, isReadingQ(q.question)).replace(/\n/g,'<br>')+'</div>';
     if(q.img) html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
