@@ -147,6 +147,7 @@
   .fbtn-know { background: #1a1a1a !important; color: #fff !important; }
   .fbtn-dunno { background: #fff !important; color: #111 !important; border: 3px solid #111 !important; }
   ruby rt { font-size: 0.5em; color: #222; font-weight: 300; }
+  .slot { display: inline-block; white-space: nowrap; }
   ruby { font-size: 1em; font-weight: inherit; ruby-align: center; ruby-position: over; }
   .qtext ruby, .q-text ruby { font-size: 1em; font-weight: inherit; }
   .opt ruby { font-weight: inherit; }
@@ -3584,7 +3585,7 @@ function rubyWord(w, r){
 var _rubyKeys = null;
 var USE_FURIFONT = false;
 var _rubySkip = null; // 讀音題要跳過嘅目標詞
-function _starWrap(h){ return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
+function _starWrap(h){ h = h.replace(/[＿★]+/g, function(m){ return m.indexOf('＿') >= 0 ? '<span class="slot">' + m + '</span>' : m; }); return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
 function rubyText(s, skipWord, plain){
   if(USE_FURIFONT) return esc(String(s||'').replace(/⟦([^⟧]+)⟧/g, '$1'));
   if(!s) return '';
