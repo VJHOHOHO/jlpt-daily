@@ -282,7 +282,7 @@ function renderQuestions(){
     qStartTimes[i] = Date.now();
     var block = '';
     try {
-    block += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
+    block += '<div class="qblock">' + _readBlockM(q, i);
     if(q.img && q.section!=='reading') block += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
     if(q.audio) block += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
@@ -389,7 +389,7 @@ function showFinal(){
     html += '<h3>' + r.sec.name + '：' + r.correct + '/' + r.total + '</h3>';
     r.results.forEach(function(res, i){
       var q = res.q;
-      html += '<div class="qblock">' + (q.img && q.section==='reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
+      html += '<div class="qblock">' + _readBlockM(q, i);
       q.options.forEach(function(op, j){
         var cls = '';
         if(j+1 === q.answer) cls = 'correct';
@@ -448,13 +448,29 @@ function getReadingTarget(question){
   return m ? m[1] : null;
 }
 function _starWrap(h){ h = h.replace(/[＿★]+/g, function(m){ return m.indexOf('＿') >= 0 ? '<span class="slot">' + m + '</span>' : m; }); return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
+function _sceneSplit(q){
+  var s = String((q && q.question) || '');
+  var M = '（文章は画像を見てください）';
+  var i = s.indexOf(M);
+  if(i < 0) return null;
+  return { above: s.slice(0, i).replace(/\n+$/, ''), below: s.slice(i + M.length).replace(/^\n+/, '') };
+}
+function _readBlockM(q, i){
+  var sp = (q.img && q.section === 'reading') ? _sceneSplit(q) : null;
+  if(sp && sp.above){
+    var h = '<div class="qtext"><b>Q' + (i + 1) + '.</b> ' + rubyText(sp.above, getReadingTarget(sp.above), isReadingQ(sp.above)).replace(/\n/g, '<br>') + '</div>' + '<div><img src="' + q.img + '" style="max-width:100%"></div>';
+    if(sp.below) h += '<div class="qtext">' + rubyText(sp.below, getReadingTarget(sp.below), isReadingQ(sp.below)).replace(/\n/g, '<br>') + '</div>';
+    return h;
+  }
+  return (q.img && q.section === 'reading' ? '<div><img src="' + q.img + '" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q' + (i + 1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g, '<br>') + '</div>';
+}
 function rubyText(s, skipWord, plain){
   if(USE_FURIFONT) return esc(String(s||'').replace(/⟦([^⟧]+)⟧/g, '$1'));
   if(!s) return '';
   s = String(s);
   var _marks = [];
   s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
-  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
+  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold;text-decoration:underline;text-underline-offset:3px">' + esc(_marks[+i]) + '</span>'; }); }
   if(!skipWord && !/[\u4e00-\u9fff]/.test(s)) return _starWrap(_restoreMarks(esc(s)));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
