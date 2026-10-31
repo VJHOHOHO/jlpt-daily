@@ -165,10 +165,18 @@ render();
 
 function getPaperQs(){
 const [year, lvl] = curPaper.split('-');
+// 檢查順序跟考試次序：語彙(V) → 文法(G) → 讀解(R) → 聽解(L)
+const SEC_RANK = {vocab:0, grammar:1, reading:2, listening:3};
+const ID_RANK = {v:0, g:1, r:2, l:3};
+function secRank(q){
+if(q.section && SEC_RANK[q.section]!==undefined) return SEC_RANK[q.section];
+const m = (q.id||'').match(/_([a-z])\d+/);
+return (m && ID_RANK[m[1]]!==undefined) ? ID_RANK[m[1]] : 9;
+}
 return allQs.filter(q=>{
 const id = q.id||'';
 return id.includes(year) && (id.startsWith(lvl+'_') || id.startsWith('n'+lvl.slice(1)+'_'));
-}).sort((a,b)=> (a.id||'').localeCompare(b.id||''));
+}).sort((a,b)=> (secRank(a)-secRank(b)) || (a.id||'').localeCompare(b.id||''));
 }
 
 function setQA(qid, status, comment){
