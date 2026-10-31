@@ -43,6 +43,7 @@ h1{font-size:24px;margin:16px 0;text-align:center}
 
 ruby { ruby-align: center; }
 ruby rt { font-size: 0.7em; color: #333; font-weight: 500; }
+.slot { display: inline-block; white-space: nowrap; }
 .qtext { font-weight: 700; }
 .qtext rt { font-weight: 400; }
 </style>
@@ -56,7 +57,7 @@ if(typeof READMAP_EXTRA !== 'undefined'){
 // 從 kanjireading.json 載入（可選）
 var _rubyKeys = null;
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function _starWrap(h){ return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
+function _starWrap(h){ h = h.replace(/[＿★]+/g, function(m){ return m.indexOf('＿') >= 0 ? '<span class="slot">' + m + '</span>' : m; }); return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
 function rubyText(s, skipWord, plain){
   if(!s) return '';
   s = String(s);
