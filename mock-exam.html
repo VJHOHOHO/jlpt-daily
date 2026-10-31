@@ -265,7 +265,7 @@ function renderQuestions(){
   var html = '';
   secQuestions.forEach(function(q, i){
     qStartTimes[i] = Date.now();
-    html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question)).replace(/\n/g,'<br>') + '</div>';
+    html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
     if(q.img) html += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
     if(q.audio) html += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
@@ -363,7 +363,7 @@ function showFinal(){
     html += '<h3>' + r.sec.name + '：' + r.correct + '/' + r.total + '</h3>';
     r.results.forEach(function(res, i){
       var q = res.q;
-      html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question)).replace(/\n/g,'<br>') + '</div>';
+      html += '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + rubyText(q.question, getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>';
       q.options.forEach(function(op, j){
         var cls = '';
         if(j+1 === q.answer) cls = 'correct';
@@ -406,11 +406,12 @@ var READMAP = {};
 if(typeof READMAP_EXTRA !== 'undefined'){
   for(var k in READMAP_EXTRA) READMAP[k] = READMAP_EXTRA[k];
 }
+function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
 function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
 }
-function rubyText(s, skipWord){
+function rubyText(s, skipWord, plain){
   if(USE_FURIFONT) return esc(s||'');
   if(!s) return '';
   s = String(s);
@@ -443,7 +444,7 @@ function rubyText(s, skipWord){
         continue;
       }
       var matched = false;
-      for(var k = 0; k < _rubyKeys.length; k++){
+      if(!plain) for(var k = 0; k < _rubyKeys.length; k++){
         var word = _rubyKeys[k];
         if(skipWord && (word === skipWord || skipWord.indexOf(word) === 0)) continue;
         if(seg.substr(i, word.length) === word){
