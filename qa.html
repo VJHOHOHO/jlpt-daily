@@ -76,7 +76,7 @@ function rubyText(s, skipWord, plain){
     if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
       var segHtml = esc(seg);
       if(!plain && READMAP[seg]) segHtml = '<ruby>' + esc(seg) + '<rt>' + esc(READMAP[seg]) + '</rt></ruby>';
-      if(skipWord && seg === skipWord) segHtml = '<span style="color:#d32f2f;font-weight:bold">' + segHtml + '</span>';
+      if(skipWord && seg === skipWord) segHtml = '<span style="color:#d32f2f;font-weight:bold;text-decoration:underline;text-underline-offset:3px">' + segHtml + '</span>';
       result += segHtml;
       continue;
     }
@@ -95,7 +95,7 @@ function rubyText(s, skipWord, plain){
           if(READMAP[spanTxt]) spanHtml = '<ruby>' + esc(spanTxt) + '<rt>' + esc(READMAP[spanTxt]) + '</rt></ruby>';
           else if(READMAP[skipWord] && spanTxt.indexOf(skipWord) === 0) spanHtml = '<ruby>' + esc(skipWord) + '<rt>' + esc(READMAP[skipWord]) + '</rt></ruby>' + esc(spanTxt.substring(skipWord.length));
         }
-        out += '<span style="color:#d32f2f;font-weight:bold">' + spanHtml + '</span>';
+        out += '<span style="color:#d32f2f;font-weight:bold;text-decoration:underline;text-underline-offset:3px">' + spanHtml + '</span>';
         i = endT;
         continue;
       }
@@ -122,7 +122,7 @@ function optRuby(q, o, useRuby){
   return useRuby ? rubyText(o) : esc(o);
 }
 function getReadingTarget(question){
-  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
+  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的意思)/);
   return m ? m[1] : null;
 }
 </script>
