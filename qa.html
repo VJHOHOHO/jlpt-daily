@@ -24,6 +24,7 @@ h1{font-size:24px;margin:16px 0;text-align:center}
 .qimg img{max-width:100%;border-radius:8px;margin:8px 0}
 .qopts{margin:8px 0 8px 8px;font-size:15px;line-height:1.8;color:#555}
 .qans{font-size:14px;color:#27ae60;margin:4px 0}
+.qexp{font-size:14px;color:#555;background:#fffbe6;border:1px solid #f0e0a0;border-radius:8px;padding:8px 10px;margin:6px 0;line-height:1.6}
 .qnote{font-size:13px;color:#e67e22;margin:4px 0}
 .qa-row{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
 .qa-row label{font-size:15px;display:flex;align-items:center;gap:6px;cursor:pointer}
@@ -75,8 +76,13 @@ function rubyText(s, skipWord){
     var hasTarget = skipWord && seg.indexOf(skipWord) >= 0;
     while(i < seg.length){
       if(hasTarget && seg.substr(i, skipWord.length) === skipWord){
-        out += '<u>'+esc(skipWord)+'</u>';
-        i += skipWord.length;
+        var endT = i + skipWord.length;
+        if(skipWord.length === 1 && /[\u4e00-\u9fff]/.test(skipWord)){
+          var STOPC = 'はがをにへとやのでは、。！？';
+          while(endT < seg.length && /[\u3041-\u3096]/.test(seg[endT]) && STOPC.indexOf(seg[endT]) < 0) endT++;
+        }
+        out += '<span style="color:#d32f2f;font-weight:bold">'+esc(seg.substring(i, endT))+'</span>';
+        i = endT;
         continue;
       }
       var matched = false;
@@ -95,7 +101,7 @@ function rubyText(s, skipWord){
   return result;
 }
 function getReadingTarget(question){
-  var m = String(question||'').match(/「([^」]+)」的讀音是？/);
+  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
 }
 </script>
@@ -203,7 +209,7 @@ if(curFilter!=='all' && s!==curFilter) return;
 if(curFilter==='fixed' &&!q.qa_fixed && s!=='fixed') return;
 qNum++;
 
-const opts = (q.options||[]).map((o,i)=>`<div>${i+1}. ${esc(o)}</div>`).join('');
+const opts = (q.options||[]).map((o,i)=>`<div>${i+1}. ${rubyText(o)}</div>`).join('');
 const imgHtml = q.img? `<div class="qimg"><img src="${q.img}"></div>`:
 (q.imgs? q.imgs.map(u=>`<div class="qimg"><img src="${u}"></div>`).join(''): '');
 const audioHtml = q.audio? `<div><audio controls src="audio/${q.audio}" style="width:100%"></audio></div>`: '';
@@ -218,6 +224,7 @@ html += `<div class="qcard ${s}" id="card-${q.id}">
 ${imgHtml}${audioHtml}
 <div class="qopts">${opts}</div>
 <div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
+${q.explanation?`<div class="qexp">💡 解說：${rubyText(q.explanation)}</div>`:''}
 ${q.note?`<div class="qnote">註：${esc(q.note)}</div>`:''}
 <div class="qa-row">
 <label><input type="checkbox" ${s==='ok'?'checked':''}
