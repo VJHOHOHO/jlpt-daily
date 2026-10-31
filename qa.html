@@ -46,7 +46,7 @@ ruby rt { font-size: 0.7em; color: #333; font-weight: 500; }
 .qtext rt { font-weight: 400; }
 </style>
 
-<script src="readmap-extra.js?v=20261031"></script>
+<script src="readmap-extra.js?v=20261031c"></script>
 <script>
 var READMAP = {};
 if(typeof READMAP_EXTRA !== 'undefined'){
@@ -58,7 +58,10 @@ function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function rubyText(s, skipWord, plain){
   if(!s) return '';
   s = String(s);
-  if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
+  var _marks = [];
+  s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
+  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
+  if(!/[\u4e00-\u9fff]/.test(s)) return _restoreMarks(esc(s));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
@@ -69,7 +72,10 @@ function rubyText(s, skipWord, plain){
     var seg = segments[si];
     if(!seg) continue;
     if(!/[\u3040-\u309f\u30a0-\u30ff]/.test(seg)){
-      result += esc(seg);
+      var segHtml = esc(seg);
+      if(!plain && READMAP[seg]) segHtml = '<ruby>' + esc(seg) + '<rt>' + esc(READMAP[seg]) + '</rt></ruby>';
+      if(skipWord && seg === skipWord) segHtml = '<span style="color:#d32f2f;font-weight:bold">' + segHtml + '</span>';
+      result += segHtml;
       continue;
     }
     var out = '', i = 0;
@@ -81,7 +87,13 @@ function rubyText(s, skipWord, plain){
           var STOPC = 'はがをにへとやのでは、。！？';
           while(endT < seg.length && /[\u3041-\u3096]/.test(seg[endT]) && STOPC.indexOf(seg[endT]) < 0) endT++;
         }
-        out += '<span style="color:#d32f2f;font-weight:bold">'+esc(seg.substring(i, endT))+'</span>';
+        var spanTxt = seg.substring(i, endT);
+        var spanHtml = esc(spanTxt);
+        if(!plain){
+          if(READMAP[spanTxt]) spanHtml = '<ruby>' + esc(spanTxt) + '<rt>' + esc(READMAP[spanTxt]) + '</rt></ruby>';
+          else if(READMAP[skipWord] && spanTxt.indexOf(skipWord) === 0) spanHtml = '<ruby>' + esc(skipWord) + '<rt>' + esc(READMAP[skipWord]) + '</rt></ruby>' + esc(spanTxt.substring(skipWord.length));
+        }
+        out += '<span style="color:#d32f2f;font-weight:bold">' + spanHtml + '</span>';
         i = endT;
         continue;
       }
@@ -98,7 +110,7 @@ function rubyText(s, skipWord, plain){
     }
     result += out;
   }
-  return result;
+  return _restoreMarks(result);
 }
 function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
 function getReadingTarget(question){
@@ -240,8 +252,8 @@ s==='fixed'? '<span class="qa-status fixed">待確認</span>': '';
 
 html += `<div class="qcard ${s}" id="card-${q.id}">
 <div class="qid">${q.id} ${fixedBadge} ${stBadge}</div>
-<div class="qtext"><b>Q${qNum}.</b> ${rubyText(q.question||'', getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>')}</div>
-${imgHtml}${audioHtml}
+${q.section==='reading'?imgHtml:''}<div class="qtext"><b>Q${qNum}.</b> ${rubyText(q.question||'', getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>')}</div>
+${q.section==='reading'?'':imgHtml}${audioHtml}
 <div class="qopts">${opts}</div>
 <div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
 ${q.explanation?`<div class="qexp">💡 解說：${rubyText(q.explanation)}</div>`:''}
