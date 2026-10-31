@@ -56,13 +56,14 @@ if(typeof READMAP_EXTRA !== 'undefined'){
 // 從 kanjireading.json 載入（可選）
 var _rubyKeys = null;
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _starWrap(h){ return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
 function rubyText(s, skipWord, plain){
   if(!s) return '';
   s = String(s);
   var _marks = [];
   s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
   function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
-  if(!/[\u4e00-\u9fff]/.test(s)) return _restoreMarks(esc(s));
+  if(!/[\u4e00-\u9fff]/.test(s)) return _starWrap(_restoreMarks(esc(s)));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
     _rubyKeys.sort(function(a,b){ return b.length - a.length; });
@@ -111,7 +112,7 @@ function rubyText(s, skipWord, plain){
     }
     result += out;
   }
-  return _restoreMarks(result);
+  return _starWrap(_restoreMarks(result));
 }
 function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
 function optRuby(q, o, useRuby){
