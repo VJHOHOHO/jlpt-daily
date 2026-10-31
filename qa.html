@@ -55,7 +55,7 @@ if(typeof READMAP_EXTRA !== 'undefined'){
 // 從 kanjireading.json 載入（可選）
 var _rubyKeys = null;
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function rubyText(s, skipWord){
+function rubyText(s, skipWord, plain){
   if(!s) return '';
   s = String(s);
   if(!/[\u4e00-\u9fff]/.test(s)) return esc(s);
@@ -86,7 +86,7 @@ function rubyText(s, skipWord){
         continue;
       }
       var matched = false;
-      for(var k = 0; k < _rubyKeys.length; k++){
+      if(!plain) for(var k = 0; k < _rubyKeys.length; k++){
         var word = _rubyKeys[k];
         if(skipWord && (word === skipWord || skipWord.indexOf(word) === 0)) continue;
         if(seg.substr(i, word.length) === word){
@@ -100,6 +100,7 @@ function rubyText(s, skipWord){
   }
   return result;
 }
+function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
 function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
@@ -167,6 +168,25 @@ function postQA(qid, status, comment){
 fetch('question_bank.json?v='+Date.now()).then(r=>r.json()).then(db=>{
 allQs = db.questions || [];
 render();
+// 同步後端 QA 標記（換裝置／重開都睇得返）
+fetch('https://jlpt-scores.hoo-c27.workers.dev/scores?type=qa_result').then(r=>r.json()).then(recs=>{
+if(!Array.isArray(recs)) return;
+const latest = {};
+recs.forEach(rec=>{
+const k = rec.key;
+if(k && (!latest[k] || (rec.submittedAt||0) > (latest[k].submittedAt||0))) latest[k] = rec;
+});
+let changed = false;
+Object.keys(latest).forEach(k=>{
+const rec = latest[k];
+const cur = qaStatus[k];
+if(!cur || (rec.submittedAt||0) > (cur.t||0)){
+qaStatus[k] = {status: rec.answer, comment: rec.comment||'', t: rec.submittedAt||Date.now()};
+changed = true;
+}
+});
+if(changed){ saveQA(); render(); }
+}).catch(()=>{});
 });
 
 function getPaperQs(){
@@ -220,7 +240,7 @@ s==='fixed'? '<span class="qa-status fixed">待確認</span>': '';
 
 html += `<div class="qcard ${s}" id="card-${q.id}">
 <div class="qid">${q.id} ${fixedBadge} ${stBadge}</div>
-<div class="qtext"><b>Q${qNum}.</b> ${rubyText(q.question||'', getReadingTarget(q.question)).replace(/\n/g,'<br>')}</div>
+<div class="qtext"><b>Q${qNum}.</b> ${rubyText(q.question||'', getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>')}</div>
 ${imgHtml}${audioHtml}
 <div class="qopts">${opts}</div>
 <div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
