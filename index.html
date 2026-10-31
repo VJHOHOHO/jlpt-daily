@@ -4286,7 +4286,7 @@ function submitDailyPractice(){
     exp.style.display='block';
     var guessed = ok && ((dailyQTimes[i]||{ans:0}).ans ? (((dailyQTimes[i].ans - dailyQTimes[i].start)/1000) < 8) : false);
     exp.innerHTML = ok ? (guessed ? '<div class="ok">✓ 答對了！（🎲 '+(((dailyQTimes[i].ans-dailyQTimes[i].start)/1000).toFixed(1))+'秒，可能係猜，建議重溫）</div>' : '<div class="ok">✓ 答對了！</div>')
-      : '<div class="err">✗ 答錯了。正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation).replace(/\n/g,'<br>'):'')+'</div>';
+      : '<div class="err">✗ 答錯了。你揀咗：'+esc(q.options[userAns-1]||'(無作答)')+'<br>正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation).replace(/\n/g,'<br>'):'')+'</div>';
   });
   saveDailyWrong(wrongQs);
   try{
