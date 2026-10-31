@@ -3647,6 +3647,12 @@ function rubyText(s, skipWord, plain){
 }
 
 function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
+function optRuby(q, o, useRuby){
+  if(typeof USE_FURIFONT !== 'undefined' && USE_FURIFONT) return esc(o);
+  var m = String((q && q.question) || '').match(/「([^」]+)」的漢字(寫法)?是？/);
+  if(m) return '<ruby>' + esc(o) + '<rt>' + esc(m[1]) + '</rt></ruby>';
+  return useRuby ? rubyText(o) : esc(o);
+}
 function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
@@ -4010,7 +4016,7 @@ function renderPracticeQuestions(qs, mode){
     if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%"></div>';
     if(q.audio) html += '<div><audio controls src="'+q.audio+'" style="width:100%"></audio></div>';
     q.options.forEach(function(op,j){
-      html += '<label class="opt"><input type="radio" name="'+mode+'_q'+i+'" value="'+(j+1)+'"> '+esc(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="'+mode+'_q'+i+'" value="'+(j+1)+'"> '+optRuby(q, op, false)+'</label>';
     });
     html += '<div class="qexplain" id="'+mode+'_exp'+i+'" style="display:none"></div></div>';
   });
@@ -4033,7 +4039,7 @@ function submitPractice(mode, ids){
     expDiv.style.display='block';
     expDiv.innerHTML = isCorrect
       ? '<div class="ok">✓ 答對了！</div>'
-      : '<div class="err">✗ 答錯了。正確答案是 '+q.answer+'. '+(q.explanation?esc(q.explanation):'')+'</div>';
+      : '<div class="err">✗ 答錯了。正確答案是 '+q.answer+'. '+(q.explanation?esc(q.explanation).replace(/\n/g,'<br>'):'')+'</div>';
   });
   var score = correct + '/' + qs.length;
   // 分範疇計分
@@ -4242,7 +4248,7 @@ function renderDailyQuestions(qs){
     if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
     if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
-      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+rubyText(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+optRuby(q, op, true)+'</label>';
     });
     html += '<div class="qexplain" id="daily_exp'+i+'" style="display:none"></div></div>';
   });
@@ -4279,7 +4285,7 @@ function submitDailyPractice(){
     exp.style.display='block';
     var guessed = ok && ((dailyQTimes[i]||{ans:0}).ans ? (((dailyQTimes[i].ans - dailyQTimes[i].start)/1000) < 8) : false);
     exp.innerHTML = ok ? (guessed ? '<div class="ok">✓ 答對了！（🎲 '+(((dailyQTimes[i].ans-dailyQTimes[i].start)/1000).toFixed(1))+'秒，可能係猜，建議重溫）</div>' : '<div class="ok">✓ 答對了！</div>')
-      : '<div class="err">✗ 答錯了。正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation):'')+'</div>';
+      : '<div class="err">✗ 答錯了。正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation).replace(/\n/g,'<br>'):'')+'</div>';
   });
   saveDailyWrong(wrongQs);
   try{
@@ -4318,7 +4324,7 @@ function renderDailyReview(){
   w.forEach(function(item,i){
     html += '<div class="qblock"><div class="qtext"><b>'+(i+1)+'.</b> '+esc(item.q).replace(/\n/g,'<br>')+'</div>';
     html += '<div class="err">你揀咗：'+esc(item.options[item.userAns-1]||'(無作答)')+'<br>正確答案：'+esc(item.options[item.answer-1])+'</div>';
-    if(item.explanation) html += '<div class="hint">💡 '+esc(item.explanation)+'</div>';
+    if(item.explanation) html += '<div class="hint">💡 '+esc(item.explanation).replace(/\n/g,'<br>')+'</div>';
     html += '</div>';
   });
   html += '<div class="hint">睇完上面嘅錯題，記住咗先開始今日練習！</div>';
@@ -4397,7 +4403,7 @@ function renderExamSection(){
     // 考試途中唔顯示聽力稿，交卷後先睇
     q.options.forEach(function(op,j){
       var checked = examAnswers[key]===(j+1) ? ' checked' : '';
-      html += '<label class="opt"><input type="radio" name="mock_'+key+'" value="'+(j+1)+'"'+checked+' onchange="saveExamAnswer(\''+key+'\','+(j+1)+')"> '+esc(op)+'</label>';
+      html += '<label class="opt"><input type="radio" name="mock_'+key+'" value="'+(j+1)+'"'+checked+' onchange="saveExamAnswer(\''+key+'\','+(j+1)+')"> '+optRuby(q, op, false)+'</label>';
     });
     html += '</div>';
   });
@@ -4578,10 +4584,10 @@ function submitExamMock(){
         var style = 'padding:6px 10px;margin:4px 0;border-radius:6px;background:#f5f5f5;';
         if(oi+1===q.answer){ mark = ' ✓正確'; style = 'padding:6px 10px;margin:4px 0;border-radius:6px;background:#e8f5e9;border:1px solid #4caf50;'; }
         if(oi+1===w.userAns && w.userAns!==q.answer){ mark = ' ✗你揀咗'; style = 'padding:6px 10px;margin:4px 0;border-radius:6px;background:#ffebee;border:1px solid #f44336;'; }
-        html += '<div style="'+style+'">'+(oi+1)+'. '+esc(op)+mark+'</div>';
+        html += '<div style="'+style+'">'+(oi+1)+'. '+optRuby(q, op, false)+mark+'</div>';
       });
       html += '</div>';
-      if(q.explanation) html += '<div style="margin-top:8px;color:#555">💡 '+esc(q.explanation)+'</div>';
+      if(q.explanation) html += '<div style="margin-top:8px;color:#555">💡 '+esc(q.explanation).replace(/\n/g,'<br>')+'</div>';
       else html += '<div style="margin-top:8px;color:#999;font-size:13px">（解說待補）</div>';
       html += '</div>';
     });
