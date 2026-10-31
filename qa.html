@@ -58,12 +58,19 @@ if(typeof READMAP_EXTRA !== 'undefined'){
 var _rubyKeys = null;
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function _starWrap(h){ h = h.replace(/[＿★]+/g, function(m){ return m.indexOf('＿') >= 0 ? '<span class="slot">' + m + '</span>' : m; }); return h.replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>'); }
+function _sceneSplit(q){
+  var s = String((q && q.question) || '');
+  var M = '（文章は画像を見てください）';
+  var i = s.indexOf(M);
+  if(i < 0) return null;
+  return { above: s.slice(0, i).replace(/\n+$/, ''), below: s.slice(i + M.length).replace(/^\n+/, '') };
+}
 function rubyText(s, skipWord, plain){
   if(!s) return '';
   s = String(s);
   var _marks = [];
   s = s.replace(/⟦([^⟧]+)⟧/g, function(_, t){ _marks.push(t); return '\uE000' + (_marks.length - 1) + '\uE001'; });
-  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold">' + esc(_marks[+i]) + '</span>'; }); }
+  function _restoreMarks(h){ return h.replace(/\uE000(\d+)\uE001/g, function(_, i){ return '<span style="color:#d32f2f;font-weight:bold;text-decoration:underline;text-underline-offset:3px">' + esc(_marks[+i]) + '</span>'; }); }
   if(!skipWord && !/[\u4e00-\u9fff]/.test(s)) return _starWrap(_restoreMarks(esc(s)));
   if(!_rubyKeys){
     _rubyKeys = Object.keys(READMAP).filter(function(k){ return /[\u4e00-\u9fff]/.test(k); });
@@ -271,9 +278,10 @@ const stBadge = s==='ok'? '<span class="qa-status ok">✓ 正確</span>':
 s==='wrong'? '<span class="qa-status wrong">✗ 有問題</span>':
 s==='fixed'? '<span class="qa-status fixed">待確認</span>': '';
 
+const _spq = (q.section==='reading' && q.img) ? _sceneSplit(q) : null;
 html += `<div class="qcard ${s}" id="card-${q.id}">
 <div class="qid">${q.id} ${fixedBadge} ${stBadge}</div>
-${q.section==='reading'?imgHtml:''}<div class="qtext"><b>Q${qNum}.</b> ${rubyText(q.question||'', getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>')}</div>
+${q.section==='reading' && _spq && _spq.above ? '<div class="qtext"><b>Q' + qNum + '.</b> ' + rubyText(_spq.above, getReadingTarget(_spq.above), isReadingQ(_spq.above)).replace(/\n/g,'<br>') + '</div>' + imgHtml + (_spq.below ? '<div class="qtext">' + rubyText(_spq.below, getReadingTarget(_spq.below), isReadingQ(_spq.below)).replace(/\n/g,'<br>') + '</div>' : '') : (q.section==='reading' ? imgHtml : '') + '<div class="qtext"><b>Q' + qNum + '.</b> ' + rubyText(q.question||'', getReadingTarget(q.question), isReadingQ(q.question)).replace(/\n/g,'<br>') + '</div>'}
 ${q.section==='reading'?'':imgHtml}${audioHtml}
 <div class="qopts">${opts}</div>
 <div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
