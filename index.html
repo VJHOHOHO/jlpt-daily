@@ -4017,7 +4017,7 @@ function renderPracticeQuestions(qs, mode){
   qs.forEach(function(q,i){
     html += '<div class="qblock" data-qid="'+q.id+'">' + (q.img && q.section==='reading' ? '<div><img src="'+q.img+'" style="max-width:100%"></div>' : '') + '<div class="qtext"><b>Q'+(i+1)+'.</b> '+esc(String(q.question||'').replace(/⟦([^⟧]+)⟧/g,'$1')).replace(/★/g,'<span style="text-decoration:underline;text-underline-offset:3px">★</span>')+'</div>';
     if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%"></div>';
-    if(q.audio) html += '<div><audio controls src="'+q.audio+'" style="width:100%"></audio></div>';
+    if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio></div>';
     q.options.forEach(function(op,j){
       html += '<label class="opt"><input type="radio" name="'+mode+'_q'+i+'" value="'+(j+1)+'"> '+optRuby(q, op, false)+'</label>';
     });
