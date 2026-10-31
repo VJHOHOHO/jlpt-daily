@@ -113,6 +113,12 @@ function rubyText(s, skipWord, plain){
   return _restoreMarks(result);
 }
 function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
+function optRuby(q, o, useRuby){
+  if(typeof USE_FURIFONT !== 'undefined' && USE_FURIFONT) return esc(o);
+  var m = String((q && q.question) || '').match(/「([^」]+)」的漢字(寫法)?是？/);
+  if(m) return '<ruby>' + esc(o) + '<rt>' + esc(m[1]) + '</rt></ruby>';
+  return useRuby ? rubyText(o) : esc(o);
+}
 function getReadingTarget(question){
   var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的意思)/);
   return m ? m[1] : null;
@@ -241,7 +247,7 @@ if(curFilter!=='all' && s!==curFilter) return;
 if(curFilter==='fixed' &&!q.qa_fixed && s!=='fixed') return;
 qNum++;
 
-const opts = (q.options||[]).map((o,i)=>`<div>${i+1}. ${rubyText(o)}</div>`).join('');
+const opts = (q.options||[]).map((o,i)=>`<div>${i+1}. ${optRuby(q, o, true)}</div>`).join('');
 const imgHtml = q.img? `<div class="qimg"><img src="${q.img}"></div>`:
 (q.imgs? q.imgs.map(u=>`<div class="qimg"><img src="${u}"></div>`).join(''): '');
 const audioHtml = q.audio? `<div><audio controls src="audio/${q.audio}" style="width:100%"></audio></div>`: '';
@@ -256,7 +262,7 @@ ${q.section==='reading'?imgHtml:''}<div class="qtext"><b>Q${qNum}.</b> ${rubyTex
 ${q.section==='reading'?'':imgHtml}${audioHtml}
 <div class="qopts">${opts}</div>
 <div class="qans">答案：${q.answer||'?'} ${q.answer_unverified?'(未核實)':''}</div>
-${q.explanation?`<div class="qexp">💡 解說：${rubyText(q.explanation)}</div>`:''}
+${q.explanation?`<div class="qexp">💡 解說：${rubyText(q.explanation).replace(/\n/g,'<br>')}</div>`:''}
 ${q.note?`<div class="qnote">註：${esc(q.note)}</div>`:''}
 <div class="qa-row">
 <label><input type="checkbox" ${s==='ok'?'checked':''}
