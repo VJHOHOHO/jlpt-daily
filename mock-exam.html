@@ -449,6 +449,13 @@ function showFinal(){
   var pct = Math.round(totalCorrect/totalQ*100);
   var sheet = computeSheet();
 
+  // 未作答嘅題補送一筆 answer=0：所有題目對錯都要有記錄，唔分邊度考（2026-11-01 用戶指示）
+  try{
+    allResults.forEach(function(r){ r.results.forEach(function(res){
+      if(!res.userAns && res.q && res.q.id) postScore({type:'mock_answer', who:currentUser||'unknown', date:new Date().toISOString().slice(0,10), key:res.q.id, answer:0, section:(res.q.section||''), level:examLevel, paper:(PAPER ? PAPER.id : '')});
+    }); });
+  }catch(e){}
+
   // 交卷總分都送後端一份（逐題已送，呢個係總結）
   try{
     var mf = {type:'mock_final', who:currentUser||'unknown',
