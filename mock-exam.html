@@ -202,13 +202,42 @@ function loadQBank(cb){
   attempt();
 }
 
+var RESTORE_MAP = null;
+function buildRestoreMap(recs, paperId){
+  var latest = {};
+  (recs || []).forEach(function(r){
+    if(paperId){ if(r.paper !== paperId) return; }
+    else if(r.paper) return;
+    if(!latest[r.key] || (r.submittedAt || 0) > (latest[r.key].submittedAt || 0)) latest[r.key] = r;
+  });
+  var map = {};
+  Object.keys(latest).forEach(function(k){ map[k] = Number(latest[k].answer) || 0; });
+  return map;
+}
+function loadRestore(cb){
+  RESTORE_MAP = {};
+  if(!currentUser){ cb(); return; }
+  var base = SCORE_API.replace(/\/submit$/, '');
+  var todayISO = new Date().toISOString().slice(0, 10);
+  fetch(base + '/scores?type=mock_final').then(function(r){ return r.json(); }).then(function(finals){
+    var done = (finals || []).some(function(f){ return f.who === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
+    if(done) return null; // 今日已交卷：新一輪唔預填
+    return fetch(base + '/scores?type=mock_answer').then(function(r){ return r.json(); });
+  }).then(function(recs){
+    if(recs){
+      var mine = recs.filter(function(r){ return r.who === currentUser && r.date === todayISO; });
+      RESTORE_MAP = buildRestoreMap(mine, PAPER ? PAPER.id : '');
+    }
+    cb();
+  }).catch(function(){ cb(); });
+}
 function startMock(){
   if(!currentUser){ alert('請先選擇使用者'); return; }
   document.getElementById('introCard').style.display = 'none';
   secIdx = 0;
   allResults = [];
   if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
-  startSection();
+  loadRestore(function(){ startSection(); }); // 先恢復今日已記錄嘅答案（跳頁/斷線都唔怕）
 }
 
 var USER_MIX = {
@@ -337,6 +366,19 @@ function renderQuestions(){
   });
   document.getElementById('questions').innerHTML = html;
   document.getElementById('progress').textContent = '共 ' + secQuestions.length + ' 題';
+  if(RESTORE_MAP){
+    var restoredHere = 0;
+    secQuestions.forEach(function(q, i){
+      var v = RESTORE_MAP[q.id];
+      if(v){
+        secAnswers[i] = v; qAnswerTimes[i] = 999;
+        var inp = document.querySelector('input[name="q' + i + '"][value="' + v + '"]');
+        if(inp) inp.checked = true;
+        restoredHere++;
+      }
+    });
+    if(restoredHere) document.getElementById('progress').textContent = '共 ' + secQuestions.length + ' 題（已恢復 ' + restoredHere + ' 題之前的答案，唔使重做，直接繼續）';
+  }
 }
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
