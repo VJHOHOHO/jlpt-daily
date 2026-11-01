@@ -4144,11 +4144,11 @@ function backPractice(mode){
 }
 function openMockExam(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
-  window.open('mock-exam.html?user='+encodeURIComponent(child),'_blank');
+  window.open('mock-exam.html?user='+encodeURIComponent(child)+'&v=r1','_blank');
 }
 function openPaperExam(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
-  window.open('mock-exam.html?paper=nihonez2026&user='+encodeURIComponent(child),'_blank');
+  window.open('mock-exam.html?paper=nihonez2026&user='+encodeURIComponent(child)+'&v=r1','_blank');
 }
 function startFullMock(){
   loadN4Bank(function(){
