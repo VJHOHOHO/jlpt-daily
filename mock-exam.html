@@ -418,7 +418,7 @@ function sheetHtml(sh){
   var td = 'border:1px solid #bbb;padding:8px 10px;text-align:center;font-size:16px';
   var th = td + ';background:#f0f0f0;font-weight:700';
   var h = '<div style="max-width:560px;margin:0 auto 8px">';
-  h += '<div style="text-align:center;font-size:15px;color:#666;margin-bottom:8px">' + esc(PAPER.title) + '</div>';
+  h += '<div style="text-align:center;font-size:15px;color:#666;margin-bottom:8px">' + esc(PAPER ? PAPER.title : (examLevel + ' 完整模擬試卷（隨機抽題）')) + '</div>';
   h += '<table style="border-collapse:collapse;width:100%">';
   h += '<tr><th style="' + th + '" colspan="2">総合得点</th><th style="' + th + '">判定</th></tr>';
   h += '<tr><td style="' + td + ';font-size:26px;font-weight:900" colspan="2">' + sh.tot + ' / 180</td>';
@@ -442,14 +442,14 @@ function showFinal(){
   var totalCorrect = 0, totalQ = 0;
   allResults.forEach(function(r){ totalCorrect += r.correct; totalQ += r.total; });
   var pct = Math.round(totalCorrect/totalQ*100);
-  var sheet = PAPER ? computeSheet() : null;
+  var sheet = computeSheet();
 
   // 交卷總分都送後端一份（逐題已送，呢個係總結）
   try{
     var mf = {type:'mock_final', who:currentUser||'unknown',
       date:new Date().toISOString().slice(0,10),
       key:'mock_final', score:totalCorrect, total:totalQ, level:examLevel};
-    if(sheet){ mf.paper = PAPER.id; mf.scaled = sheet.tot; mf.scaled_lr = sheet.lr; mf.scaled_listening = sheet.li; mf.pass = sheet.pass ? 1 : 0; }
+    if(sheet){ if(PAPER) mf.paper = PAPER.id; mf.scaled = sheet.tot; mf.scaled_lr = sheet.lr; mf.scaled_listening = sheet.li; mf.pass = sheet.pass ? 1 : 0; }
     postScore(mf);
   }catch(e){}
 
