@@ -171,6 +171,7 @@ function getReadingTarget(question){
 <button data-f="fixed">🔧 已修正待確認</button>
 </div>
 <div class="stats" id="stats"></div>
+<div id="doneZone" style="margin-top:10px;text-align:left"></div>
 </div>
 
 <div id="qlist"></div>
@@ -305,6 +306,40 @@ onblur="if(qaStatus['${q.id}']?.status==='wrong')setQA('${q.id}','wrong',this.va
 list.innerHTML = html || '<div class="controls">沒有符合的題目</div>';
 document.getElementById('stats').textContent =
 `共 ${qs.length} 題｜✓ ${cOk}｜✗ ${cWrong}｜🔧 ${cFixed}｜未驗 ${cPend}`;
+renderDoneZone();
+}
+
+function paperQsFor(pv){
+const [year, lvl] = pv.split('-');
+return allQs.filter(q=>{
+const id = q.id||'';
+return id.includes(year) && (id.startsWith(lvl+'_') || id.startsWith('n'+lvl.slice(1)+'_'));
+});
+}
+function renderDoneZone(){
+const zone = document.getElementById('doneZone');
+if(!zone) return;
+if(!allQs.length){ zone.innerHTML = '<div style="color:#888">完成進度載入中…</div>'; return; }
+const sel = document.getElementById('paperSel');
+const done = [], todo = [];
+Array.from(sel.options).forEach(op=>{
+if(op.disabled) return;
+const qs = paperQsFor(op.value);
+let d = 0;
+qs.forEach(q=>{ const s = qaStatus[q.id]? qaStatus[q.id].status: 'pending'; if(s==='ok'||s==='wrong'||s==='fixed') d++; });
+const item = {v: op.value, label: op.textContent, total: qs.length, done: d};
+if(qs.length && d >= qs.length) done.push(item); else todo.push(item);
+});
+let h = '<div style="font-weight:700;font-size:16px;margin-bottom:6px">📊 完成進度：' + done.length + '／' + (done.length + todo.length) + ' 份完成</div>';
+h += '<div style="margin-bottom:4px"><span style="font-weight:700;color:#2e7d32">✅ 完成區</span></div>';
+h += done.length ? done.map(it=>'<button onclick="gotoPaper(\'' + it.v + '\')" style="margin:2px;padding:6px 10px;border-radius:999px;border:1px solid #2e7d32;background:#e8f5e9;cursor:pointer;font-size:14px">' + esc(it.label) + '（' + it.total + ' 題）✓</button>').join('') : '<span style="color:#888">暫時未有</span>';
+h += '<div style="margin:8px 0 4px"><span style="font-weight:700;color:#b26a00">📋 未完成</span></div>';
+h += todo.length ? todo.map(it=>'<button onclick="gotoPaper(\'' + it.v + '\')" style="margin:2px;padding:6px 10px;border-radius:999px;border:1px solid #ccc;background:#fff8e1;cursor:pointer;font-size:14px">' + esc(it.label) + '：已驗 ' + it.done + '／共 ' + it.total + '（仲差 ' + (it.total - it.done) + '）</button>').join('') : '<span style="color:#888">全部完成 🎉</span>';
+zone.innerHTML = h;
+}
+function gotoPaper(v){
+const sel = document.getElementById('paperSel');
+sel.value = v; curPaper = v; render(); window.scrollTo(0, 0);
 }
 
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
