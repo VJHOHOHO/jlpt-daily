@@ -424,7 +424,7 @@ function sheetHtml(sh){
   var td = 'border:1px solid #bbb;padding:8px 10px;text-align:center;font-size:16px';
   var th = td + ';background:#f0f0f0;font-weight:700';
   var h = '<div style="max-width:560px;margin:0 auto 8px">';
-  h += '<div style="text-align:center;font-size:15px;color:#666;margin-bottom:8px">' + esc(PAPER ? PAPER.title : (((typeof USER_MIX !== 'undefined' && USER_MIX[currentUser]) ? USER_MIX[currentUser].base : 'N4') + ' 完整模擬試卷')) + '</div>';
+  h += '<div style="text-align:center;font-size:15px;color:#666;margin-bottom:8px">' + esc(PAPER ? PAPER.title : 'N4 完整模擬試卷') + '</div>';
   h += '<table style="border-collapse:collapse;width:100%">';
   h += '<tr><th style="' + th + '" colspan="2">総合得点</th><th style="' + th + '">判定</th></tr>';
   h += '<tr><td style="' + td + ';font-size:26px;font-weight:900" colspan="2">' + sh.tot + ' / 180</td>';
