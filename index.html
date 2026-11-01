@@ -4073,6 +4073,7 @@ function submitPractice(mode, ids){
     var sel = document.querySelector('input[name="'+mode+'_q'+i+'"]:checked');
     var userAns = sel ? parseInt(sel.value) : 0;
     var isCorrect = (userAns === q.answer);
+    if(q.id) saveQuizAnswer('rand5', q.id, userAns); // 統一記錄：所有題目對錯都入後端，唔分邊度做（2026-11-01 用戶指示）
     if(isCorrect) correct++;
     else wrong.push({q:q, userAns:userAns, index:i});
     var expDiv = $(mode+'_exp'+i);
@@ -4367,6 +4368,7 @@ function getYesterdayWrong(){
   return mine[yk]||[];
 }
 function renderDailyReview(){
+  fetchUnifiedWrongReview(); // 統一錯題複習：唔分來源（每日練習／隨機練習／模擬卷），以後端最新對錯為準
   var w = getYesterdayWrong();
   if(!w.length){ $('dailyReview').innerHTML=''; return; }
   var html = '<div class="card-sub" style="margin:10px 0">📝 昨日錯題複習（'+w.length+' 題）：</div>';
@@ -4378,6 +4380,52 @@ function renderDailyReview(){
   });
   html += '<div class="hint">睇完上面嘅錯題，記住咗先開始今日練習！</div>';
   $('dailyReview').innerHTML = html;
+}
+var _uniReviewFor = '', _uniReviewAt = 0;
+function fetchUnifiedWrongReview(){
+  if(!child) return;
+  if(_uniReviewFor === child && Date.now() - _uniReviewAt < 60000) return;
+  _uniReviewFor = child; _uniReviewAt = Date.now();
+  var who = encodeURIComponent(child);
+  var types = ['mock_answer', 'daily20_answer', 'rand5_answer'];
+  var all = [], done = 0;
+  types.forEach(function(t){
+    fetch('https://jlpt-scores.hoo-c27.workers.dev/scores?type=' + t + '&who=' + who).then(function(r){ return r.json(); }).then(function(recs){
+      if(Array.isArray(recs)) all = all.concat(recs);
+    }).catch(function(){}).then(function(){
+      done++;
+      if(done === types.length && all.length) applyUnifiedWrongReview(all);
+    });
+  });
+}
+function applyUnifiedWrongReview(recs){
+  loadQBank(function(){
+    var byId = {}; QBANK.forEach(function(q){ byId[q.id] = q; });
+    var latest = {};
+    recs.forEach(function(r){
+      if(!r.key || !byId[r.key]) return;
+      if(!latest[r.key] || (r.submittedAt||0) > (latest[r.key].submittedAt||0)) latest[r.key] = r;
+    });
+    var todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    var wrong = [];
+    Object.keys(latest).forEach(function(id){
+      var r = latest[id], q = byId[id];
+      if(Number(r.answer) !== q.answer && (r.submittedAt||0) < todayStart.getTime()) wrong.push({q:q, userAns:Number(r.answer)||0, t:r.submittedAt||0});
+    });
+    wrong.sort(function(a,b){ return b.t - a.t; });
+    wrong = wrong.slice(0, 20);
+    if(!wrong.length){ $('dailyReview').innerHTML = ''; return; }
+    var html = '<div class="card-sub" style="margin:10px 0">📝 錯題複習（全部來源，' + wrong.length + ' 題未清）：</div>';
+    wrong.forEach(function(item, i){
+      var q = item.q;
+      html += '<div class="qblock"><div class="qtext"><b>' + (i+1) + '.</b> ' + esc(q.question).replace(/\n/g,'<br>') + '</div>';
+      html += '<div class="err">你揀咗：' + esc(q.options[item.userAns-1] || '(無作答)') + '<br>正確答案：' + esc(q.options[q.answer-1]) + '</div>';
+      if(q.explanation) html += '<div class="hint">💡 ' + esc(q.explanation).replace(/\n/g,'<br>') + '</div>';
+      html += '</div>';
+    });
+    html += '<div class="hint">呢啲係之前做錯、仲未答對返嘅題（唔分喺邊度做錯）。睇完記住咗先開始今日練習！</div>';
+    $('dailyReview').innerHTML = html;
+  });
 }
 function backDaily(){
   $('dailyBody').style.display='none'; $('dailyIntro').style.display='block';
