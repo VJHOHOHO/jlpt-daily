@@ -80,6 +80,7 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
 
   <div class="card" id="resultCard" style="display:none">
     <h2>成績</h2>
+    <div id="scoreSheet"></div>
     <div class="score" id="finalScore"></div>
     <div id="review"></div>
     <button class="btn" onclick="location.href='index.html'">返主頁</button>
@@ -129,11 +130,18 @@ var allResults = [];
 var timerInt = null;
 
 var examLevel = 'MIX';
+var PAPER = null;
 // 從 URL 參數攞 level 同 user
 try{
   var pm = new URLSearchParams(window.location.search);
   var lv = pm.get('level');
   if(lv && ['N5','N4','N3','MIX'].indexOf(lv)>=0) examLevel = lv;
+  var pp = pm.get('paper');
+  if(pp === 'nihonez2026'){
+    PAPER = { id: 'nihonez-n4-korean-2026', file: 'question_bank_nihonez.json', title: 'N4 模擬卷（Nihonez Korean Practice Test 1 – 2026）', level: 'N4', mins: { vocab: 25, gram_read: 55, listening: 40 } };
+    examLevel = 'N4';
+    window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
+  }
   var u = pm.get('user');
   if(u){
     currentUser = decodeURIComponent(u);
@@ -163,7 +171,7 @@ function loadQBank(cb){
   var tries = 0;
   function attempt(){
     tries++;
-    fetch('question_bank.json', {cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(d){
+    fetch(PAPER ? PAPER.file : 'question_bank.json', {cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(d){
       QBANK = d.questions || d;
       if(!QBANK.length) throw new Error('empty bank');
       cb();
@@ -183,6 +191,7 @@ function startMock(){
   document.getElementById('introCard').style.display = 'none';
   secIdx = 0;
   allResults = [];
+  if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
   startSection();
 }
 
@@ -214,6 +223,18 @@ function startSection(){
   document.getElementById('sectionTitle').textContent = '第 ' + (secIdx+1) + '/3 部分：' + sec.name;
 
   loadQBank(function(){
+    if(PAPER){
+      // 成份卷模式：全卷照考試次序出題，唔抽題、唔分流
+      secQuestions = QBANK.filter(function(q){ return sec.filter(q); }).sort(function(a,b){ return (a.mondai - b.mondai) || (a.number - b.number); });
+      if(!secQuestions.length){
+        document.getElementById('questions').innerHTML = '<div style="color:#d32f2f;font-size:17px;line-height:1.8">⚠️ 這一部分暫時抽不到題目，請 <a href="javascript:location.reload()">重新載入</a> 再試。</div>';
+        return;
+      }
+      secAnswers = {};
+      renderQuestions();
+      startTimer(sec.mins * 60);
+      return;
+    }
     // 按程度分流：seed 按考生+日期（兩姊妹唔會撞同一份卷）；程度配比按 USER_MIX
     var prof = USER_MIX[currentUser] || null;
     var mainLevel = (examLevel === 'MIX') ? (prof ? prof.base : 'N4') : examLevel;
@@ -320,7 +341,7 @@ function answerQ(i, val){
     postScore({type:'mock_answer', who:currentUser||'unknown',
       date:new Date().toISOString().slice(0,10),
       key:(q.id||('mock_q'+i)), answer:val,
-      section:(sections[secIdx]||{}).id||'', level:examLevel});
+      section:(sections[secIdx]||{}).id||'', level:examLevel, paper:(PAPER ? PAPER.id : '')});
   }catch(e){}
 }
 
@@ -368,21 +389,69 @@ function startNextSection(){
   startSection();
 }
 
+function computeSheet(){
+  // 官方格式成績表（模擬換算：按答對比例推算，非官方量尺分數）
+  var sc = { vocab:[0,0], grammar:[0,0], reading:[0,0], listening:[0,0] };
+  allResults.forEach(function(r){ r.results.forEach(function(res){
+    var s = sc[res.q.section]; if(s){ s[1]++; if(res.correct) s[0]++; }
+  });});
+  var lrC = sc.vocab[0] + sc.grammar[0] + sc.reading[0];
+  var lrT = sc.vocab[1] + sc.grammar[1] + sc.reading[1];
+  var lr = lrT ? Math.round(lrC / lrT * 120) : 0;
+  var li = sc.listening[1] ? Math.round(sc.listening[0] / sc.listening[1] * 60) : 0;
+  var tot = lr + li;
+  var pass = (tot >= 90 && lr >= 38 && li >= 19); // N4 合格基準
+  function grade(c, t){ var p = t ? c / t * 100 : 0; return p >= 67 ? 'A' : (p >= 34 ? 'B' : 'C'); }
+  return { sc: sc, lr: lr, li: li, tot: tot, pass: pass,
+    gVocab: grade(sc.vocab[0], sc.vocab[1]), gGrammar: grade(sc.grammar[0], sc.grammar[1]), gReading: grade(sc.reading[0], sc.reading[1]) };
+}
+function sheetHtml(sh){
+  var td = 'border:1px solid #bbb;padding:8px 10px;text-align:center;font-size:16px';
+  var th = td + ';background:#f0f0f0;font-weight:700';
+  var h = '<div style="max-width:560px;margin:0 auto 8px">';
+  h += '<div style="text-align:center;font-size:15px;color:#666;margin-bottom:8px">' + esc(PAPER.title) + '</div>';
+  h += '<table style="border-collapse:collapse;width:100%">';
+  h += '<tr><th style="' + th + '" colspan="2">総合得点</th><th style="' + th + '">判定</th></tr>';
+  h += '<tr><td style="' + td + ';font-size:26px;font-weight:900" colspan="2">' + sh.tot + ' / 180</td>';
+  h += '<td style="' + td + ';font-size:22px;font-weight:900;color:' + (sh.pass ? '#2e7d32' : '#c62828') + '">' + (sh.pass ? '合格' : '不合格') + '</td></tr>';
+  h += '<tr><th style="' + th + '">言語知識・読解</th><th style="' + th + '">聴解</th><th style="' + th + '">合格基準</th></tr>';
+  h += '<tr><td style="' + td + '">' + sh.lr + ' / 120</td><td style="' + td + '">' + sh.li + ' / 60</td><td style="' + td + ';font-size:13px;color:#666">總分 ≥90<br>言語知識・読解 ≥38<br>聴解 ≥19</td></tr>';
+  h += '</table>';
+  h += '<table style="border-collapse:collapse;width:100%;margin-top:10px">';
+  h += '<tr><th style="' + th + '" colspan="3">参考情報（A：≥67%　B：34–66%　C：&lt;34%）</th></tr>';
+  h += '<tr><th style="' + th + '">文字・語彙</th><th style="' + th + '">文法</th><th style="' + th + '">読解</th></tr>';
+  h += '<tr><td style="' + td + ';font-size:20px;font-weight:700">' + sh.gVocab + '<div style="font-size:12px;color:#888;font-weight:400">' + sh.sc.vocab[0] + '/' + sh.sc.vocab[1] + ' 題</div></td>';
+  h += '<td style="' + td + ';font-size:20px;font-weight:700">' + sh.gGrammar + '<div style="font-size:12px;color:#888;font-weight:400">' + sh.sc.grammar[0] + '/' + sh.sc.grammar[1] + ' 題</div></td>';
+  h += '<td style="' + td + ';font-size:20px;font-weight:700">' + sh.gReading + '<div style="font-size:12px;color:#888;font-weight:400">' + sh.sc.reading[0] + '/' + sh.sc.reading[1] + ' 題</div></td></tr>';
+  h += '</table>';
+  h += '<div style="font-size:12px;color:#999;margin-top:6px;text-align:center">※ 模擬換算：分數按答對比例推算，非官方量尺分數，僅供參考。</div>';
+  h += '</div>';
+  return h;
+}
+
 function showFinal(){
   var totalCorrect = 0, totalQ = 0;
   allResults.forEach(function(r){ totalCorrect += r.correct; totalQ += r.total; });
   var pct = Math.round(totalCorrect/totalQ*100);
+  var sheet = PAPER ? computeSheet() : null;
 
   // 交卷總分都送後端一份（逐題已送，呢個係總結）
   try{
-    postScore({type:'mock_final', who:currentUser||'unknown',
+    var mf = {type:'mock_final', who:currentUser||'unknown',
       date:new Date().toISOString().slice(0,10),
-      key:'mock_final', score:totalCorrect, total:totalQ, level:examLevel});
+      key:'mock_final', score:totalCorrect, total:totalQ, level:examLevel};
+    if(sheet){ mf.paper = PAPER.id; mf.scaled = sheet.tot; mf.scaled_lr = sheet.lr; mf.scaled_listening = sheet.li; mf.pass = sheet.pass ? 1 : 0; }
+    postScore(mf);
   }catch(e){}
 
   document.getElementById('breakCard').style.display = 'none';
   document.getElementById('resultCard').style.display = 'block';
-  document.getElementById('finalScore').innerHTML = '總分：' + totalCorrect + ' / ' + totalQ + ' (' + pct + '%)';
+  if(sheet){
+    document.getElementById('scoreSheet').innerHTML = sheetHtml(sheet);
+    document.getElementById('finalScore').innerHTML = '答對：' + totalCorrect + ' / ' + totalQ + ' (' + pct + '%)';
+  } else {
+    document.getElementById('finalScore').innerHTML = '總分：' + totalCorrect + ' / ' + totalQ + ' (' + pct + '%)';
+  }
 
   var html = '';
   allResults.forEach(function(r){
