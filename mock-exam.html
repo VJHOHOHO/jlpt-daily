@@ -118,6 +118,15 @@ function postScore(data){
   }
   attempt();
 }
+function reportQ(btn, qid){
+  var note = prompt('邊度有問題？（可留空）') ;
+  if(note === null) return;
+  postScore({type:'question_report', who:currentUser||'unknown',
+    date:new Date().toISOString().slice(0,10),
+    key:qid, answer:'report', comment:note||'', paper:(PAPER ? PAPER.id : '')});
+  btn.textContent = '✓ 已回報，多謝！';
+  btn.disabled = true;
+}
 var sections = [
   { id: 'vocab', name: '言語知識（文字・語彙）', mins: 25, filter: function(q){ return q.section==='vocab'; } },
   { id: 'gram_read', name: '言語知識（文法）・読解', mins: 55, filter: function(q){ return q.section==='grammar' || q.section==='reading'; } },
@@ -138,7 +147,7 @@ try{
   if(lv && ['N5','N4','N3','MIX'].indexOf(lv)>=0) examLevel = lv;
   var pp = pm.get('paper');
   if(pp === 'nihonez2026'){
-    PAPER = { id: 'nihonez-n4-korean-2026', file: 'question_bank_nihonez.json', title: 'N4 模擬卷（Nihonez Korean Practice Test 1 – 2026）', level: 'N4', mins: { vocab: 25, gram_read: 55, listening: 40 } };
+    PAPER = { id: 'nihonez-n4-korean-2026', file: 'question_bank_nihonez.json', title: 'N4 完整模擬試卷', level: 'N4', mins: { vocab: 25, gram_read: 55, listening: 40 } };
     examLevel = 'N4';
     window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
   }
@@ -468,6 +477,7 @@ function showFinal(){
       if(res.guessed) html += '<div class="explain" style="background:#fff3e0">🎲 猜對！用咗 ' + res.time.toFixed(1) + ' 秒，建議重溫。</div>';
       if(!res.correct) html += '<div class="explain" style="background:#ffebee">❌ 答錯，加入錯題本加強。</div>';
       if(q.explanation) html += '<div class="explain">💡 ' + esc(q.explanation).replace(/\n/g,'<br>') + '</div>';
+      html += '<div style="margin-top:8px"><button type="button" style="font-size:13px;padding:6px 14px;border:1px solid #ddd;border-radius:16px;background:#fff;color:#888;cursor:pointer" onclick="reportQ(this,\'' + q.id + '\')">⚠️ 題目有問題？回報</button></div>';
       html += '</div>';
     });
   });
