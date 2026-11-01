@@ -3689,6 +3689,8 @@ function optRuby(q, o, useRuby){
   if(m) return esc(o); // 漢字題：選項唔加振假名（問漢字本身，加讀音＝洩底）
   var um = String((q && q.question) || '').match(/「([^」]+)」的用法/);
   if(um && useRuby) return rubyText(o, um[1]); // 用法題：選項入面目標詞紅字加底線（同原卷）
+  var tm = String((q && q.question) || '').match(/⟦([^⟧]+)⟧/);
+  if(tm && q.section === 'vocab' && !/[\u4e00-\u9fff]/.test(tm[1]) && /[\u4e00-\u9fff]/.test(o)) return esc(o); // 表記題：題幹目標係假名、選項係漢字→選項唔加振假名（加讀音＝洩底，2026-11-01 QA修正）
   return useRuby ? rubyText(o) : esc(o);
 }
 function getReadingTarget(question){
