@@ -214,6 +214,7 @@ function buildRestoreMap(recs, paperId){
   Object.keys(latest).forEach(function(k){ map[k] = Number(latest[k].answer) || 0; });
   return map;
 }
+function normUser(u){ return u ? String(u).replace(/\s+/g, '').replace('許悦', '許悅') : u; }
 function loadRestore(cb){
   if(_restoreState === 2){ cb(); return; }
   _restoreCbs.push(cb);
@@ -227,16 +228,17 @@ function loadRestore(cb){
   }
   setTimeout(done, 6000); // 恢復最多等 6 秒，絕對唔阻考試開始
   RESTORE_MAP = {};
+  currentUser = normUser(currentUser);
   if(!currentUser){ done(); return; }
   var base = SCORE_API.replace(/\/submit$/, '');
   var todayISO = new Date().toISOString().slice(0, 10);
   fetch(base + '/scores?type=mock_final').then(function(r){ return r.json(); }).then(function(finals){
-    var doneToday = (finals || []).some(function(f){ return f.who === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
+    var doneToday = (finals || []).some(function(f){ return normUser(f.who) === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
     if(doneToday) return null; // 今日已交卷：新一輪唔預填
     return fetch(base + '/scores?type=mock_answer').then(function(r){ return r.json(); });
   }).then(function(recs){
     if(recs){
-      var mine = recs.filter(function(r){ return r.who === currentUser && r.date === todayISO; });
+      var mine = recs.filter(function(r){ return normUser(r.who) === currentUser && r.date === todayISO; });
       RESTORE_MAP = buildRestoreMap(mine, PAPER ? PAPER.id : '');
     }
     done();
