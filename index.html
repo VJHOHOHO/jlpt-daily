@@ -3685,7 +3685,7 @@ function rubyText(s, skipWord, plain){
 function isReadingQ(question){ return /「[^」]+」的讀音是？/.test(String(question||'')); }
 function optRuby(q, o, useRuby){
   if(typeof USE_FURIFONT !== 'undefined' && USE_FURIFONT) return esc(o);
-  var m = String((q && q.question) || '').match(/「([^」]+)」的漢字(寫法)?是？/);
+  var m = String((q && q.question) || '').match(/「([^」]+)」的漢字(寫法|表記)?是？/);
   if(m) return esc(o); // 漢字題：選項唔加振假名（問漢字本身，加讀音＝洩底）
   var um = String((q && q.question) || '').match(/「([^」]+)」的用法/);
   if(um && useRuby) return rubyText(o, um[1]); // 用法題：選項入面目標詞紅字加底線（同原卷）
@@ -3694,7 +3694,7 @@ function optRuby(q, o, useRuby){
   return useRuby ? rubyText(o) : esc(o);
 }
 function getReadingTarget(question){
-  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的片假名寫法是？|的意思|的用法正確的是？)/);
+  var m = String(question||'').match(/「([^」]+)」(?:的讀音是？|的漢字是？|的漢字寫法是？|的漢字表記是？|的片假名寫法是？|的意思|的用法正確的是？)/);
   return m ? m[1] : null;
 }
 
