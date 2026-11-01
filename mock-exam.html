@@ -261,10 +261,10 @@ function startSection(){
       extraN = Math.round(target * prof.ratio);
     }
     var rand = seededRand((currentUser||'unknown') + '|' + new Date().toISOString().slice(0,10) + '|' + mainLevel + '|' + sec.id);
-    function pickFrom(level, n){
+    function pickFrom(levels, n){
       if(n <= 0) return [];
       var pool = QBANK.filter(function(q){
-        return !q.needs_image && sec.filter(q) && q.level === level;
+        return !q.needs_image && sec.filter(q) && levels.indexOf(q.level) >= 0;
       });
       var groups = {}, singles = [];
       pool.forEach(function(q){
@@ -285,12 +285,11 @@ function startSection(){
       if(need > 0) picked = picked.concat(singles.slice(0, need));
       return picked;
     }
-    var picked = pickFrom(mainLevel, target - extraN);
-    if(extraLevel) picked = picked.concat(pickFrom(extraLevel, extraN));
+    var picked = pickFrom(['N5', 'N4', 'N3'], target);
     if(picked.length < target){
       var usedIds = {}; picked.forEach(function(q){ usedIds[q.id] = 1; });
       var rest = QBANK.filter(function(q){
-        return !q.needs_image && !q.group && sec.filter(q) && !usedIds[q.id] && (q.level === mainLevel || q.level === extraLevel);
+        return !q.needs_image && !q.group && sec.filter(q) && !usedIds[q.id];
       });
       picked = picked.concat(shuffleSeeded(rest, rand).slice(0, target - picked.length));
     }
