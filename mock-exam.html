@@ -215,6 +215,13 @@ function buildRestoreMap(recs, paperId){
   return map;
 }
 function normUser(u){ return u ? String(u).replace(/\s+/g, '').replace('許悦', '許悅') : u; }
+function fetchJsonTO(url, ms){
+  return new Promise(function(resolve, reject){
+    var ctl = ('AbortController' in window) ? new AbortController() : null;
+    var to = setTimeout(function(){ if(ctl) ctl.abort(); reject(new Error('timeout')); }, ms);
+    fetch(url, ctl ? { signal: ctl.signal } : {}).then(function(r){ return r.json(); }).then(function(j){ clearTimeout(to); resolve(j); }).catch(function(e){ clearTimeout(to); reject(e); });
+  });
+}
 function loadRestore(cb){
   if(_restoreState === 2){ cb(); return; }
   _restoreCbs.push(cb);
@@ -230,25 +237,54 @@ function loadRestore(cb){
     fireCbs();
     showRestoreNote();
   }
-  // 軟上限 25 秒：放行等緊嘅開始掣，但唔作廢之後返到嘅恢復結果（之後嘅部分渲染時照用）
-  setTimeout(function(){ if(!finished) fireCbs(); }, 25000);
   RESTORE_MAP = {};
   currentUser = normUser(currentUser);
   if(!currentUser){ done(); return; }
   var base = SCORE_API.replace(/\/submit$/, '');
   var todayISO = new Date().toISOString().slice(0, 10);
   var whoQ = '&who=' + encodeURIComponent(currentUser); // 只拉自己嘅記錄，快好多
-  fetch(base + '/scores?type=mock_final' + whoQ).then(function(r){ return r.json(); }).then(function(finals){
-    var doneToday = (finals || []).some(function(f){ return normUser(f.who) === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
-    if(doneToday) return null; // 今日已交卷：新一輪唔預填
-    return fetch(base + '/scores?type=mock_answer' + whoQ).then(function(r){ return r.json(); });
-  }).then(function(recs){
-    if(recs){
-      var mine = recs.filter(function(r){ return normUser(r.who) === currentUser && r.date === todayISO; });
-      RESTORE_MAP = buildRestoreMap(mine, PAPER ? PAPER.id : '');
-    }
-    done();
-  }).catch(function(){ done(); });
+  var retried = false;
+  function attempt(){
+    fetchJsonTO(base + '/scores?type=mock_final' + whoQ, 30000).then(function(finals){
+      var doneToday = (finals || []).some(function(f){ return normUser(f.who) === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
+      if(doneToday) return null; // 今日已交卷：新一輪唔預填
+      return fetchJsonTO(base + '/scores?type=mock_answer' + whoQ, 30000);
+    }).then(function(recs){
+      if(recs){
+        var mine = recs.filter(function(r){ return normUser(r.who) === currentUser && r.date === todayISO; });
+        RESTORE_MAP = buildRestoreMap(mine, PAPER ? PAPER.id : '');
+      }
+      done();
+    }).catch(function(){
+      if(!retried){ retried = true; setTimeout(attempt, 1500); } // 網絡唔穩自動重試一次
+      else done();
+    });
+  }
+  attempt();
+}
+function loadRestoreWait(cb){ // 等恢復真正完成先行，唔俾未載完就開卷
+  if(_restoreState === 2){ cb(); return; }
+  loadRestore(function(){});
+  var iv = setInterval(function(){
+    if(_restoreState === 2){ clearInterval(iv); cb(); }
+  }, 400);
+}
+function resumeMock(){
+  if(!currentUser){ alert('請先選擇使用者'); return; }
+  var st = document.getElementById('resumeStatus');
+  var rb = document.getElementById('resumeBtn');
+  if(rb){ rb.disabled = true; rb.textContent = '載入中…'; }
+  var t0 = Date.now();
+  if(st) st.textContent = '正在載入你今日嘅答案…';
+  var tick = setInterval(function(){ if(st) st.textContent = '正在載入你今日嘅答案…（已等 ' + Math.round((Date.now() - t0) / 1000) + ' 秒，唔好關頁面）'; }, 1000);
+  loadRestoreWait(function(){
+    clearInterval(tick);
+    secIdx = 0;
+    allResults = [];
+    if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
+    document.getElementById('introCard').style.display = 'none';
+    startSection();
+  });
 }
 function showRestoreNote(){
   var card = document.getElementById('introCard');
@@ -259,7 +295,7 @@ function showRestoreNote(){
   d.id = 'restoreNote';
   d.className = 'hint';
   d.style.cssText = 'margin-top:8px;color:#2e7d32;font-weight:bold';
-  d.textContent = '✅ 搵到你今日做過嘅 ' + n + ' 題答案，按「開始模擬考」就會自動填返，唔使重做。';
+  d.textContent = '✅ 搵到你今日做過嘅 ' + n + ' 題答案，撳「繼續之前的考試」就會自動填返，唔使重做。';
   card.appendChild(d);
 }
 window.addEventListener('load', function(){
@@ -267,8 +303,19 @@ window.addEventListener('load', function(){
   if(card && !document.getElementById('verTag')){
     var v = document.createElement('div');
     v.id = 'verTag'; v.className = 'hint'; v.style.marginTop = '10px';
-    v.textContent = '版本：2026-11-01 恢復版';
+    v.textContent = '版本：2026-11-01 繼續版';
     card.appendChild(v);
+  }
+  if(card && currentUser && !document.getElementById('resumeBtn')){
+    var rb = document.createElement('button');
+    rb.id = 'resumeBtn'; rb.className = 'btn';
+    rb.style.cssText = 'margin-top:12px;background:#2e7d32;color:#fff';
+    rb.textContent = '↩️ 繼續之前的考試（載入今日答案）';
+    rb.onclick = resumeMock;
+    card.appendChild(rb);
+    var st = document.createElement('div');
+    st.id = 'resumeStatus'; st.className = 'hint'; st.style.marginTop = '8px';
+    card.appendChild(st);
   }
   if(currentUser){ loadRestore(function(){}); }
 });
@@ -279,7 +326,7 @@ function startMock(){
   secIdx = 0;
   allResults = [];
   if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
-  loadRestore(function(){ document.getElementById('introCard').style.display = 'none'; startSection(); }); // 先恢復今日已記錄嘅答案（跳頁/斷線都唔怕）
+  loadRestoreWait(function(){ document.getElementById('introCard').style.display = 'none'; startSection(); }); // 等恢復真正完成先入卷（跳頁/斷線都唔怕）
 }
 
 var USER_MIX = {
