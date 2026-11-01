@@ -183,7 +183,14 @@ function loadQBank(cb){
     fetch(PAPER ? PAPER.file : 'question_bank.json', {cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }).then(function(d){
       QBANK = d.questions || d;
       if(!QBANK.length) throw new Error('empty bank');
-      cb();
+      if(PAPER){ cb(); return; }
+      // 隨機模式：併入 Nihonez 題庫擴大題池，減少撞熟題（載入失敗唔阻主流程）
+      fetch('question_bank_nihonez.json', {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d2){
+        var extra = (d2 && d2.questions) || [];
+        var seen = {}; QBANK.forEach(function(q){ seen[q.id] = 1; });
+        extra.forEach(function(q){ if(q && q.id && !seen[q.id]) QBANK.push(q); });
+        cb();
+      }).catch(function(){ cb(); });
     }).catch(function(e){
       if(tries < 3){ setTimeout(attempt, 1500); return; }
       var q = document.getElementById('questions');
