@@ -215,6 +215,7 @@ function buildRestoreMap(recs, paperId){
   return map;
 }
 function loadRestore(cb){
+  if(RESTORE_MAP !== null){ cb(); return; }
   RESTORE_MAP = {};
   if(!currentUser){ cb(); return; }
   var base = SCORE_API.replace(/\/submit$/, '');
@@ -231,6 +232,26 @@ function loadRestore(cb){
     cb();
   }).catch(function(){ cb(); });
 }
+window.addEventListener('load', function(){
+  var card = document.getElementById('introCard');
+  if(card && !document.getElementById('verTag')){
+    var v = document.createElement('div');
+    v.id = 'verTag'; v.className = 'hint'; v.style.marginTop = '10px';
+    v.textContent = '版本：2026-11-01 恢復版';
+    card.appendChild(v);
+  }
+  if(currentUser){
+    loadRestore(function(){
+      var n = RESTORE_MAP ? Object.keys(RESTORE_MAP).filter(function(k){ return RESTORE_MAP[k]; }).length : 0;
+      if(n && card){
+        var d = document.createElement('div');
+        d.className = 'hint'; d.style.cssText = 'margin-top:8px;color:#2e7d32;font-weight:bold';
+        d.textContent = '✅ 搵到你今日做過嘅 ' + n + ' 題答案，按「開始模擬考」就會自動填返，唔使重做。';
+        card.appendChild(d);
+      }
+    });
+  }
+});
 function startMock(){
   if(!currentUser){ alert('請先選擇使用者'); return; }
   document.getElementById('introCard').style.display = 'none';
