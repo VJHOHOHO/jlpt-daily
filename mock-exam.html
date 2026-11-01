@@ -314,14 +314,14 @@ function renderQuestions(){
     try {
     block += '<div class="qblock">' + _readBlockM(q, i);
     if(q.img && q.section!=='reading') block += '<div><img src="' + q.img + '" style="max-width:100%"></div>';
-    if(q.audio) block += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
+    if(q.audio) block += '<div><audio controls src="https://jlpt-scores.hoo-c27.workers.dev/audio/' + q.audio + '" style="width:100%"></audio></div>';
     q.options.forEach(function(op, j){
       block += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + optRuby(q, op, true) + '</label>';
     });
     block += '</div>';
     } catch(e) {
       block = '<div class="qblock"><div class="qtext"><b>Q' + (i+1) + '.</b> ' + _starWrap(esc(q.question)).replace(/\n/g,'<br>') + '</div>';
-      if(q.audio) block += '<div><audio controls src="audio/' + q.audio + '" style="width:100%"></audio></div>';
+      if(q.audio) block += '<div><audio controls src="https://jlpt-scores.hoo-c27.workers.dev/audio/' + q.audio + '" style="width:100%"></audio></div>';
       q.options.forEach(function(op, j){
         block += '<label class="opt"><input type="radio" name="q'+i+'" value="'+(j+1)+'" onchange="answerQ('+i+','+(j+1)+')"> ' + esc(op) + '</label>';
       });
