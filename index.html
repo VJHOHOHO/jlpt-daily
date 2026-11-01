@@ -4173,7 +4173,12 @@ function loadQBank(cb){
   if(QBANK){ cb(); return; }
   fetch('question_bank.json').then(function(r){ return r.json(); }).then(function(j){
     QBANK = j.questions || j;
-    cb();
+    // Nihonez N4 成份卷 QA 完成、正式上線（2026-11-01 用戶宣佈）：併入每日練習題池（按 id 去重）
+    fetch('question_bank_nihonez.json').then(function(r){ return r.json(); }).then(function(j2){
+      var seen = {}; QBANK.forEach(function(q){ seen[q.id]=1; });
+      (j2.questions || j2).forEach(function(q){ if(!seen[q.id]) QBANK.push(q); });
+      cb();
+    }).catch(function(){ cb(); });
   }).catch(function(){ setMsg('題庫載入失敗，請檢查網絡。','err'); });
 }
 // 連題感知抽題：抽中一題，同 group 的全部一起出
