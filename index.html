@@ -4052,7 +4052,7 @@ function renderPracticeQuestions(qs, mode){
   qs.forEach(function(q,i){
     html += '<div class="qblock" data-qid="'+q.id+'">' + _readBlockX(q, i, 'esc', false);
     if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%"></div>';
-    if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio></div>';
+    if(q.audio) html += '<div><audio controls src="https://jlpt-scores.hoo-c27.workers.dev/audio/'+q.audio+'" style="width:100%"></audio></div>';
     q.options.forEach(function(op,j){
       html += '<label class="opt"><input type="radio" name="'+mode+'_q'+i+'" value="'+(j+1)+'"> '+optRuby(q, op, false)+'</label>';
     });
@@ -4288,7 +4288,7 @@ function renderDailyQuestions(qs){
     var _skip = getReadingTarget(q.question);
     html += '<div class="qblock" data-qid="'+q.id+'">' + _readBlockX(q, i, 'ruby', true);
     if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
-    if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
+    if(q.audio) html += '<div><audio controls src="https://jlpt-scores.hoo-c27.workers.dev/audio/'+q.audio+'" style="width:100%"></audio><div class="hint">聽完先作答</div></div>';
     q.options.forEach(function(op,j){
       html += '<label class="opt"><input type="radio" name="daily_q'+i+'" value="'+(j+1)+'" onchange="dailyQTimes['+i+'].ans=Date.now();saveDailyQAnswer('+i+','+(j+1)+')"> '+optRuby(q, op, true)+'</label>';
     });
@@ -4441,7 +4441,7 @@ function renderExamSection(){
     var key = sec+'_'+i;
     html += '<div class="qblock">' + _readBlockX(q, i, 'escbr', true);
     if(q.img && q.section!=='reading') html += '<div><img src="'+q.img+'" style="max-width:100%;margin:8px 0"></div>';
-    if(q.audio) html += '<div><audio controls src="audio/'+q.audio+'" style="width:100%"></audio></div>';
+    if(q.audio) html += '<div><audio controls src="https://jlpt-scores.hoo-c27.workers.dev/audio/'+q.audio+'" style="width:100%"></audio></div>';
     // 考試途中唔顯示聽力稿，交卷後先睇
     q.options.forEach(function(op,j){
       var checked = examAnswers[key]===(j+1) ? ' checked' : '';
