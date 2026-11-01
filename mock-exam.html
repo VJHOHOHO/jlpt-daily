@@ -202,7 +202,7 @@ function loadQBank(cb){
   attempt();
 }
 
-var RESTORE_MAP = null;
+var RESTORE_MAP = null, _restoreState = 0, _restoreCbs = [];
 function buildRestoreMap(recs, paperId){
   var latest = {};
   (recs || []).forEach(function(r){
@@ -215,22 +215,32 @@ function buildRestoreMap(recs, paperId){
   return map;
 }
 function loadRestore(cb){
-  if(RESTORE_MAP !== null){ cb(); return; }
+  if(_restoreState === 2){ cb(); return; }
+  _restoreCbs.push(cb);
+  if(_restoreState === 1) return;
+  _restoreState = 1;
+  var finished = false;
+  function done(){
+    if(finished) return; finished = true; _restoreState = 2;
+    var cbs = _restoreCbs; _restoreCbs = [];
+    cbs.forEach(function(f){ try{ f(); }catch(e){} });
+  }
+  setTimeout(done, 6000); // 恢復最多等 6 秒，絕對唔阻考試開始
   RESTORE_MAP = {};
-  if(!currentUser){ cb(); return; }
+  if(!currentUser){ done(); return; }
   var base = SCORE_API.replace(/\/submit$/, '');
   var todayISO = new Date().toISOString().slice(0, 10);
   fetch(base + '/scores?type=mock_final').then(function(r){ return r.json(); }).then(function(finals){
-    var done = (finals || []).some(function(f){ return f.who === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
-    if(done) return null; // 今日已交卷：新一輪唔預填
+    var doneToday = (finals || []).some(function(f){ return f.who === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
+    if(doneToday) return null; // 今日已交卷：新一輪唔預填
     return fetch(base + '/scores?type=mock_answer').then(function(r){ return r.json(); });
   }).then(function(recs){
     if(recs){
       var mine = recs.filter(function(r){ return r.who === currentUser && r.date === todayISO; });
       RESTORE_MAP = buildRestoreMap(mine, PAPER ? PAPER.id : '');
     }
-    cb();
-  }).catch(function(){ cb(); });
+    done();
+  }).catch(function(){ done(); });
 }
 window.addEventListener('load', function(){
   var card = document.getElementById('introCard');
@@ -254,11 +264,12 @@ window.addEventListener('load', function(){
 });
 function startMock(){
   if(!currentUser){ alert('請先選擇使用者'); return; }
-  document.getElementById('introCard').style.display = 'none';
+  var btn = document.querySelector('#introCard .btn');
+  if(btn){ btn.textContent = '載入緊之前的答案…'; btn.disabled = true; }
   secIdx = 0;
   allResults = [];
   if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
-  loadRestore(function(){ startSection(); }); // 先恢復今日已記錄嘅答案（跳頁/斷線都唔怕）
+  loadRestore(function(){ document.getElementById('introCard').style.display = 'none'; startSection(); }); // 先恢復今日已記錄嘅答案（跳頁/斷線都唔怕）
 }
 
 var USER_MIX = {
