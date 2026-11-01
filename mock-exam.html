@@ -460,6 +460,7 @@ function showFinal(){
 
   document.getElementById('breakCard').style.display = 'none';
   document.getElementById('resultCard').style.display = 'block';
+  window.scrollTo(0, 0); // 成績頁一打開就置頂（用戶 2026-11-01 要求）
   if(sheet){
     document.getElementById('scoreSheet').innerHTML = sheetHtml(sheet);
     document.getElementById('finalScore').innerHTML = '答對：' + totalCorrect + ' / ' + totalQ + ' (' + pct + '%)';
