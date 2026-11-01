@@ -332,9 +332,9 @@ if(qs.length && d >= qs.length) done.push(item); else todo.push(item);
 });
 let h = '<div style="font-weight:700;font-size:16px;margin-bottom:6px">📊 完成進度：' + done.length + '／' + (done.length + todo.length) + ' 份完成</div>';
 h += '<div style="margin-bottom:4px"><span style="font-weight:700;color:#2e7d32">✅ 完成區</span></div>';
-h += done.length ? done.map(it=>'<button onclick="gotoPaper(\'' + it.v + '\')" style="margin:2px;padding:6px 10px;border-radius:999px;border:1px solid #2e7d32;background:#e8f5e9;cursor:pointer;font-size:14px">' + esc(it.label) + '（' + it.total + ' 題）✓</button>').join('') : '<span style="color:#888">暫時未有</span>';
+h += done.length ? done.map(it=>'<button onclick="gotoPaper(\'' + it.v + '\')" style="margin:2px;padding:6px 10px;border-radius:999px;border:1px solid #2e7d32;background:#c8e6c9;color:#1b5e20;font-weight:600;cursor:pointer;font-size:14px">' + esc(it.label) + '（' + it.total + ' 題）✓</button>').join('') : '<span style="color:#888">暫時未有</span>';
 h += '<div style="margin:8px 0 4px"><span style="font-weight:700;color:#b26a00">📋 未完成</span></div>';
-h += todo.length ? todo.map(it=>'<button onclick="gotoPaper(\'' + it.v + '\')" style="margin:2px;padding:6px 10px;border-radius:999px;border:1px solid #ccc;background:#fff8e1;cursor:pointer;font-size:14px">' + esc(it.label) + '：已驗 ' + it.done + '／共 ' + it.total + '（仲差 ' + (it.total - it.done) + '）</button>').join('') : '<span style="color:#888">全部完成 🎉</span>';
+h += todo.length ? todo.map(it=>'<button onclick="gotoPaper(\'' + it.v + '\')" style="margin:2px;padding:6px 10px;border-radius:999px;border:1px solid #d7a400;background:#ffecb3;color:#4e342e;font-weight:600;cursor:pointer;font-size:14px">' + esc(it.label) + '：已驗 ' + it.done + '／共 ' + it.total + '（仲差 ' + (it.total - it.done) + '）</button>').join('') : '<span style="color:#888">全部完成 🎉</span>';
 zone.innerHTML = h;
 }
 function gotoPaper(v){
