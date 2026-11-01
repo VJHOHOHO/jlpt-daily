@@ -276,7 +276,7 @@ qNum++;
 const opts = (q.options||[]).map((o,i)=>`<div>${i+1}. ${optRuby(q, o, true)}</div>`).join('');
 const imgHtml = q.img? `<div class="qimg"><img src="${q.img}"></div>`:
 (q.imgs? q.imgs.map(u=>`<div class="qimg"><img src="${u}"></div>`).join(''): '');
-const audioHtml = q.audio? `<div><audio controls src="audio/${q.audio}" style="width:100%"></audio></div>`: '';
+const audioHtml = q.audio? `<div><audio controls src="https://jlpt-scores.hoo-c27.workers.dev/audio/${q.audio}" style="width:100%"></audio></div>`: '';
 const fixedBadge = q.qa_fixed? '<span class="qa-status fixed">已修正</span>': '';
 const stBadge = s==='ok'? '<span class="qa-status ok">✓ 正確</span>':
 s==='wrong'? '<span class="qa-status wrong">✗ 有問題</span>':
