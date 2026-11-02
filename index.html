@@ -536,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261102-v31</div>
+<div class="src" style="opacity:0.5">v20261102-v32</div>
 
 <script>
 var N4SET={};
@@ -3298,6 +3298,25 @@ var SENT_PATTERNS = [
   {name:'義務・禁止・許可', form:'～なければ ならない（必須）；～ては いけない（唔准）；～ても いい（可以）', ex:'例：明日は 早く 起きなければ なりません。'},
   {name:'推測 ～らしい／～ようだ／～みたいだ／～そうだ', form:'普通形＋らしい／ようだ／みたいだ／そうだ（好像…）', ex:'例：明日は 雨が 降りそうです。'}
 ];
+/* 交卷前檢查：句子必須用到當日句型嘅標誌形，先交到（2026-11-02 用戶指示，起因：授受嗰課要用三個形其中一個）。
+   可能形變化太多，唔硬性檢查，靠晚檢把關（null）。 */
+var PATTERN_KEYS = [
+  {forms:'～てあげる／～てくれる／～てもらう', re:/あげ|くれ|もら/},
+  {forms:'受身形 ～れる／～られる', re:/(られ|まれ|かれ|され|たれ|われ|なれ|ばれ|がれ)(る|た|ま|ない|て)/},
+  {forms:'使役形 ～せる／～させる', re:/(させ|ませ|かせ|たせ|わせ|がせ|ばせ|なせ)(る|た|ま|ない|て)/},
+  {forms:'～てしまう／～ておく／～てみる', re:/てしま|でしま|てお|でお|てみ|でみ/},
+  null,
+  {forms:'～たら／～ば／～ても／～なら', re:/たら|だら|れば|なら|ても|でも/},
+  {forms:'使役受身形 ～させられる', re:/(させ|ませ|かせ|たせ|わせ|がせ|ばせ|なせ)られ/},
+  {forms:'～ようになる／～ようにする', re:/ように/},
+  {forms:'～なければならない／～てはいけない／～てもいい', re:/なけれ|なくては|なくちゃ|てはいけ|てはだめ|てはダメ|てもいい|てもかま/},
+  {forms:'～らしい／～ようだ／～みたいだ／～そうだ', re:/らしい|ようだ|みたい|そう/}
+];
+function mustFor(ds){
+  var p = patternFor(ds); if(!p) return null;
+  var m = PATTERN_KEYS[(dayNumOf(ds) - PATTERN_BASE) % SENT_PATTERNS.length];
+  return m ? {name:p.name, forms:m.forms, re:m.re} : null;
+}
 function dayNumOf(ds){ var p = String(ds).split('-'); return Math.floor(Date.UTC(+p[0], +p[1]-1, +p[2]) / 86400000); }
 var PATTERN_BASE = dayNumOf('2026-11-03');
 function patternFor(ds){
@@ -3334,6 +3353,8 @@ function renderHomework(){
         var th = '<div class="word-row" style="font-size:17px"><b>今日句型：</b>' + esc(p.name) + '<br><span style="font-size:15px">' + esc(p.form) + '<br>' + esc(p.ex) + '</span>';
         if(p.teach && p.teach.length){ th += '<div style="font-size:15px;margin-top:8px;line-height:1.7">' + p.teach.map(function(t){ return esc(t); }).join('<br>') + '</div>'; }
         else{ th += '<div style="font-size:15px;margin-top:8px">造句方式：揀一個推薦生字 → 諗清楚「邊個做咩」 → 套入今日句型 → 寫一句完整句子。</div>'; }
+        var mf = mustFor(target);
+        if(mf){ th += '<div style="font-size:15px;margin-top:8px;color:#c22;font-weight:bold">提醒：今日句子一定要用 ' + esc(mf.forms) + ' 其中一個，冇用到係交唔到㗎。</div>'; }
         th += '</div>';
         tp.innerHTML = th;
       }
@@ -3418,6 +3439,8 @@ function submitDaily(){
   var words = rec.map(function(x){ return x.w+'：'+x.m; });
   var sent=$('sent').value.trim();
   if(!sent){ setMsg('造句未填：用上面其中一個推薦生字 + 今日句型作一句。','err'); return; }
+  var must = mustFor(target);
+  if(must && !must.re.test(sent)){ setMsg('今日句型係「' + must.name + '」：句子要用 ' + must.forms + ' 其中一個先交到。你呢句未用到，改好再交。','err'); return; }
 
   var btn=$('submitBtn'); btn.disabled=true; btn.textContent='提交中…';
   setMsg('提交中，請稍候…','');
