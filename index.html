@@ -369,13 +369,10 @@ dy>
 <div class="section-content hidden">
 <div class="card" id="formCard">
   <h2 id="formTitle"><span class="kicon">書</span>今日學習</h2>
-  <div class="hint">左邊寫生字，右邊寫中文意思，兩個都要填</div>
-  <div class="wrow"><span class="wnum">1</span><input type="text" id="w1" placeholder="生字" autocomplete="off"><input type="text" id="m1" placeholder="中文意思" autocomplete="off"></div>
-  <div class="wrow"><span class="wnum">2</span><input type="text" id="w2" placeholder="生字" autocomplete="off"><input type="text" id="m2" placeholder="中文意思" autocomplete="off"></div>
-  <div class="wrow"><span class="wnum">3</span><input type="text" id="w3" placeholder="生字" autocomplete="off"><input type="text" id="m3" placeholder="中文意思" autocomplete="off"></div>
-  <div class="wrow"><span class="wnum">4</span><input type="text" id="w4" placeholder="生字" autocomplete="off"><input type="text" id="m4" placeholder="中文意思" autocomplete="off"></div>
-  <div class="wrow"><span class="wnum">5</span><input type="text" id="w5" placeholder="生字" autocomplete="off"><input type="text" id="m5" placeholder="中文意思" autocomplete="off"></div>
-  <label>造句（選填，唔使交）</label><input type="text" id="sent" autocomplete="off">
+  <div class="hint">今日推薦生字（系統每日派 5 個 N4 生字）：睇一睇，記一記。</div>
+  <div id="recWords"><div class="hint">載入中…</div></div>
+  <div id="todayPattern" style="margin-top:10px"></div>
+  <label>今日造句（必填）：用上面其中一個推薦生字 + 今日句型，作一句完整嘅句子</label><input type="text" id="sent" autocomplete="off">
   <button id="submitBtn">提交</button>
   <div id="assess"></div>
   <div class="msg" id="msg"></div>
@@ -539,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261020-v29</div>
+<div class="src" style="opacity:0.5">v20261102-v30</div>
 
 <script>
 var N4SET={};
@@ -3031,7 +3028,7 @@ function postScore(data){
 var child = null, makeupDate = null, quiz = null;
 /* N4 系統字表（ikuchannel 903 字，學習用） */
 var N4VOCAB = [];
-fetch('n4vocab.json').then(function(r){ return r.json(); }).then(function(d){ N4VOCAB = d || []; buildReadMap(); }).catch(function(){});
+fetch('n4vocab.json').then(function(r){ return r.json(); }).then(function(d){ N4VOCAB = d || []; buildReadMap(); if(typeof renderHomework==='function') renderHomework(); }).catch(function(){});
 /* N5/N3 字表 */
 var N5VOCAB = [], N3VOCAB = [];
 var VERIFIED_R = {};
@@ -3155,7 +3152,7 @@ function pickChild(name){
   loadCorrections();
   $('formTitle').textContent = '今日學習';
   renderMiss(); renderRecall(); renderQuizHist(); renderWeekHist(); loadAnalysis(); renderHist(); renderDailyReview(); renderDailyHist(); renderExamHist(); backDaily(); backExamMock();
-  backQuiz(); backWeekQuiz(); clearForm(); prefillToday();
+  backQuiz(); backWeekQuiz(); clearForm(); prefillToday(); renderHomework();
   setMsg('',''); $('assess').innerHTML='';
   fetchBackendDates();
   fetchDatabase();
@@ -3164,7 +3161,7 @@ function pickChild(name){
 }
 
 function clearForm(){
-  ['w1','w2','w3','w4','w5','m1','m2','m3','m4','m5','sent'].forEach(function(id){ $(id).value=''; });
+  var s = $('sent'); if(s) s.value = '';
 }
 function setMsg(t,cls){ var m=$('msg'); m.textContent=t; m.className='msg '+cls; }
 
@@ -3208,7 +3205,7 @@ function renderMiss(){
 function startMakeup(d){
   makeupDate = d;
   $('formTitle').textContent = '補交 '+d;
-  clearForm(); setMsg('',''); $('assess').innerHTML='';
+  clearForm(); setMsg('',''); $('assess').innerHTML=''; renderHomework();
   $('formCard').scrollIntoView({behavior:'smooth'});
 }
 
@@ -3271,13 +3268,63 @@ function resubmitDaily(ds){
 function prefillToday(){
   var t = findByDate(loadAll(), todayKey());
   if(t){
-    for(var i=0;i<5;i++){
-      var parts = String(t.words[i]||'').split(/[:：]/);
-      $('w'+(i+1)).value = parts[0]||'';
-      $('m'+(i+1)).value = parts.slice(1).join('：')||'';
-    }
     $('sent').value = t.sentence||'';
     setMsg('今日已經提交過，可以修改後再提交。','ok');
+  }
+}
+
+/* ---------- 今日推薦生字＋今日句型（2026-11-02 新制） ----------
+   推薦生字：純粹由（邊個小朋友＋日期）決定，N4 生字表 750 字順序輪派，
+   每日 5 個；許悅 offset 0、許逸 offset 375，兩人唔同。任何時間、任何裝置
+   用同一公式都計得返同一組，方便晚間檢查核對。
+   今日句型：10 個 N4 句型由 2026-11-03 起每日輪換（第 1 課起），
+   2026-11-03 之前係自由作句。10 日一個循環，未掌握嘅下個循環再嚟。 */
+var SENT_PATTERNS = [
+  {name:'授受表現 ～てあげる／～てくれる／～てもらう', form:'我幫人做：～てあげる；人幫我做：～てくれる；請人幫我做：～てもらう', ex:'例：弟に 本を 読んで あげました。'},
+  {name:'受身形 ～れる／～られる', form:'人 は 人 に ～れる／られる（被…）', ex:'例：先生に ほめられました。'},
+  {name:'使役形 ～せる／～させる', form:'人 は 人 に／を ～せる／させる（叫…做）', ex:'例：母は 子どもに 部屋を そうじさせました。'},
+  {name:'～てしまう／～ておく／～てみる', form:'～てしまう（做完／不小心做了）；～ておく（預先做好）；～てみる（試著做）', ex:'例：新しい くつを 買って みました。'},
+  {name:'可能形 ～られる／～える', form:'動詞可能形（讀める、食べられる…）＋ が／を', ex:'例：私は 漢字が 読めます。'},
+  {name:'條件形 ～たら／～ば／～ても／～なら', form:'～たら（如果…就）；～ても（就算…也）；～なら（如果是…的話）', ex:'例：雨が 降ったら、出かけません。'},
+  {name:'使役受身形 ～させられる', form:'人 は ～させられる（被迫做…）', ex:'例：子どもの とき、野菜を 食べさせられました。'},
+  {name:'～ようになる vs ～ようにする', form:'～ようになる（變得會…）；～ようにする（努力做到…）', ex:'例：毎日 練習して、泳げるように なりました。'},
+  {name:'義務・禁止・許可', form:'～なければ ならない（必須）；～ては いけない（唔准）；～ても いい（可以）', ex:'例：明日は 早く 起きなければ なりません。'},
+  {name:'推測 ～らしい／～ようだ／～みたいだ／～そうだ', form:'普通形＋らしい／ようだ／みたいだ／そうだ（好像…）', ex:'例：明日は 雨が 降りそうです。'}
+];
+function dayNumOf(ds){ var p = String(ds).split('-'); return Math.floor(Date.UTC(+p[0], +p[1]-1, +p[2]) / 86400000); }
+var PATTERN_BASE = dayNumOf('2026-11-03');
+function patternFor(ds){
+  var dn = dayNumOf(ds);
+  if(dn < PATTERN_BASE) return null;
+  return SENT_PATTERNS[(dn - PATTERN_BASE) % SENT_PATTERNS.length];
+}
+function recWordsFor(who, ds){
+  if(!N4VOCAB.length) return [];
+  var off = who === '許逸' ? 375 : (who === 'GOBI' ? 100 : 0);
+  var start = ((dayNumOf(ds) * 5 + off) % N4VOCAB.length + N4VOCAB.length) % N4VOCAB.length;
+  var out = [];
+  for(var i = 0; i < 5; i++) out.push(N4VOCAB[(start + i) % N4VOCAB.length]);
+  return out;
+}
+function renderHomework(){
+  var target = makeupDate || todayKey();
+  var rw = $('recWords'), tp = $('todayPattern');
+  if(rw){
+    if(!child){ rw.innerHTML = '<div class="hint">請先揀「我是誰」。</div>'; }
+    else if(!N4VOCAB.length){ rw.innerHTML = '<div class="hint">生字表載入中…</div>'; }
+    else{
+      rw.innerHTML = recWordsFor(child, target).map(function(x, i){
+        return '<div class="word-row" style="font-size:19px"><b>' + (i+1) + '.</b> ' + esc(x.w) + (x.r ? '（' + esc(x.r) + '）' : '') + ' — ' + esc(x.m) + '</div>';
+      }).join('');
+    }
+  }
+  if(tp){
+    if(!child){ tp.innerHTML = ''; }
+    else{
+      var p = patternFor(target);
+      if(!p){ tp.innerHTML = '<div class="hint">今日句型：自由作句（聽日起會有指定句型）。</div>'; }
+      else{ tp.innerHTML = '<div class="word-row" style="font-size:17px"><b>今日句型：</b>' + esc(p.name) + '<br><span style="font-size:15px">' + esc(p.form) + '<br>' + esc(p.ex) + '</span></div>'; }
+    }
   }
 }
 
@@ -3351,20 +3398,16 @@ function loadCorrections(){
 
 /* ---------- 提交 ---------- */
 function submitDaily(){
-  var words=[], ok=true;
-  for(var i=1;i<=5;i++){
-    var w=$('w'+i).value.trim(), m=$('m'+i).value.trim();
-    if(!w){ setMsg('生字 '+i+' 未填。','err'); ok=false; break; }
-    if(!m){ setMsg('生字 '+i+' 嘅中文意思未填。','err'); ok=false; break; }
-    words.push(w+'：'+m);
-  }
-  if(!ok) return;
-  var sent=$('sent').value.trim();
   if(!child){ setMsg('請先揀「我是誰」。','err'); return; }
+  var target = makeupDate || todayKey();
+  var rec = recWordsFor(child, target);
+  if(!rec.length){ setMsg('生字表未載入，請重新整理頁面再試。','err'); return; }
+  var words = rec.map(function(x){ return x.w+'：'+x.m; });
+  var sent=$('sent').value.trim();
+  if(!sent){ setMsg('造句未填：用上面其中一個推薦生字 + 今日句型作一句。','err'); return; }
 
   var btn=$('submitBtn'); btn.disabled=true; btn.textContent='提交中…';
   setMsg('提交中，請稍候…','');
-  var target = makeupDate || todayKey();
   var arr = loadAll().filter(function(e){ return e.date!==target; });
   arr.push({date:target, words:words, sentence:sent});
   saveAll(arr);
@@ -3376,10 +3419,10 @@ function submitDaily(){
     var arr2 = loadAll();
     var rec = findByDate(arr2, target);
     if(rec){ rec.synced = synced; saveAll(arr2); }
-    $('assess').innerHTML = assessWords(words);
+    $('assess').innerHTML = '<div class="msg ok">今日推薦生字：'+esc(words.join('、'))+'</div><div class="hint">今晚會檢查你嘅句子：有冇用推薦生字同今日句型、用得啱唔啱、成句完唔完整。</div>';
     if(synced){
       showPopup(makeupDate?'補交成功！':'已提交！',
-                makeupDate?'已記錄補交。':'今晚會有檢查同複習快問。');
+                makeupDate?'已記錄補交。':'今晚會檢查你嘅句子。');
       setMsg(makeupDate?'補交成功。':'已提交。','ok');
     }else{
       showPopup('已記錄', '已喺本機記錄，但同步失敗，請再提交一次。');
