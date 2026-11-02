@@ -536,7 +536,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261102-v30</div>
+<div class="src" style="opacity:0.5">v20261102-v31</div>
 
 <script>
 var N4SET={};
@@ -3122,6 +3122,7 @@ $('todayStr').textContent = todayKey();
 
 function pickChild(name){
   child = name; makeupDate = null;
+  try{ if(name==='許悅' || name==='許逸') localStorage.setItem('jlpt_child_v1', name); }catch(e){}
   // GOBI 驗證區標示
   var gobiBanner = $('gobiBanner');
   if(name==='GOBI'){
@@ -3144,6 +3145,7 @@ function pickChild(name){
   $('btnGobi').className = 'testbtn' + (name==='GOBI' ? ' active' : '');
   ['missCard','recallCard','quizCard','weekCard','randCard','fullCard','dailyCard','examCard','flashCard','anaCard','mockCard','corrCard','formCard','histCard'].forEach(function(id){ var el=$(id); if(el) el.style.display='block'; });
   document.querySelectorAll('.main-section').forEach(function(el){ el.style.display='block'; });
+  renderHomework(); /* 提早渲染作業卡，唔好等成串 render 先出（2026-11-02 用戶實測生字唔顯示） */
   if(name==='GOBI'){
     fetchGobiPool();
     $('missCard').style.display='none';
@@ -3280,7 +3282,12 @@ function prefillToday(){
    今日句型：10 個 N4 句型由 2026-11-03 起每日輪換（第 1 課起），
    2026-11-03 之前係自由作句。10 日一個循環，未掌握嘅下個循環再嚟。 */
 var SENT_PATTERNS = [
-  {name:'授受表現 ～てあげる／～てくれる／～てもらう', form:'我幫人做：～てあげる；人幫我做：～てくれる；請人幫我做：～てもらう', ex:'例：弟に 本を 読んで あげました。'},
+  {name:'授受表現 ～てあげる／～てくれる／～てもらう', form:'我幫人做：～てあげる；人幫我做：～てくれる；請人幫我做：～てもらう', ex:'例：弟に 本を 読んで あげました。',
+   teach:['造句方式：授受表現最緊要睇「邊個幫邊個做」——',
+     '① ～てあげる＝我（方）幫人做。例：私は 妹に 本を 読んで あげました。（我讀書畀妹妹聽）',
+     '② ～てくれる＝人哋幫我（方）做。例：母は 私に ケーキを 作って くれました。（媽媽整蛋糕畀我）',
+     '③ ～てもらう＝我請人哋幫我做。例：私は 先生に 作文を 見て もらいました。（我請老師幫我睇作文）',
+     '作句步驟：揀一個推薦生字 → 諗清楚邊個幫邊個做咩 → 按方向揀①②③ → 寫齊成句：邊個 は／が ＋ 邊個 に ＋ 咩 を ＋ 動詞て形 ＋ あげる／くれる／もらう。']},
   {name:'受身形 ～れる／～られる', form:'人 は 人 に ～れる／られる（被…）', ex:'例：先生に ほめられました。'},
   {name:'使役形 ～せる／～させる', form:'人 は 人 に／を ～せる／させる（叫…做）', ex:'例：母は 子どもに 部屋を そうじさせました。'},
   {name:'～てしまう／～ておく／～てみる', form:'～てしまう（做完／不小心做了）；～ておく（預先做好）；～てみる（試著做）', ex:'例：新しい くつを 買って みました。'},
@@ -3310,7 +3317,7 @@ function renderHomework(){
   var target = makeupDate || todayKey();
   var rw = $('recWords'), tp = $('todayPattern');
   if(rw){
-    if(!child){ rw.innerHTML = '<div class="hint">請先揀「我是誰」。</div>'; }
+    if(!child){ rw.innerHTML = '<div class="hint">請先揀邊個做（撳下面個名，生字即刻出）：</div><div style="margin:8px 0"><button class="btn2" onclick="pickChild(\'許悅\')">許悅</button> <button class="btn2" onclick="pickChild(\'許逸\')">許逸</button></div>'; }
     else if(!N4VOCAB.length){ rw.innerHTML = '<div class="hint">生字表載入中…</div>'; }
     else{
       rw.innerHTML = recWordsFor(child, target).map(function(x, i){
@@ -3322,8 +3329,14 @@ function renderHomework(){
     if(!child){ tp.innerHTML = ''; }
     else{
       var p = patternFor(target);
-      if(!p){ tp.innerHTML = '<div class="hint">今日句型：自由作句（聽日起會有指定句型）。</div>'; }
-      else{ tp.innerHTML = '<div class="word-row" style="font-size:17px"><b>今日句型：</b>' + esc(p.name) + '<br><span style="font-size:15px">' + esc(p.form) + '<br>' + esc(p.ex) + '</span></div>'; }
+      if(!p){ tp.innerHTML = '<div class="hint">今日句型：自由作句（聽日起會有指定句型）。造句方式：揀一個推薦生字，諗清楚想講咩，寫一句完整句子。</div>'; }
+      else{
+        var th = '<div class="word-row" style="font-size:17px"><b>今日句型：</b>' + esc(p.name) + '<br><span style="font-size:15px">' + esc(p.form) + '<br>' + esc(p.ex) + '</span>';
+        if(p.teach && p.teach.length){ th += '<div style="font-size:15px;margin-top:8px;line-height:1.7">' + p.teach.map(function(t){ return esc(t); }).join('<br>') + '</div>'; }
+        else{ th += '<div style="font-size:15px;margin-top:8px">造句方式：揀一個推薦生字 → 諗清楚「邊個做咩」 → 套入今日句型 → 寫一句完整句子。</div>'; }
+        th += '</div>';
+        tp.innerHTML = th;
+      }
     }
   }
 }
@@ -4586,6 +4599,9 @@ function autoSaveHomework(changedField){
 }
 // 綁定輸入事件
 var _hwTimer = {};
+window.addEventListener('load', function(){
+  try{ var saved = localStorage.getItem('jlpt_child_v1'); if(saved && !child) pickChild(saved); }catch(e){}
+});
 document.addEventListener('DOMContentLoaded', function(){
   function bindHw(id){
     var el = document.getElementById(id);
