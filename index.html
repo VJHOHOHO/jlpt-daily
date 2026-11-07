@@ -538,7 +538,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261107-v33</div>
+<div class="src" style="opacity:0.5">v20261107-v34</div>
 
 <script>
 var N4SET={};
@@ -4534,6 +4534,29 @@ function renderDailyHist(){
    當機／跳出／重開頁面之後，入返嚟撳綠色掣就載返同一份題，已答自動填返，未答繼續做。
    平日練習另外有後台後備：本機紀錄唔見咗，都可以憑後台今日逐題答案重建（已答填返＋新題補足到 15 題）。 */
 var _dailyResuming = false;
+/* 後台場次紀錄（v34 補強）：本機 localStorage 萬一俾瀏覽器清走（或換機），
+   都可以憑後台場次紀錄重建——同模擬卷繼續掣同一原理。直送 /submit，唔經 postScore 備份，避免備份膨脹，失敗重試一次。 */
+function postSession(type, dateStr2, obj){
+  if(!child) return;
+  var payload = {type: type, who: child, date: dateStr2, key: 'session', answer: JSON.stringify(obj)};
+  var tries = 0;
+  function attempt(){
+    tries++;
+    fetch(SCORE_API, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)}).catch(function(){
+      if(tries < 2) setTimeout(attempt, 2000);
+    });
+  }
+  attempt();
+}
+function latestSession(recs, wantDate){
+  var best = null;
+  (recs || []).forEach(function(r){
+    if(r.key === 'session' && r.date === wantDate && (!best || (r.submittedAt || 0) >= (best.submittedAt || 0))) best = r;
+  });
+  if(!best) return null;
+  try{ var o = JSON.parse(best.answer); if(o && !o.done) return o; }catch(e){}
+  return null;
+}
 function dailyProgKey(){ return 'jlpt_daily_progress_' + child; }
 function loadDailyProgress(){
   if(!child) return null;
@@ -4546,19 +4569,25 @@ function loadDailyProgress(){
 function saveDailyProgressFresh(qs){
   if(!child) return;
   try{ localStorage.setItem(dailyProgKey(), JSON.stringify({date: todayKey(), qs: qs, answers: {}, savedAt: Date.now()})); }catch(e){}
+  postSession('daily_session', todayKey(), {ids: qs.map(function(q){ return q.id; }), ansById: {}});
   if(typeof refreshDailyResumeBtn === 'function') refreshDailyResumeBtn();
 }
 function noteDailyProgressAnswer(i, val){
   var p = loadDailyProgress(); if(!p) return;
   p.answers = p.answers || {}; p.answers[i] = val; p.savedAt = Date.now();
   try{ localStorage.setItem(dailyProgKey(), JSON.stringify(p)); }catch(e){}
+  var ansById = {};
+  Object.keys(p.answers).forEach(function(k){ var q = p.qs[Number(k)]; if(q && q.id) ansById[q.id] = p.answers[k]; });
+  postSession('daily_session', todayKey(), {ids: p.qs.map(function(q){ return q.id; }), ansById: ansById});
 }
 function clearDailyProgress(){
   if(!child) return;
   try{ localStorage.removeItem(dailyProgKey()); }catch(e){}
+  postSession('daily_session', todayKey(), {done: true});
+  _dailyBackendMap = null; _dailyBackendSession = null;
   if(typeof refreshDailyResumeBtn === 'function') refreshDailyResumeBtn();
 }
-var _dailyBackendMap = null, _dailyBackendFor = '';
+var _dailyBackendMap = null, _dailyBackendFor = '', _dailyBackendSession = null;
 function refreshDailyResumeBtn(){
   var w = $('dailyResumeWrap'); if(!w) return;
   if(!child){ w.innerHTML = ''; return; }
@@ -4573,17 +4602,21 @@ function refreshDailyResumeBtn(){
   checkDailyBackendResume();
 }
 function checkDailyBackendResume(){
-  if(!child || child === 'GOBI') return;
+  if(!child) return;
   try{ var ds = JSON.parse(localStorage.getItem('daily_scores') || '{}'); if(ds[child + '_' + todayKey()]) return; }catch(e){}
   if(_dailyBackendFor === child){
-    if(_dailyBackendMap && Object.keys(_dailyBackendMap).length) showDailyBackendResumeBtn();
+    showDailyBackendResumeBtn();
     return;
   }
   _dailyBackendFor = child;
+  fetch(WORKER_API + '/scores?type=daily_session&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
+    _dailyBackendSession = latestSession(recs, todayKey());
+    showDailyBackendResumeBtn();
+  }).catch(function(){});
   fetch(WORKER_API + '/scores?type=daily20_answer&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
     var latest = {};
     (recs || []).forEach(function(r){
-      if(r.date === todayKey() && r.key && (!latest[r.key] || (r.submittedAt || 0) >= (latest[r.key].submittedAt || 0))) latest[r.key] = r;
+      if(r.date === todayKey() && r.key && r.key !== 'session' && (!latest[r.key] || (r.submittedAt || 0) >= (latest[r.key].submittedAt || 0))) latest[r.key] = r;
     });
     _dailyBackendMap = latest;
     showDailyBackendResumeBtn();
@@ -4591,6 +4624,12 @@ function checkDailyBackendResume(){
 }
 function showDailyBackendResumeBtn(){
   var w = $('dailyResumeWrap'); if(!w || loadDailyProgress()) return;
+  if(_dailyBackendSession && _dailyBackendSession.ids && _dailyBackendSession.ids.length){
+    var na = Object.keys(_dailyBackendSession.ansById || {}).length;
+    w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 喺後台搵到你今日未做完嘅練習（已答 ' + na + ' / ' + _dailyBackendSession.ids.length + ' 題），撳下面繼續，之前嘅答案會自動填返。</div>'
+      + '<button class="btn" style="background:#2e7d32;color:#fff;margin-top:6px" onclick="resumeDailyFromBackend()">↩️ 繼續今日練習（載入之前的答案）</button>';
+    return;
+  }
   var n = _dailyBackendMap ? Object.keys(_dailyBackendMap).length : 0;
   if(!n) return;
   w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 喺後台搵到你今日答過嘅 ' + n + ' 題，撳下面繼續，之前嘅答案會自動填返。</div>'
@@ -4615,13 +4654,21 @@ function resumeDailyPractice(){
   $('dailyCard').scrollIntoView({behavior: 'smooth'});
 }
 function resumeDailyFromBackend(){
-  if(!_dailyBackendMap) return;
+  if(!_dailyBackendMap && !_dailyBackendSession) return;
   loadQBank(function(){
     var byId = {}; QBANK.forEach(function(q){ byId[q.id] = q; });
     var qs = [], answers = {};
-    Object.keys(_dailyBackendMap).forEach(function(id){
-      if(byId[id]){ answers[qs.length] = Number(_dailyBackendMap[id].answer); qs.push(byId[id]); }
-    });
+    if(_dailyBackendSession && _dailyBackendSession.ids && _dailyBackendSession.ids.length){
+      var ansById = _dailyBackendSession.ansById || {};
+      _dailyBackendSession.ids.forEach(function(id){
+        if(byId[id]){ if(ansById[id] !== undefined) answers[qs.length] = Number(ansById[id]); qs.push(byId[id]); }
+      });
+    }
+    if(!qs.length && _dailyBackendMap){
+      Object.keys(_dailyBackendMap).forEach(function(id){
+        if(byId[id]){ answers[qs.length] = Number(_dailyBackendMap[id].answer); qs.push(byId[id]); }
+      });
+    }
     if(!qs.length){ setMsg('後台未有今日答案可載入。', 'err'); return; }
     if(qs.length < 15){
       var used = {}; qs.forEach(function(q){ used[q.id] = 1; });
@@ -4648,23 +4695,56 @@ function loadWeekProgress(){
 function saveWeekProgress(){
   if(!child || typeof wq === 'undefined' || !wq || !wq.qs) return;
   try{ localStorage.setItem(weekProgKey(), JSON.stringify({wk: wq.wk, qs: wq.qs, idx: wq.idx, s: wq.s, wrong: wq.wrong, savedAt: Date.now()})); }catch(e){}
+  postSession('week_session', wq.wk, {qs: wq.qs, idx: wq.idx, s: wq.s, wrong: wq.wrong});
   if(typeof refreshWeekResumeBtn === 'function') refreshWeekResumeBtn();
 }
 function clearWeekProgress(){
   if(!child) return;
   try{ localStorage.removeItem(weekProgKey()); }catch(e){}
+  postSession('week_session', weekKey(), {done: true});
+  _weekBackendSession = null;
   if(typeof refreshWeekResumeBtn === 'function') refreshWeekResumeBtn();
 }
+var _weekBackendSession = null, _weekBackendFor = '';
 function refreshWeekResumeBtn(){
   var w = $('weekResumeWrap'); if(!w) return;
   if(!child){ w.innerHTML = ''; return; }
   var rec = loadWeekRec();
   if(rec[weekKey()]){ w.innerHTML = ''; return; }
   var p = loadWeekProgress();
-  if(!p){ w.innerHTML = ''; return; }
+  if(!p){ w.innerHTML = ''; checkWeekBackendResume(); return; }
   var doneN = p.qs.filter(function(q){ return q.userAns !== undefined && q.userAns !== null; }).length;
   w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 搵到你今週未做完嘅大測驗（已答 ' + doneN + ' / ' + p.qs.length + ' 題），撳下面繼續。</div>'
     + '<button class="btn" style="background:#2e7d32;color:#fff;margin-top:6px" onclick="resumeWeekQuiz()">↩️ 繼續本週大測驗</button>';
+}
+function checkWeekBackendResume(){
+  if(!child) return;
+  var wk = weekKey();
+  if(_weekBackendFor === child + '_' + wk){
+    showWeekBackendResumeBtn();
+    return;
+  }
+  _weekBackendFor = child + '_' + wk;
+  fetch(WORKER_API + '/scores?type=week_session&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
+    _weekBackendSession = latestSession(recs, wk);
+    showWeekBackendResumeBtn();
+  }).catch(function(){});
+}
+function showWeekBackendResumeBtn(){
+  var w = $('weekResumeWrap'); if(!w || loadWeekProgress()) return;
+  var rec = loadWeekRec();
+  if(rec[weekKey()]) return;
+  var s = _weekBackendSession;
+  if(!s || !s.qs || !s.qs.length) return;
+  var doneN = s.qs.filter(function(q){ return q.userAns !== undefined && q.userAns !== null; }).length;
+  w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 喺後台搵到你今週未做完嘅大測驗（已答 ' + doneN + ' / ' + s.qs.length + ' 題），撳下面繼續。</div>'
+    + '<button class="btn" style="background:#2e7d32;color:#fff;margin-top:6px" onclick="resumeWeekFromBackend()">↩️ 繼續本週大測驗</button>';
+}
+function resumeWeekFromBackend(){
+  var s = _weekBackendSession;
+  if(!s || !s.qs) return;
+  try{ localStorage.setItem(weekProgKey(), JSON.stringify({wk: weekKey(), qs: s.qs, idx: s.idx || 0, s: s.s, wrong: s.wrong || [], savedAt: Date.now()})); }catch(e){}
+  resumeWeekQuiz();
 }
 function resumeWeekQuiz(){
   var p = loadWeekProgress();
