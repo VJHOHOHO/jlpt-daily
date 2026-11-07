@@ -358,6 +358,7 @@ dy>
     </div>
     <div id="dailyReview"></div>
     <button class="btn2" onclick="startDailyPractice()">開始今日練習</button>
+    <div id="dailyResumeWrap"></div>
     <div id="dailyHist"></div>
   </div>
   <div id="dailyBody" style="display:none"></div>
@@ -424,6 +425,7 @@ dy>
   <div id="weekIntro">
     <div class="hint">語彙 8 題＋文法 8 題＋讀解 4 題＋複習 5 題，每星期做一次，成績會交去做每週分析。</div>
     <button class="btn2" onclick="startWeekQuiz()">開始測驗</button>
+    <div id="weekResumeWrap"></div>
     <div id="weekHist"></div>
   </div>
   <div id="weekBody" style="display:none"></div>
@@ -536,7 +538,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261102-v32</div>
+<div class="src" style="opacity:0.5">v20261107-v33</div>
 
 <script>
 var N4SET={};
@@ -4030,6 +4032,7 @@ used[p.w]=1; q.sec='複習'; revQs.push(q);
 }
 revQs.forEach(function(q){ qs.push(q);});
 wq={qs:qs,idx:0,wk:wk,s:{'語彙':0,'文法':0,'讀解':0,'複習':0},wrong:[]};
+if(typeof saveWeekProgress==='function') saveWeekProgress();
 renderWeekQ();
 }
 function renderWeekQ(){
@@ -4055,6 +4058,7 @@ btns[i].classList.add('no');
 btns.forEach(function(b,bi){ if(q.opts[bi]===q.ans) b.classList.add('ok');});
 wq.wrong.push(''+q.q+' → '+q.ans);
 }
+if(typeof saveWeekProgress==='function') saveWeekProgress();
 var nb=document.createElement('button'); nb.className='btn2';
 if(wq.idx<wq.qs.length-1){
   nb.textContent='下一題'; nb.onclick=nextWeekQ; $('weekBody').appendChild(nb);
@@ -4063,8 +4067,9 @@ if(wq.idx<wq.qs.length-1){
   setTimeout(nextWeekQ, 1500);
 }
 }
-function nextWeekQ(){ wq.idx++; if(wq.idx>=wq.qs.length) endWeekQuiz(); else renderWeekQ();}
+function nextWeekQ(){ wq.idx++; if(wq.idx>=wq.qs.length) endWeekQuiz(); else { if(typeof saveWeekProgress==='function') saveWeekProgress(); renderWeekQ(); } }
 function endWeekQuiz(){
+if(typeof clearWeekProgress==='function') clearWeekProgress();
 var s=wq.s, total=s['語彙']+s['文法']+s['讀解']+s['複習'];
 saveWeekRec(wq.wk,{total:total+'/25',s:s,wrong:wq.wrong.join(' ／ ')||'全部啱'});
 var p=new URLSearchParams();
@@ -4094,7 +4099,7 @@ $('weekBody').innerHTML='<div class="q-score">本週得分：'+total+' / 25</div
 '<div class="msg '+c[1]+'">'+c[0]+'</div>'+review+'<div style="text-align:center"><button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
 renderWeekHist();
 }
-function backWeekQuiz(){ $('weekBody').style.display='none'; $('weekIntro').style.display='block';}
+function backWeekQuiz(){ $('weekBody').style.display='none'; $('weekIntro').style.display='block'; if(typeof refreshWeekResumeBtn==='function') refreshWeekResumeBtn(); }
 function redoWeekQuiz(){ var wk=weekKey(), rec=loadWeekRec(); delete rec[wk]; localStorage.setItem(weekQuizKey(),JSON.stringify(rec)); startWeekQuiz(); }
 function renderWeekHist(){
 var rec=loadWeekRec(), keys=Object.keys(rec).sort().reverse().slice(0,4);
@@ -4385,6 +4390,7 @@ function renderDailyQuestions(qs){
   html += '<button class="btn" onclick="backDaily()">返回</button>';
   $('dailyBody').innerHTML = html;
   $('dailyBody').dataset.questions = JSON.stringify(qs);
+  if(typeof saveDailyProgressFresh==='function' && !_dailyResuming) saveDailyProgressFresh(qs);
 }
 function saveDailyQAnswer(i, val){
   try{
@@ -4392,6 +4398,7 @@ function saveDailyQAnswer(i, val){
     var q = qs[i];
     if(q && q.id) saveQuizAnswer('daily20', q.id, val);
   }catch(e){}
+  if(typeof noteDailyProgressAnswer==='function') noteDailyProgressAnswer(i, val);
 }
 function secName(s){ return {vocab:'語彙',grammar:'文法',reading:'讀解',listening:'聽解'}[s]||s; }
 function submitDailyPractice(){
@@ -4428,6 +4435,7 @@ function submitDailyPractice(){
   summary += wrongQs.length ? '<div class="hint">錯咗 '+wrongQs.length+' 題，已記錄，聽日會先複習呢啲錯題。</div>' : '<div class="ok">全部答對，好叻！</div>';
   $('dailyBody').innerHTML = summary + $('dailyBody').innerHTML;
   renderDailyHist();
+  if(typeof clearDailyProgress==='function') clearDailyProgress();
 }
 function saveDailyWrong(wrongQs){
   if(!child || !wrongQs.length) return;
@@ -4509,6 +4517,7 @@ function applyUnifiedWrongReview(recs){
 function backDaily(){
   $('dailyBody').style.display='none'; $('dailyIntro').style.display='block';
   renderDailyReview(); renderDailyHist();
+  if(typeof refreshDailyResumeBtn==='function') refreshDailyResumeBtn();
 }
 function renderDailyHist(){
   var rec = JSON.parse(localStorage.getItem('daily_wrong')||'{}');
@@ -4518,6 +4527,154 @@ function renderDailyHist(){
     ? '<div class="hint" style="margin-top:10px">錯題記錄：</div>'+keys.map(function(k){
         return '<div class="recall-empty">'+esc(k)+'：錯 '+mine[k].length+' 題</div>';
       }).join('') : '';
+}
+
+/* ---------- 繼續作答：平日練習＋大測驗（2026-11-07 用戶要求，比照模擬卷繼續掣） ---------- */
+/* 原理：開始嗰陣將成份題目（連選項次序）即時存入 localStorage，逐題作答即時更新；
+   當機／跳出／重開頁面之後，入返嚟撳綠色掣就載返同一份題，已答自動填返，未答繼續做。
+   平日練習另外有後台後備：本機紀錄唔見咗，都可以憑後台今日逐題答案重建（已答填返＋新題補足到 15 題）。 */
+var _dailyResuming = false;
+function dailyProgKey(){ return 'jlpt_daily_progress_' + child; }
+function loadDailyProgress(){
+  if(!child) return null;
+  try{
+    var p = JSON.parse(localStorage.getItem(dailyProgKey()) || 'null');
+    if(p && p.date === todayKey() && p.qs && p.qs.length) return p;
+  }catch(e){}
+  return null;
+}
+function saveDailyProgressFresh(qs){
+  if(!child) return;
+  try{ localStorage.setItem(dailyProgKey(), JSON.stringify({date: todayKey(), qs: qs, answers: {}, savedAt: Date.now()})); }catch(e){}
+  if(typeof refreshDailyResumeBtn === 'function') refreshDailyResumeBtn();
+}
+function noteDailyProgressAnswer(i, val){
+  var p = loadDailyProgress(); if(!p) return;
+  p.answers = p.answers || {}; p.answers[i] = val; p.savedAt = Date.now();
+  try{ localStorage.setItem(dailyProgKey(), JSON.stringify(p)); }catch(e){}
+}
+function clearDailyProgress(){
+  if(!child) return;
+  try{ localStorage.removeItem(dailyProgKey()); }catch(e){}
+  if(typeof refreshDailyResumeBtn === 'function') refreshDailyResumeBtn();
+}
+var _dailyBackendMap = null, _dailyBackendFor = '';
+function refreshDailyResumeBtn(){
+  var w = $('dailyResumeWrap'); if(!w) return;
+  if(!child){ w.innerHTML = ''; return; }
+  var p = loadDailyProgress();
+  if(p){
+    var n = Object.keys(p.answers || {}).length;
+    w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 搵到你今日未做完嘅練習（已答 ' + n + ' / ' + p.qs.length + ' 題），撳下面繼續，唔使重做。</div>'
+      + '<button class="btn" style="background:#2e7d32;color:#fff;margin-top:6px" onclick="resumeDailyPractice()">↩️ 繼續今日練習（載入之前的答案）</button>';
+    return;
+  }
+  w.innerHTML = '';
+  checkDailyBackendResume();
+}
+function checkDailyBackendResume(){
+  if(!child || child === 'GOBI') return;
+  try{ var ds = JSON.parse(localStorage.getItem('daily_scores') || '{}'); if(ds[child + '_' + todayKey()]) return; }catch(e){}
+  if(_dailyBackendFor === child){
+    if(_dailyBackendMap && Object.keys(_dailyBackendMap).length) showDailyBackendResumeBtn();
+    return;
+  }
+  _dailyBackendFor = child;
+  fetch(WORKER_API + '/scores?type=daily20_answer&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
+    var latest = {};
+    (recs || []).forEach(function(r){
+      if(r.date === todayKey() && r.key && (!latest[r.key] || (r.submittedAt || 0) >= (latest[r.key].submittedAt || 0))) latest[r.key] = r;
+    });
+    _dailyBackendMap = latest;
+    showDailyBackendResumeBtn();
+  }).catch(function(){});
+}
+function showDailyBackendResumeBtn(){
+  var w = $('dailyResumeWrap'); if(!w || loadDailyProgress()) return;
+  var n = _dailyBackendMap ? Object.keys(_dailyBackendMap).length : 0;
+  if(!n) return;
+  w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 喺後台搵到你今日答過嘅 ' + n + ' 題，撳下面繼續，之前嘅答案會自動填返。</div>'
+    + '<button class="btn" style="background:#2e7d32;color:#fff;margin-top:6px" onclick="resumeDailyFromBackend()">↩️ 繼續今日練習（載入後台答案）</button>';
+}
+function resumeDailyPractice(){
+  var p = loadDailyProgress();
+  if(!p){ setMsg('搵唔到未完成嘅練習紀錄。', 'err'); return; }
+  _dailyResuming = true;
+  renderDailyQuestions(p.qs);
+  _dailyResuming = false;
+  var ans = p.answers || {}, n = 0;
+  Object.keys(ans).forEach(function(k){
+    var i = Number(k);
+    var el = document.querySelector('input[name="daily_q' + i + '"][value="' + ans[k] + '"]');
+    if(el){ el.checked = true; n++; if(dailyQTimes[i]) dailyQTimes[i].ans = dailyQTimes[i].start + 10000; }
+  });
+  var note = document.createElement('div');
+  note.className = 'hint'; note.style.cssText = 'color:#2e7d32;font-weight:bold';
+  note.textContent = '已恢復之前的答案 ' + n + ' / ' + p.qs.length + ' 題，唔使重做，繼續答埋未答嘅就得。';
+  $('dailyBody').insertBefore(note, $('dailyBody').firstChild);
+  $('dailyCard').scrollIntoView({behavior: 'smooth'});
+}
+function resumeDailyFromBackend(){
+  if(!_dailyBackendMap) return;
+  loadQBank(function(){
+    var byId = {}; QBANK.forEach(function(q){ byId[q.id] = q; });
+    var qs = [], answers = {};
+    Object.keys(_dailyBackendMap).forEach(function(id){
+      if(byId[id]){ answers[qs.length] = Number(_dailyBackendMap[id].answer); qs.push(byId[id]); }
+    });
+    if(!qs.length){ setMsg('後台未有今日答案可載入。', 'err'); return; }
+    if(qs.length < 15){
+      var used = {}; qs.forEach(function(q){ used[q.id] = 1; });
+      var pool = QBANK.filter(function(q){ return !used[q.id] && !q.needs_image && !q.audio_issue; });
+      var includeListening = $('includeListening') ? $('includeListening').checked : true;
+      if(!includeListening) pool = pool.filter(function(q){ return q.section !== 'listening'; });
+      pickGroupAware(pool, 15 - qs.length).forEach(function(q){ if(qs.length < 15) qs.push(q); });
+    }
+    try{ localStorage.setItem(dailyProgKey(), JSON.stringify({date: todayKey(), qs: qs, answers: answers, savedAt: Date.now()})); }catch(e){}
+    resumeDailyPractice();
+  });
+}
+/* 大測驗：逐題作答嗰陣將成個 wq（題目＋選項次序＋分數＋進度）存入 localStorage；
+   當機返嚟撳掣，跳返去未答嗰題繼續，之前嘅分唔會唔見。 */
+function weekProgKey(){ return 'jlpt_week_progress_' + child; }
+function loadWeekProgress(){
+  if(!child) return null;
+  try{
+    var p = JSON.parse(localStorage.getItem(weekProgKey()) || 'null');
+    if(p && p.wk === weekKey() && p.qs && p.qs.length && p.idx < p.qs.length) return p;
+  }catch(e){}
+  return null;
+}
+function saveWeekProgress(){
+  if(!child || typeof wq === 'undefined' || !wq || !wq.qs) return;
+  try{ localStorage.setItem(weekProgKey(), JSON.stringify({wk: wq.wk, qs: wq.qs, idx: wq.idx, s: wq.s, wrong: wq.wrong, savedAt: Date.now()})); }catch(e){}
+  if(typeof refreshWeekResumeBtn === 'function') refreshWeekResumeBtn();
+}
+function clearWeekProgress(){
+  if(!child) return;
+  try{ localStorage.removeItem(weekProgKey()); }catch(e){}
+  if(typeof refreshWeekResumeBtn === 'function') refreshWeekResumeBtn();
+}
+function refreshWeekResumeBtn(){
+  var w = $('weekResumeWrap'); if(!w) return;
+  if(!child){ w.innerHTML = ''; return; }
+  var rec = loadWeekRec();
+  if(rec[weekKey()]){ w.innerHTML = ''; return; }
+  var p = loadWeekProgress();
+  if(!p){ w.innerHTML = ''; return; }
+  var doneN = p.qs.filter(function(q){ return q.userAns !== undefined && q.userAns !== null; }).length;
+  w.innerHTML = '<div class="hint" style="color:#2e7d32;font-weight:bold;margin-top:8px">✅ 搵到你今週未做完嘅大測驗（已答 ' + doneN + ' / ' + p.qs.length + ' 題），撳下面繼續。</div>'
+    + '<button class="btn" style="background:#2e7d32;color:#fff;margin-top:6px" onclick="resumeWeekQuiz()">↩️ 繼續本週大測驗</button>';
+}
+function resumeWeekQuiz(){
+  var p = loadWeekProgress();
+  if(!p) return;
+  wq = {qs: p.qs, idx: p.idx, wk: p.wk, s: p.s, wrong: p.wrong};
+  while(wq.idx < wq.qs.length && wq.qs[wq.idx].userAns !== undefined && wq.qs[wq.idx].userAns !== null) wq.idx++;
+  if(wq.idx >= wq.qs.length){ endWeekQuiz(); return; }
+  $('weekIntro').style.display = 'none'; $('weekBody').style.display = 'block';
+  renderWeekQ();
+  $('weekCard').scrollIntoView({behavior: 'smooth'});
 }
 
 /* ---------- 假日模擬考 ---------- */
