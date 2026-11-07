@@ -538,7 +538,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261107-v34</div>
+<div class="src" style="opacity:0.5">v20261107-v35</div>
 
 <script>
 var N4SET={};
@@ -3162,6 +3162,7 @@ function pickChild(name){
   fetchDatabase();
   updateProgressRings();
   updateScopeCard();
+  if(typeof refreshResumeButtonsSafe === 'function') refreshResumeButtonsSafe();
 }
 
 function clearForm(){
@@ -4603,17 +4604,20 @@ function refreshDailyResumeBtn(){
 }
 function checkDailyBackendResume(){
   if(!child) return;
-  try{ var ds = JSON.parse(localStorage.getItem('daily_scores') || '{}'); if(ds[child + '_' + todayKey()]) return; }catch(e){}
   if(_dailyBackendFor === child){
     showDailyBackendResumeBtn();
     return;
   }
   _dailyBackendFor = child;
+  /* 場次紀錄優先：交咗卷會寫入 done 標記，所以有未完成場次就一定未交卷，唔使再理本機分數紀錄 */
   fetch(WORKER_API + '/scores?type=daily_session&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
     _dailyBackendSession = latestSession(recs, todayKey());
     showDailyBackendResumeBtn();
   }).catch(function(){});
   fetch(WORKER_API + '/scores?type=daily20_answer&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
+    var submittedToday = false;
+    try{ var ds = JSON.parse(localStorage.getItem('daily_scores') || '{}'); if(ds[child + '_' + todayKey()]) submittedToday = true; }catch(e){}
+    if(submittedToday){ _dailyBackendMap = null; showDailyBackendResumeBtn(); return; }
     var latest = {};
     (recs || []).forEach(function(r){
       if(r.date === todayKey() && r.key && r.key !== 'session' && (!latest[r.key] || (r.submittedAt || 0) >= (latest[r.key].submittedAt || 0))) latest[r.key] = r;
@@ -4709,8 +4713,6 @@ var _weekBackendSession = null, _weekBackendFor = '';
 function refreshWeekResumeBtn(){
   var w = $('weekResumeWrap'); if(!w) return;
   if(!child){ w.innerHTML = ''; return; }
-  var rec = loadWeekRec();
-  if(rec[weekKey()]){ w.innerHTML = ''; return; }
   var p = loadWeekProgress();
   if(!p){ w.innerHTML = ''; checkWeekBackendResume(); return; }
   var doneN = p.qs.filter(function(q){ return q.userAns !== undefined && q.userAns !== null; }).length;
@@ -4732,8 +4734,6 @@ function checkWeekBackendResume(){
 }
 function showWeekBackendResumeBtn(){
   var w = $('weekResumeWrap'); if(!w || loadWeekProgress()) return;
-  var rec = loadWeekRec();
-  if(rec[weekKey()]) return;
   var s = _weekBackendSession;
   if(!s || !s.qs || !s.qs.length) return;
   var doneN = s.qs.filter(function(q){ return q.userAns !== undefined && q.userAns !== null; }).length;
@@ -4746,6 +4746,16 @@ function resumeWeekFromBackend(){
   try{ localStorage.setItem(weekProgKey(), JSON.stringify({wk: weekKey(), qs: s.qs, idx: s.idx || 0, s: s.s, wrong: s.wrong || [], savedAt: Date.now()})); }catch(e){}
   resumeWeekQuiz();
 }
+/* 保險觸發：揀人流程中段萬一有其他渲染出錯，繼續掣嘅 refresh 唔會跟住死；
+   開頁後頭 16 秒定時補 refresh（等後台場次紀錄返嚟），展開練習／測驗區嗰陣亦會補觸發（toggleSection 內）。 */
+function refreshResumeButtonsSafe(){
+  try{ if(typeof refreshDailyResumeBtn === 'function') refreshDailyResumeBtn(); }catch(e){}
+  try{ if(typeof refreshWeekResumeBtn === 'function') refreshWeekResumeBtn(); }catch(e){}
+}
+window.addEventListener('load', function(){
+  var n = 0;
+  var iv = setInterval(function(){ n++; if(child) refreshResumeButtonsSafe(); if(n >= 8) clearInterval(iv); }, 2000);
+});
 function resumeWeekQuiz(){
   var p = loadWeekProgress();
   if(!p) return;
@@ -5126,6 +5136,7 @@ function toggleSection(el){
     content.classList.toggle('hidden');
     el.classList.toggle('collapsed');
   }
+  if(typeof refreshResumeButtonsSafe === 'function') setTimeout(refreshResumeButtonsSafe, 300);
 }
 // 預設全部展開，用戶可以撳嚟收起
 </script>
