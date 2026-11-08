@@ -111,6 +111,7 @@
   .opt.ok { background: #1a1a1a; color: #fff; }
   .opt.no { background: #fff; color: #999; opacity: .6; }
   .opt:disabled { cursor: default; }
+  .opt.sel { background: #fff3c4; border-color: #f0a500; font-weight: bold; }
   .q-score { font-size: 30px; font-weight: 900; text-align: center; padding: 20px; color: #111;
              animation: pop .4s ease; }
   .passage { background: rgba(255,255,255,.6); border-radius: 16px; padding: 18px;
@@ -538,7 +539,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261107-v35</div>
+<div class="src" style="opacity:0.5">v20261108-v36</div>
 
 <script>
 var N4SET={};
@@ -3999,6 +4000,27 @@ $('weekBody').innerHTML='<div class="q-score">'+wk+' 已完成：'+rec[wk].total
 '<div style="text-align:center">'+redoBtn+'<button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
 return;
 }
+/* 每次打開都從記録載入同一套題，直到完成為止：有未完成記録（本機或後台）就直接繼續，唔會重新抽題。 */
+var p0=loadWeekProgress();
+if(p0){ resumeWeekQuiz(); return; }
+if(_weekBackendSession && _weekBackendSession.qs && _weekBackendSession.qs.length){ resumeWeekFromBackend(); return; }
+if(child && _weekBackendDoneFor !== child+'_'+wk){
+$('weekBody').innerHTML='<div class="recall-empty">載入緊你嘅記録…</div>';
+checkWeekBackendResume();
+var tries=0;
+var iv=setInterval(function(){
+tries++;
+if(loadWeekProgress()){ clearInterval(iv); resumeWeekQuiz(); return; }
+if(_weekBackendSession && _weekBackendSession.qs && _weekBackendSession.qs.length){ clearInterval(iv); resumeWeekFromBackend(); return; }
+if(_weekBackendDoneFor === child+'_'+wk || tries>=10){ clearInterval(iv); startWeekQuizFresh(); }
+},800);
+return;
+}
+startWeekQuizFresh();
+}
+function startWeekQuizFresh(){
+var wk=weekKey();
+$('weekIntro').style.display='none'; $('weekBody').style.display='block';
 var pool=poolWords();
 if(pool.length<8){
 $('weekBody').innerHTML='<div class="recall-empty">生字唔夠 8 個，儲多幾日先玩得大測驗。</div><div style="text-align:center"><button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
@@ -4044,31 +4066,37 @@ var qHtml = (q.type==='j2c' && q.w) ? '「'+rubyWord(q.w,q.r)+'」嘅意思係�
 html+='<div class="q-text">'+qHtml+'</div>'+
 q.opts.map(function(o,i){ var od = (q.type==='j2c') ? esc(o) : rubyText(o); return '<button class="opt" data-i="'+i+'">'+od+'</button>';}).join('');
 $('weekBody').innerHTML=html;
+wq.pending=-1;
 var btns=$('weekBody').querySelectorAll('.opt');
-btns.forEach(function(b){ b.onclick=function(){ answerWeekQ(parseInt(b.getAttribute('data-i'),10));};});
+btns.forEach(function(b){ b.onclick=function(){ selectWeekOpt(parseInt(b.getAttribute('data-i'),10));};});
+var nb=document.createElement('button'); nb.className='btn2'; nb.id='weekNextBtn'; nb.disabled=true;
+nb.textContent=(wq.idx<wq.qs.length-1)?'下一題':'交卷';
+nb.onclick=nextWeekQ; $('weekBody').appendChild(nb);
+var hint=document.createElement('div'); hint.className='hint'; hint.style.textAlign='center';
+hint.textContent='揀咗可以改，撳「'+nb.textContent+'」先作實。';
+$('weekBody').appendChild(hint);
 }
-function answerWeekQ(i){
-var q=wq.qs[wq.idx];
+function selectWeekOpt(i){
+wq.pending=i;
+var btns=$('weekBody').querySelectorAll('.opt');
+btns.forEach(function(b,bi){ b.classList.toggle('sel', bi===i); });
+var nb=$('weekNextBtn'); if(nb) nb.disabled=false;
+}
+/* 點選只係暫選（可以改選），撳「下一題／交卷」先正式記錄嗰一題：寫入 userAns＋saveQuizAnswer＋計分＋存進度。
+   未撳下一題就離開，嗰題當未答，繼續作答嗰陣會返到嗰題（resume 靠 userAns 有冇值嚟跳過已作實嘅題）。 */
+function nextWeekQ(){
+if(!wq || wq.pending===undefined || wq.pending<0) return;
+var q=wq.qs[wq.idx], i=wq.pending;
 q.userAns=q.opts[i];
 saveQuizAnswer('week', 'q'+wq.idx, i);
-var btns=$('weekBody').querySelectorAll('.opt');
-btns.forEach(function(b){ b.disabled=true;});
-if(q.opts[i]===q.ans){ wq.s[q.sec]++; btns[i].classList.add('ok');}
-else{
-btns[i].classList.add('no');
-btns.forEach(function(b,bi){ if(q.opts[bi]===q.ans) b.classList.add('ok');});
-wq.wrong.push(''+q.q+' → '+q.ans);
-}
+if(q.opts[i]===q.ans){ wq.s[q.sec]++; }
+else{ wq.wrong.push(''+q.q+' → '+q.ans); }
+wq.pending=-1;
+wq.idx++;
+if(wq.idx>=wq.qs.length){ endWeekQuiz(); return; }
 if(typeof saveWeekProgress==='function') saveWeekProgress();
-var nb=document.createElement('button'); nb.className='btn2';
-if(wq.idx<wq.qs.length-1){
-  nb.textContent='下一題'; nb.onclick=nextWeekQ; $('weekBody').appendChild(nb);
-}else{
-  nb.textContent='交卷緊…'; nb.disabled=true; $('weekBody').appendChild(nb);
-  setTimeout(nextWeekQ, 1500);
+renderWeekQ();
 }
-}
-function nextWeekQ(){ wq.idx++; if(wq.idx>=wq.qs.length) endWeekQuiz(); else { if(typeof saveWeekProgress==='function') saveWeekProgress(); renderWeekQ(); } }
 function endWeekQuiz(){
 if(typeof clearWeekProgress==='function') clearWeekProgress();
 var s=wq.s, total=s['語彙']+s['文法']+s['讀解']+s['複習'];
@@ -4101,7 +4129,7 @@ $('weekBody').innerHTML='<div class="q-score">本週得分：'+total+' / 25</div
 renderWeekHist();
 }
 function backWeekQuiz(){ $('weekBody').style.display='none'; $('weekIntro').style.display='block'; if(typeof refreshWeekResumeBtn==='function') refreshWeekResumeBtn(); }
-function redoWeekQuiz(){ var wk=weekKey(), rec=loadWeekRec(); delete rec[wk]; localStorage.setItem(weekQuizKey(),JSON.stringify(rec)); startWeekQuiz(); }
+function redoWeekQuiz(){ var wk=weekKey(), rec=loadWeekRec(); delete rec[wk]; localStorage.setItem(weekQuizKey(),JSON.stringify(rec)); if(typeof clearWeekProgress==='function') clearWeekProgress(); _weekBackendSession=null; startWeekQuiz(); }
 function renderWeekHist(){
 var rec=loadWeekRec(), keys=Object.keys(rec).sort().reverse().slice(0,4);
 $('weekHist').innerHTML = keys.length
@@ -4300,6 +4328,24 @@ function pickGroupAware(pool, n){
 }
 function startDailyPractice(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  /* 每次打開都從記録載入同一套題，直到完成為止：有未完成記録（本機或後台）就直接繼續，唔會重新抽題。 */
+  var pd0 = loadDailyProgress();
+  if(pd0){ resumeDailyPractice(); return; }
+  if(_dailyBackendSession && _dailyBackendSession.ids && _dailyBackendSession.ids.length){ resumeDailyFromBackend(); return; }
+  if(_dailyBackendMap && Object.keys(_dailyBackendMap).length){ resumeDailyFromBackend(); return; }
+  if(!_dailyBackendDone){
+    try{ refreshDailyResumeBtn(); }catch(e){}
+    setMsg('載入緊你今日嘅練習記録…', 'ok');
+    var dtries = 0;
+    var div = setInterval(function(){
+      dtries++;
+      if(loadDailyProgress()){ clearInterval(div); resumeDailyPractice(); return; }
+      if(_dailyBackendSession && _dailyBackendSession.ids && _dailyBackendSession.ids.length){ clearInterval(div); resumeDailyFromBackend(); return; }
+      if(_dailyBackendMap && Object.keys(_dailyBackendMap).length){ clearInterval(div); resumeDailyFromBackend(); return; }
+      if(_dailyBackendDone || dtries >= 10){ clearInterval(div); _dailyBackendDone = true; startDailyPractice(); }
+    }, 800);
+    return;
+  }
   var level = $('dailyLevel').value;
   var includeListening = $('includeListening') ? $('includeListening').checked : true;
   loadQBank(function(){
@@ -4588,7 +4634,7 @@ function clearDailyProgress(){
   _dailyBackendMap = null; _dailyBackendSession = null;
   if(typeof refreshDailyResumeBtn === 'function') refreshDailyResumeBtn();
 }
-var _dailyBackendMap = null, _dailyBackendFor = '', _dailyBackendSession = null;
+var _dailyBackendMap = null, _dailyBackendFor = '', _dailyBackendSession = null, _dailyBackendDone = false;
 function refreshDailyResumeBtn(){
   var w = $('dailyResumeWrap'); if(!w) return;
   if(!child){ w.innerHTML = ''; return; }
@@ -4612,8 +4658,9 @@ function checkDailyBackendResume(){
   /* 場次紀錄優先：交咗卷會寫入 done 標記，所以有未完成場次就一定未交卷，唔使再理本機分數紀錄 */
   fetch(WORKER_API + '/scores?type=daily_session&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
     _dailyBackendSession = latestSession(recs, todayKey());
+    _dailyBackendDone = true;
     showDailyBackendResumeBtn();
-  }).catch(function(){});
+  }).catch(function(){ _dailyBackendDone = true; });
   fetch(WORKER_API + '/scores?type=daily20_answer&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
     var submittedToday = false;
     try{ var ds = JSON.parse(localStorage.getItem('daily_scores') || '{}'); if(ds[child + '_' + todayKey()]) submittedToday = true; }catch(e){}
@@ -4709,7 +4756,7 @@ function clearWeekProgress(){
   _weekBackendSession = null;
   if(typeof refreshWeekResumeBtn === 'function') refreshWeekResumeBtn();
 }
-var _weekBackendSession = null, _weekBackendFor = '';
+var _weekBackendSession = null, _weekBackendFor = '', _weekBackendDoneFor = '';
 function refreshWeekResumeBtn(){
   var w = $('weekResumeWrap'); if(!w) return;
   if(!child){ w.innerHTML = ''; return; }
@@ -4729,8 +4776,9 @@ function checkWeekBackendResume(){
   _weekBackendFor = child + '_' + wk;
   fetch(WORKER_API + '/scores?type=week_session&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
     _weekBackendSession = latestSession(recs, wk);
+    _weekBackendDoneFor = child + '_' + wk;
     showWeekBackendResumeBtn();
-  }).catch(function(){});
+  }).catch(function(){ _weekBackendDoneFor = child + '_' + wk; });
 }
 function showWeekBackendResumeBtn(){
   var w = $('weekResumeWrap'); if(!w || loadWeekProgress()) return;
