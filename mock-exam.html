@@ -156,11 +156,25 @@ try{
     examLevel = 'N4';
     window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
   }
+  if(pp === 'nihonez-n5-2025'){
+    PAPER = { id: 'nihonez-n5-july-2025', file: 'question_bank_nihonez_n5_2025.json', title: 'N5 完整模擬試卷', level: 'N5', mins: { vocab: 25, gram_read: 50, listening: 30 } };
+    examLevel = 'N5';
+    window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
+  }
+  if(pp === 'nihonez-n5-2024'){
+    PAPER = { id: 'nihonez-n5-july-2024', file: 'question_bank_nihonez_n5_2024.json', title: 'N5 完整模擬試卷', level: 'N5', mins: { vocab: 25, gram_read: 50, listening: 30 } };
+    examLevel = 'N5';
+    window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
+  }
   var u = pm.get('user');
   if(u){
     currentUser = decodeURIComponent(u);
     // 自動開始，唔使再揀人
     window.addEventListener('load', function(){
+      if(PAPER && PAPER.level === 'N5'){
+        document.getElementById('introCard').innerHTML = '<h1>' + PAPER.title + '</h1><div class="hint">考生：<b>'+currentUser+'</b><br><br>和正式 JLPT N5 考試一樣，分三部分計時：<br>• <b>言語知識（文字・語彙）</b>：25 分鐘<br>• <b>言語知識（文法）・読解</b>：50 分鐘<br>• <b>聴解</b>：30 分鐘<br><br>做完一部分可以休息，再按開始做下一部分。<br>交卷後即時顯示答案同講解。</div><button class="btn btn2" onclick="startMock()">開始模擬考</button>';
+        return;
+      }
       document.getElementById('introCard').innerHTML = '<h1>N4 完整模擬卷</h1><div class="hint">考生：<b>'+currentUser+'</b><br><br>和正式 JLPT N4 考試一樣，分三部分計時：<br>• <b>言語知識（文字・語彙）</b>：25 分鐘<br>• <b>言語知識（文法）・読解</b>：55 分鐘<br>• <b>聴解</b>：35 分鐘<br><br>做完一部分可以休息，再按開始做下一部分。<br>交卷後即時顯示答案同講解。</div><button class="btn btn2" onclick="startMock()">開始模擬考</button>';
     });
   }
@@ -551,7 +565,7 @@ function computeSheet(){
   var lr = lrT ? Math.round(lrC / lrT * 120) : 0;
   var li = sc.listening[1] ? Math.round(sc.listening[0] / sc.listening[1] * 60) : 0;
   var tot = lr + li;
-  var pass = (tot >= 90 && lr >= 38 && li >= 19); // N4 合格基準
+  var pass = (PAPER && PAPER.level === 'N5') ? (tot >= 80 && lr >= 38 && li >= 19) : (tot >= 90 && lr >= 38 && li >= 19); // N5 合格基準總分 80；N4 為 90（分科基準相同）
   function grade(c, t){ var p = t ? c / t * 100 : 0; return p >= 67 ? 'A' : (p >= 34 ? 'B' : 'C'); }
   return { sc: sc, lr: lr, li: li, tot: tot, pass: pass,
     gVocab: grade(sc.vocab[0], sc.vocab[1]), gGrammar: grade(sc.grammar[0], sc.grammar[1]), gReading: grade(sc.reading[0], sc.reading[1]) };
@@ -566,7 +580,7 @@ function sheetHtml(sh){
   h += '<tr><td style="' + td + ';font-size:26px;font-weight:900" colspan="2">' + sh.tot + ' / 180</td>';
   h += '<td style="' + td + ';font-size:22px;font-weight:900;color:' + (sh.pass ? '#2e7d32' : '#c62828') + '">' + (sh.pass ? '合格' : '不合格') + '</td></tr>';
   h += '<tr><th style="' + th + '">言語知識・読解</th><th style="' + th + '">聴解</th><th style="' + th + '">合格基準</th></tr>';
-  h += '<tr><td style="' + td + '">' + sh.lr + ' / 120</td><td style="' + td + '">' + sh.li + ' / 60</td><td style="' + td + ';font-size:13px;color:#666">總分 ≥90<br>言語知識・読解 ≥38<br>聴解 ≥19</td></tr>';
+  h += '<tr><td style="' + td + '">' + sh.lr + ' / 120</td><td style="' + td + '">' + sh.li + ' / 60</td><td style="' + td + ';font-size:13px;color:#666">' + ((PAPER && PAPER.level === 'N5') ? '總分 ≥80' : '總分 ≥90') + '<br>言語知識・読解 ≥38<br>聴解 ≥19</td></tr>';
   h += '</table>';
   h += '<table style="border-collapse:collapse;width:100%;margin-top:10px">';
   h += '<tr><th style="' + th + '" colspan="3">参考情報（A：≥67%　B：34–66%　C：&lt;34%）</th></tr>';
