@@ -165,6 +165,7 @@ function getReadingTarget(question){
 <option value="2009-n3">2009 N3</option>
 <option value="nk26-n4">Nihonez N4（Korean 2026）</option>
 <option value="nz25-n4">Nihonez N4（July 2025）</option>
+<option value="nz25-n3">Nihonez N3（July 2025）</option>
 <option value="nz25-n5">Nihonez N5（July 2025）</option>
 <option value="nz24-n5">Nihonez N5（July 2024）</option>
 </select>
@@ -215,8 +216,8 @@ function postQA(qid, status, comment){
 }
 
 // 載入題庫
-Promise.all([fetch('question_bank.json?v='+Date.now()).then(r=>r.json()), fetch('question_bank_2012.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_2009.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_2025.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_n5_2025.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_n5_2024.json?v='+Date.now()).then(r=>r.json()).catch(()=>null)]).then(([db, db2, db3, db4, db5, db6, db7])=>{
-allQs = (db.questions || []).concat((db2 && db2.questions) || []).concat((db3 && db3.questions) || []).concat((db4 && db4.questions) || []).concat((db5 && db5.questions) || []).concat((db6 && db6.questions) || []).concat((db7 && db7.questions) || []);
+Promise.all([fetch('question_bank.json?v='+Date.now()).then(r=>r.json()), fetch('question_bank_2012.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_2009.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_2025.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_n5_2025.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_n5_2024.json?v='+Date.now()).then(r=>r.json()).catch(()=>null), fetch('question_bank_nihonez_n3_2025.json?v='+Date.now()).then(r=>r.json()).catch(()=>null)]).then(([db, db2, db3, db4, db5, db6, db7, db8])=>{
+allQs = (db.questions || []).concat((db2 && db2.questions) || []).concat((db3 && db3.questions) || []).concat((db4 && db4.questions) || []).concat((db5 && db5.questions) || []).concat((db6 && db6.questions) || []).concat((db7 && db7.questions) || []).concat((db8 && db8.questions) || []);
 render();
 // 同步後端 QA 標記（換裝置／重開都睇得返）
 fetch('https://jlpt-scores.hoo-c27.workers.dev/scores?type=qa_result').then(r=>r.json()).then(recs=>{
