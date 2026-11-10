@@ -156,6 +156,11 @@ try{
     examLevel = 'N4';
     window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
   }
+  if(pp === 'nihonez-wb2012-n4'){
+    PAPER = { id: 'nihonez-n4-workbook-2012', file: 'question_bank_nihonez_wb2012.json', title: 'N4 完整模擬試卷', level: 'N4', mins: { vocab: 25, gram_read: 55, listening: 40 } };
+    examLevel = 'N4';
+    window.addEventListener('load', function(){ var h = document.querySelector('#introCard h1'); if(h) h.textContent = PAPER.title; });
+  }
   if(pp === 'nihonez-n5-2025'){
     PAPER = { id: 'nihonez-n5-july-2025', file: 'question_bank_nihonez_n5_2025.json', title: 'N5 完整模擬試卷', level: 'N5', mins: { vocab: 25, gram_read: 50, listening: 30 } };
     examLevel = 'N5';
