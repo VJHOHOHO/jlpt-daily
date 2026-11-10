@@ -458,6 +458,7 @@ dy>
     <button class="btn2" onclick="openMockExam()">開始模擬卷</button>
     <button class="btn2" onclick="openPaperExam()">N4 成份卷（Nihonez 2026）</button>
     <button class="btn2" onclick="openPaperExam2025()">N4 成份卷（Nihonez 2025）</button>
+    <button class="btn2" onclick="openPaperExamWB2012()">N4 成份卷（Workbook 2012）</button>
     <button class="btn2" onclick="openPaperExamN5_2025()">N5 成份卷（Nihonez 2025）</button>
     <button class="btn2" onclick="openPaperExamN5_2024()">N5 成份卷（Nihonez 2024）</button>
     <button class="btn2" onclick="openPaperExamN3_2025()">N3 成份卷（Nihonez 2025）</button>
@@ -4271,6 +4272,10 @@ function openPaperExam2025(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
   window.open('mock-exam.html?paper=nihonez2025&user='+encodeURIComponent(child)+'&v=r1','_blank');
 }
+function openPaperExamWB2012(){
+  if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  window.open('mock-exam.html?paper=nihonez-wb2012-n4&user='+encodeURIComponent(child)+'&v=r1','_blank');
+}
 function openPaperExamN5_2025(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
   window.open('mock-exam.html?paper=nihonez-n5-2025&user='+encodeURIComponent(child)+'&v=r1','_blank');
@@ -4326,7 +4331,12 @@ function loadQBank(cb){
             fetch('question_bank_nihonez_n3_2025.json').then(function(r){ return r.json(); }).then(function(j6){
               var seen6 = {}; QBANK.forEach(function(q){ seen6[q.id]=1; });
               (j6.questions || j6).forEach(function(q){ if(!seen6[q.id]) QBANK.push(q); });
-              cb();
+              // Nihonez N4 Workbook 2012 成份卷（2026-11-10 上線）：同樣併入每日練習題池（按 id 去重）
+              fetch('question_bank_nihonez_wb2012.json').then(function(r){ return r.json(); }).then(function(j7){
+                var seen7 = {}; QBANK.forEach(function(q){ seen7[q.id]=1; });
+                (j7.questions || j7).forEach(function(q){ if(!seen7[q.id]) QBANK.push(q); });
+                cb();
+              }).catch(function(){ cb(); });
             }).catch(function(){ cb(); });
           }).catch(function(){ cb(); });
         }).catch(function(){ cb(); });
