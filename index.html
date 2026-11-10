@@ -458,6 +458,8 @@ dy>
     <button class="btn2" onclick="openMockExam()">開始模擬卷</button>
     <button class="btn2" onclick="openPaperExam()">N4 成份卷（Nihonez 2026）</button>
     <button class="btn2" onclick="openPaperExam2025()">N4 成份卷（Nihonez 2025）</button>
+    <button class="btn2" onclick="openPaperExamN5_2025()">N5 成份卷（Nihonez 2025）</button>
+    <button class="btn2" onclick="openPaperExamN5_2024()">N5 成份卷（Nihonez 2024）</button>
     <div id="fullHist"></div>
   </div>
   <div id="fullBody" style="display:none"></div>
@@ -4268,6 +4270,14 @@ function openPaperExam2025(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
   window.open('mock-exam.html?paper=nihonez2025&user='+encodeURIComponent(child)+'&v=r1','_blank');
 }
+function openPaperExamN5_2025(){
+  if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  window.open('mock-exam.html?paper=nihonez-n5-2025&user='+encodeURIComponent(child)+'&v=r1','_blank');
+}
+function openPaperExamN5_2024(){
+  if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  window.open('mock-exam.html?paper=nihonez-n5-2024&user='+encodeURIComponent(child)+'&v=r1','_blank');
+}
 function startFullMock(){
   loadN4Bank(function(){
     var pool = N4_BANK.filter(function(q){ return !q.needs_image; });
@@ -4300,7 +4310,16 @@ function loadQBank(cb){
       fetch('question_bank_nihonez_2025.json').then(function(r){ return r.json(); }).then(function(j3){
         var seen3 = {}; QBANK.forEach(function(q){ seen3[q.id]=1; });
         (j3.questions || j3).forEach(function(q){ if(!seen3[q.id]) QBANK.push(q); });
-        cb();
+        // Nihonez N5 兩份成份卷（2026-11-10 上線）：同樣併入每日練習題池（按 id 去重）
+        fetch('question_bank_nihonez_n5_2025.json').then(function(r){ return r.json(); }).then(function(j4){
+          var seen4 = {}; QBANK.forEach(function(q){ seen4[q.id]=1; });
+          (j4.questions || j4).forEach(function(q){ if(!seen4[q.id]) QBANK.push(q); });
+          fetch('question_bank_nihonez_n5_2024.json').then(function(r){ return r.json(); }).then(function(j5){
+            var seen5 = {}; QBANK.forEach(function(q){ seen5[q.id]=1; });
+            (j5.questions || j5).forEach(function(q){ if(!seen5[q.id]) QBANK.push(q); });
+            cb();
+          }).catch(function(){ cb(); });
+        }).catch(function(){ cb(); });
       }).catch(function(){ cb(); });
     }).catch(function(){ cb(); });
   }).catch(function(){ setMsg('題庫載入失敗，請檢查網絡。','err'); });
