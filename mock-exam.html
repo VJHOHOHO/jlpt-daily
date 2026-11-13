@@ -40,6 +40,7 @@ h2 { font-size: 22px; margin: 0 0 12px 0; }
   .qtext rt, .opt rt { font-weight: 300 !important; }
 
 </style>
+<style>.kw { color:#d32f2f; font-weight:bold; } .kwbox { margin-top:10px; padding:10px 12px; background:#fff8e1; border:1px solid #ffe082; border-radius:8px; font-size:15px; line-height:1.65; } .kwbox-title { font-weight:bold; color:#e65100; } .kwbox-tip { color:#555; } .kwbox-list { margin-top:4px; }</style>
 </head>
 <body>
 <div class="container">
@@ -657,6 +658,110 @@ function sheetHtml(sh){
   return h;
 }
 
+/* ---------- 看關鍵字（2026-11-13 新增）：檢討畫面標紅關鍵字＋技巧框 ----------
+   新路徑：只喺交卷後嘅檢討畫面裝飾題幹文字同加框，唔郁作答／交卷／計分／後端記錄。
+   關鍵字表按類別，每類配一句訊號；匹配長字優先，避免重疊重複標。 */
+var KW_CATS = [
+  { signal: '否定，睇漏咗成句意思會掉轉', words: ['ではない', 'なくて', 'ません', 'ない', 'ずに'] },
+  { signal: '轉折，重點通常喺佢後面嗰句', words: ['けれども', 'しかし', 'ところが', 'でも'] },
+  { signal: '因果，前因後果要連埋睇', words: ['だから', 'それで', 'ので'] },
+  { signal: '指前面講過嘅嘢，畫箭頭返去搵', words: ['これ', 'それ', 'あれ', 'この', 'その', 'あの'] },
+  { signal: '次序或時間，答案多數喺附近', words: ['それから', '前に', '後で', '先に', 'それに', 'まず'] },
+  { signal: '題目問嘅就係呢樣，答案只搵呢樣', words: ['どうして', 'いくつ', 'いつ', 'どこ', 'だれ', 'なに', 'なぜ', 'どの', 'どちら', 'いくら'] },
+  { signal: '講者改主意，答案取最後決定', words: ['やっぱり', '実は'] }
+];
+var KW_FLAT = [];
+KW_CATS.forEach(function(c){ c.words.forEach(function(w){ KW_FLAT.push({ w: w, s: c.signal }); }); });
+KW_FLAT.sort(function(a, b){ return b.w.length - a.w.length; });
+function kwScan(text){
+  text = String(text || '');
+  var parts = [], found = [], seen = {}, i = 0;
+  while(i < text.length){
+    var hit = null;
+    for(var k = 0; k < KW_FLAT.length; k++){
+      if(text.substr(i, KW_FLAT[k].w.length) === KW_FLAT[k].w){ hit = KW_FLAT[k]; break; }
+    }
+    if(hit && hit.w === 'ので' && text.charAt(i + 2) === 'す') hit = null; // のです＝說明語氣，唔係因果「ので」
+    if(hit && hit.w === 'ない' && i >= 2 && text.substr(i - 2, 2) === 'あん') hit = null; // あんない＝案内，入面嘅「ない」唔係否定
+    if(hit && hit.w === 'この' && i >= 2 && text.substr(i - 2, 2) === 'あそ') hit = null; // あそこ＝嗰度，入面嘅「この」唔係指示詞
+    if(hit && hit.w === 'それ' && text.charAt(i + 2) === 'ぞ') hit = null; // それぞれ＝各自，唔係指示詞「それ」
+    if(hit){
+      parts.push({ t: hit.w, kw: true });
+      if(!seen[hit.w]){ seen[hit.w] = 1; found.push(hit); }
+      i += hit.w.length;
+    } else {
+      if(parts.length && !parts[parts.length - 1].kw) parts[parts.length - 1].t += text.charAt(i);
+      else parts.push({ t: text.charAt(i), kw: false });
+      i++;
+    }
+  }
+  return { parts: parts, found: found };
+}
+function kwBoxHtml(text){
+  var found = kwScan(text).found;
+  var h = '<div class="kwbox"><div class="kwbox-title">🔑 看關鍵字</div>';
+  h += '<div class="kwbox-tip">先睇問題問乜，圈起關鍵字，再帶住佢去搵答案。</div>';
+  if(found.length){
+    h += '<div class="kwbox-list">' + found.map(function(f){
+      return '<div><span class="kw">' + esc(f.w) + '</span>：' + esc(f.s) + '</div>';
+    }).join('') + '</div>';
+  }
+  return h + '</div>';
+}
+/* 將一個已渲染嘅文字元素入面嘅關鍵字包紅：只拆文字節點，唔郁現有標記
+   （跳過振假名 rt、已有 inline style 嘅原卷紅標籤／★ span、.slot 槽位）。 */
+function kwHighlightEl(rootEl){
+  if(!rootEl || !document.createTreeWalker) return;
+  var walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node){
+      var p = node.parentNode;
+      while(p && p !== rootEl){
+        if(p.tagName === 'RT' || p.tagName === 'RP') return NodeFilter.FILTER_REJECT;
+        if(p.classList && (p.classList.contains('kw') || p.classList.contains('slot') || p.classList.contains('kwbox'))) return NodeFilter.FILTER_REJECT;
+        if(p.tagName === 'SPAN' && p.getAttribute && p.getAttribute('style')) return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var nodes = [];
+  while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(function(node){
+    var res = kwScan(node.nodeValue);
+    if(!res.found.length) return;
+    var frag = document.createDocumentFragment();
+    res.parts.forEach(function(part){
+      if(part.kw){
+        var s = document.createElement('span');
+        s.className = 'kw';
+        s.textContent = part.t;
+        frag.appendChild(s);
+      } else {
+        frag.appendChild(document.createTextNode(part.t));
+      }
+    });
+    if(node.parentNode) node.parentNode.replaceChild(frag, node);
+  });
+}
+/* 檢討畫面裝飾（showFinal 渲染完之後行） */
+function kwMockReviewPass(){
+  try{
+    if(typeof allResults === 'undefined' || !allResults) return;
+    var reviewEl = document.getElementById('review');
+    if(!reviewEl) return;
+    var blocks = reviewEl.querySelectorAll('.qblock');
+    var flat = [];
+    allResults.forEach(function(r){ r.results.forEach(function(res){ flat.push(res.q); }); });
+    flat.forEach(function(q, idx){
+      var b = blocks[idx];
+      if(!b || !q) return;
+      var qts = b.querySelectorAll('.qtext');
+      for(var j = 0; j < qts.length; j++) kwHighlightEl(qts[j]);
+      b.innerHTML += kwBoxHtml(q.question || '');
+    });
+  }catch(e){}
+}
+
 function showFinal(){
   var totalCorrect = 0, totalQ = 0;
   allResults.forEach(function(r){ totalCorrect += r.correct; totalQ += r.total; });
@@ -709,6 +814,7 @@ function showFinal(){
     });
   });
   document.getElementById('review').innerHTML = html;
+  kwMockReviewPass();
 
   // 儲存成績同錯題
   try{
