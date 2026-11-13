@@ -2,8 +2,8 @@
 """預計「考試範圍完成度」四個百分比，寫成 scope-progress.json 推上網站。
 用戶 2026-11-13 指示：數字唔使即時，每日 12:00／00:00 預計好，頁面只下載細 JSON。
 計法同 index.html 舊版 updateScopeCard 完全一致：
-  文法／讀解／聽解 = 後端 daily20_answer + mock_answer，每題取最新一次作答，對 QBANK 計正確率
-  語彙 = 本人生字庫已收集字數 / 750
+  四格同口徑：daily20_answer + mock_answer，每題取最新一次作答，對 QBANK 按 section 計正確率
+  （語彙 2026-11-13 用戶拍板：由「生字庫收集字數/750」改用語彙題練習正確率，同其他三格一致）
 QBANK 合併次序同 loadQBank 一致（先出現者優先）。"""
 import json, math, subprocess, sys, os, datetime
 
@@ -49,7 +49,7 @@ def num(x):
     except (TypeError, ValueError):
         return None
 
-def compute(who, ans, sec, vocab):
+def compute(who, ans, sec):
     latest = {}
     for t in ('daily20_answer', 'mock_answer'):
         for r in scores(t, who) or []:
@@ -59,7 +59,7 @@ def compute(who, ans, sec, vocab):
             cur = latest.get(k)
             if cur is None or (r.get('submittedAt') or 0) >= (cur.get('submittedAt') or 0):
                 latest[k] = r
-    st = {'grammar': [0, 0], 'reading': [0, 0], 'listening': [0, 0]}
+    st = {'vocab': [0, 0], 'grammar': [0, 0], 'reading': [0, 0], 'listening': [0, 0]}
     for k, r in latest.items():
         s = sec.get(k)
         if s not in st:
@@ -68,19 +68,17 @@ def compute(who, ans, sec, vocab):
         a1, a2 = num(r.get('answer')), num(ans[k])
         if a1 is not None and a1 == a2:
             st[s][0] += 1
-    words = {it.get('word') for it in vocab if it.get('who') == who and it.get('word')}
-    result = {'vocab': min(100, js_round(len(words) / 750 * 100))}
-    for s in ('grammar', 'reading', 'listening'):
+    result = {}
+    for s in ('vocab', 'grammar', 'reading', 'listening'):
         c, n = st[s]
         result[s] = js_round(c / n * 100) if n > 0 else 0
     return result
 
 def main():
     ans, sec = load_qbank()
-    vocab = fetch_json([BASE + '/vocab']) or []
     users = {}
     for who in USERS:
-        users[who] = compute(who, ans, sec, vocab)
+        users[who] = compute(who, ans, sec)
         print(who, users[who], flush=True)
     payload = {'updated': datetime.datetime.now().astimezone().isoformat(timespec='seconds'),
                'users': users}
