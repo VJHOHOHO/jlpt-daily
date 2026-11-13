@@ -586,7 +586,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v43</div>
+<div class="src" style="opacity:0.5">v20261113-v44</div>
 
 <script>
 var N4SET={};
@@ -5584,63 +5584,29 @@ function renderScopePies(){
 }
 function updateScopeCard(){
   if(!child) return;
-  // 確保元素存在
   var testEl = document.getElementById('scope-vocab');
   if(!testEl){ setTimeout(updateScopeCard, 500); return; }
-  // 2026-11-13 改：完成度改用後端真實作答記錄計（舊版讀本機 n4_rand/full_scores，細路實際冇用嗰個模式，永遠顯示 0）
-  // 2026-11-13 再修：加數字顯示＋載入中／失敗重試狀態；fetch 失敗或逾時唔再靜默扮 0；切人時舊回應唔覆蓋新數（runId 守衛）
+  // 2026-11-13 改（用戶指示）：完成度唔再即時拉後端全量記錄計（太重，電話會逾時失敗）；
+  // 改由每日 12:00／00:00 預計好嘅 scope-progress.json 直接讀四個數字，數字唔使即時。
   var runId = (window.__scopeRunId || 0) + 1; window.__scopeRunId = runId;
-  var secIds = ['scope-grammar','scope-reading','scope-listening'];
-  setScopeState(['scope-vocab'].concat(secIds), 'loading');
-  ['scope-vocab'].concat(secIds).forEach(function(id){ var e2 = document.getElementById(id); if(e2) e2.dataset.percent = 0; });
+  var ids = ['scope-vocab','scope-grammar','scope-reading','scope-listening'];
+  setScopeState(ids, 'loading');
+  ids.forEach(function(id){ var e2 = document.getElementById(id); if(e2) e2.dataset.percent = 0; });
   renderScopePies();
-  var base = 'https://jlpt-scores.hoo-c27.workers.dev';
-  var who = encodeURIComponent(child);
-  loadQBank(function(){
+  var stamp = Math.floor(Date.now()/43200000); // 半日一個版本，對齊預計節奏，避免食舊快取
+  scopeFetchJson('scope-progress.json?v=' + stamp, 15000).then(function(j){
     if(window.__scopeRunId !== runId) return;
-    var ansMap = {}, secMap = {};
-    (QBANK||[]).forEach(function(q){ ansMap[q.id] = q.answer; secMap[q.id] = q.section; });
-    Promise.all([
-      scopeFetchJson(base + '/scores?type=daily20_answer&who=' + who, 25000),
-      scopeFetchJson(base + '/scores?type=mock_answer&who=' + who, 25000)
-    ]).then(function(res){
-      if(window.__scopeRunId !== runId) return;
-      if(res[0] === null || res[1] === null){ setScopeState(secIds, 'error'); return; }
-      var latest = {};
-      [].concat(res[0]||[], res[1]||[]).forEach(function(r){
-        if(!r.key || !(r.key in ansMap)) return;
-        if(!latest[r.key] || (r.submittedAt||0) >= (latest[r.key].submittedAt||0)) latest[r.key] = r;
-      });
-      var st = {grammar:[0,0], reading:[0,0], listening:[0,0]};
-      Object.keys(latest).forEach(function(k){
-        var sec = secMap[k];
-        if(!st[sec]) return;
-        st[sec][1]++;
-        if(Number(latest[k].answer) === Number(ansMap[k])) st[sec][0]++;
-      });
-      var map = {'grammar':'scope-grammar','reading':'scope-reading','listening':'scope-listening'};
-      Object.keys(map).forEach(function(sec){
-        var pct = st[sec][1] > 0 ? Math.round(st[sec][0]/st[sec][1]*100) : 0;
-        var el = document.getElementById(map[sec]);
-        if(el) el.dataset.percent = pct;
-        setScopePct(map[sec], pct + '%');
-      });
-      renderProgressRings();
-      renderScopePies();
-    });
-    // 語彙：N4 單語掌握度 = 生字庫已收集字數（本人）/ 750
-    scopeFetchJson(base + '/vocab', 25000).then(function(v){
-      if(window.__scopeRunId !== runId) return;
-      if(v === null){ setScopeState(['scope-vocab'], 'error'); return; }
-      var seen = {};
-      (v||[]).forEach(function(it){ if(it.who === child && it.word) seen[it.word] = 1; });
-      var pct = Math.min(100, Math.round(Object.keys(seen).length/750*100));
-      var el = document.getElementById('scope-vocab');
+    var u = j && j.users && j.users[child];
+    if(!u){ setScopeState(ids, 'error'); return; }
+    var map = {vocab:'scope-vocab', grammar:'scope-grammar', reading:'scope-reading', listening:'scope-listening'};
+    Object.keys(map).forEach(function(k){
+      var pct = Math.max(0, Math.min(100, parseInt(u[k]) || 0));
+      var el = document.getElementById(map[k]);
       if(el) el.dataset.percent = pct;
-      setScopePct('scope-vocab', pct + '%');
-      renderProgressRings();
-      renderScopePies();
+      setScopePct(map[k], pct + '%');
     });
+    renderProgressRings();
+    renderScopePies();
   });
 }
 </script>
