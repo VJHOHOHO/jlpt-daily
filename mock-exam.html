@@ -123,7 +123,7 @@ function reportQ(btn, qid){
   if(note === null) return;
   postScore({type:'question_report', who:currentUser||'unknown',
     date:new Date().toISOString().slice(0,10),
-    key:qid, answer:'report', comment:note||'', paper:(PAPER ? PAPER.id : '')});
+    key:qid, answer:'report', comment:note||'', paper:paperId()});
   btn.textContent = '✓ 已回報，多謝！';
   btn.disabled = true;
 }
@@ -140,11 +140,14 @@ var timerInt = null;
 
 var examLevel = 'MIX';
 var PAPER = null;
+var MODE_N4 = false;
+function paperId(){ return PAPER ? PAPER.id : (MODE_N4 ? 'n4mod' : ''); }
 // 從 URL 參數攞 level 同 user
 try{
   var pm = new URLSearchParams(window.location.search);
   var lv = pm.get('level');
   if(lv && ['N5','N4','N3','MIX'].indexOf(lv)>=0) examLevel = lv;
+  if(pm.get('mode') === 'n4'){ MODE_N4 = true; examLevel = 'N4'; }
   var pp = pm.get('paper');
   if(pp === 'nihonez2026'){
     PAPER = { id: 'nihonez-n4-korean-2026', file: 'question_bank_nihonez.json', title: 'N4 完整模擬試卷', level: 'N4', mins: { vocab: 25, gram_read: 55, listening: 40 } };
@@ -189,6 +192,10 @@ try{
         document.getElementById('introCard').innerHTML = '<h1>' + PAPER.title + '</h1><div class="hint">考生：<b>'+currentUser+'</b><br><br>和正式 JLPT N3 考試一樣，分三部分計時：<br>• <b>言語知識（文字・語彙）</b>：30 分鐘<br>• <b>言語知識（文法）・読解</b>：70 分鐘<br>• <b>聴解</b>：40 分鐘<br><br>做完一部分可以休息，再按開始做下一部分。<br>交卷後即時顯示答案同講解。</div><button class="btn btn2" onclick="startMock()">開始模擬考</button>';
         return;
       }
+      if(MODE_N4){
+        document.getElementById('introCard').innerHTML = '<h1>N4 完整模擬試卷</h1><div class="hint">考生：<b>'+currentUser+'</b><br><br>分三部分計時：<br>• <b>言語知識（文字・語彙）</b>：20 題，20 分鐘<br>• <b>言語知識（文法）・読解</b>：38 題，60 分鐘<br>• <b>聴解</b>：28 題，40 分鐘<br><br>做完一部分可以休息，再按開始做下一部分。<br>交卷後即時顯示答案同講解。</div><button class="btn btn2" onclick="startMock()">開始模擬考</button>';
+        return;
+      }
       document.getElementById('introCard').innerHTML = '<h1>N4 完整模擬卷</h1><div class="hint">考生：<b>'+currentUser+'</b><br><br>和正式 JLPT N4 考試一樣，分三部分計時：<br>• <b>言語知識（文字・語彙）</b>：25 分鐘<br>• <b>言語知識（文法）・読解</b>：55 分鐘<br>• <b>聴解</b>：35 分鐘<br><br>做完一部分可以休息，再按開始做下一部分。<br>交卷後即時顯示答案同講解。</div><button class="btn btn2" onclick="startMock()">開始模擬考</button>';
     });
   }
@@ -222,7 +229,8 @@ function loadQBank(cb){
         var extra = (d2 && d2.questions) || [];
         var seen = {}; QBANK.forEach(function(q){ seen[q.id] = 1; });
         extra.forEach(function(q){ if(q && q.id && !seen[q.id]) QBANK.push(q); });
-        cb();
+        if(MODE_N4){ mergeMoreBanks(['question_bank_nihonez_2025.json', 'question_bank_nihonez_wb2012.json'], cb); }
+        else cb();
       }).catch(function(){ cb(); });
     }).catch(function(e){
       if(tries < 3){ setTimeout(attempt, 1500); return; }
@@ -233,6 +241,37 @@ function loadQBank(cb){
     });
   }
   attempt();
+}
+
+function mergeMoreBanks(files, cb){
+  var i = 0;
+  function next(){
+    if(i >= files.length){ cb(); return; }
+    fetch(files[i++], {cache:'no-store'}).then(function(r){ return r.json(); }).then(function(d){
+      var extra = (d && d.questions) || [];
+      var seen = {}; QBANK.forEach(function(q){ seen[q.id] = 1; });
+      extra.forEach(function(q){ if(q && q.id && !seen[q.id]) QBANK.push(q); });
+      next();
+    }).catch(function(){ next(); });
+  }
+  next();
+}
+function pickFromN4(secId, n, rand){
+  var pool = QBANK.filter(function(q){ return !q.needs_image && q.level === 'N4' && q.section === secId; });
+  var groups = {}, singles = [];
+  pool.forEach(function(q){
+    if(q.group){ (groups[q.group]=groups[q.group]||[]).push(q); }
+    else singles.push(q);
+  });
+  Object.keys(groups).forEach(function(g){ groups[g].sort(function(a,b){ return (a.qnum||0)-(b.qnum||0); }); });
+  var groupList = Object.keys(groups).map(function(g){ return groups[g]; });
+  groupList = shuffleSeeded(groupList, rand);
+  singles = shuffleSeeded(singles, rand);
+  var picked = [];
+  groupList.forEach(function(g){ if(picked.length + g.length <= n + 2) picked = picked.concat(g); });
+  var need = n - picked.length;
+  if(need > 0) picked = picked.concat(singles.slice(0, need));
+  return picked;
 }
 
 var RESTORE_MAP = null, _restoreState = 0, _restoreCbs = [];
@@ -279,13 +318,13 @@ function loadRestore(cb){
   var retried = false;
   function attempt(){
     fetchJsonTO(base + '/scores?type=mock_final' + whoQ, 30000).then(function(finals){
-      var doneToday = (finals || []).some(function(f){ return normUser(f.who) === currentUser && f.date === todayISO && ((PAPER && f.paper === PAPER.id) || (!PAPER && !f.paper)); });
+      var doneToday = (finals || []).some(function(f){ return normUser(f.who) === currentUser && f.date === todayISO && ((f.paper || '') === paperId()); });
       if(doneToday) return null; // 今日已交卷：新一輪唔預填
       return fetchJsonTO(base + '/scores?type=mock_answer' + whoQ, 30000);
     }).then(function(recs){
       if(recs){
         var mine = recs.filter(function(r){ return normUser(r.who) === currentUser && r.date === todayISO; });
-        RESTORE_MAP = buildRestoreMap(mine, PAPER ? PAPER.id : '');
+        RESTORE_MAP = buildRestoreMap(mine, paperId());
       }
       done();
     }).catch(function(){
@@ -315,6 +354,7 @@ function resumeMock(){
     secIdx = 0;
     allResults = [];
     if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
+    else if(MODE_N4){ sections[0].mins = 20; sections[1].mins = 60; sections[2].mins = 40; }
     document.getElementById('introCard').style.display = 'none';
     startSection();
   });
@@ -336,7 +376,7 @@ window.addEventListener('load', function(){
   if(card && !document.getElementById('verTag')){
     var v = document.createElement('div');
     v.id = 'verTag'; v.className = 'hint'; v.style.marginTop = '10px';
-    v.textContent = '版本：2026-11-01 繼續版';
+    v.textContent = '版本：2026-11-13 模組卷版';
     card.appendChild(v);
   }
   if(card && currentUser && !document.getElementById('resumeBtn')){
@@ -359,6 +399,7 @@ function startMock(){
   secIdx = 0;
   allResults = [];
   if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
+  else if(MODE_N4){ sections[0].mins = 20; sections[1].mins = 60; sections[2].mins = 40; }
   loadRestoreWait(function(){ document.getElementById('introCard').style.display = 'none'; startSection(); }); // 等恢復真正完成先入卷（跳頁/斷線都唔怕）
 }
 
@@ -436,8 +477,17 @@ function startSection(){
       if(need > 0) picked = picked.concat(singles.slice(0, need));
       return picked;
     }
-    var picked = pickFrom(['N5', 'N4', 'N3'], target);
-    if(picked.length < target){
+    var picked;
+    if(MODE_N4){
+      // N4 模組卷：只抽 N4，按學習需求重配題數（文法最弱加權、聽解跟足真考、讀解成組）
+      var randN4 = seededRand((currentUser||'unknown') + '|' + new Date().toISOString().slice(0,10) + '|n4mod|' + sec.id);
+      if(sec.id === 'gram_read'){ target = 38; picked = pickFromN4('grammar', 24, randN4).concat(pickFromN4('reading', 14, randN4)); }
+      else if(sec.id === 'vocab'){ target = 20; picked = pickFromN4('vocab', 20, randN4); }
+      else { target = 28; picked = pickFromN4('listening', 28, randN4); }
+    } else {
+      picked = pickFrom(['N5', 'N4', 'N3'], target);
+    }
+    if(!MODE_N4 && picked.length < target){
       var usedIds = {}; picked.forEach(function(q){ usedIds[q.id] = 1; });
       var rest = QBANK.filter(function(q){
         return !q.needs_image && !q.group && sec.filter(q) && !usedIds[q.id];
@@ -520,7 +570,7 @@ function answerQ(i, val){
     postScore({type:'mock_answer', who:currentUser||'unknown',
       date:new Date().toISOString().slice(0,10),
       key:(q.id||('mock_q'+i)), answer:val,
-      section:(sections[secIdx]||{}).id||'', level:examLevel, paper:(PAPER ? PAPER.id : '')});
+      section:(sections[secIdx]||{}).id||'', level:examLevel, paper:paperId()});
   }catch(e){}
 }
 
@@ -616,7 +666,7 @@ function showFinal(){
   // 未作答嘅題補送一筆 answer=0：所有題目對錯都要有記錄，唔分邊度考（2026-11-01 用戶指示）
   try{
     allResults.forEach(function(r){ r.results.forEach(function(res){
-      if(!res.userAns && res.q && res.q.id) postScore({type:'mock_answer', who:currentUser||'unknown', date:new Date().toISOString().slice(0,10), key:res.q.id, answer:0, section:(res.q.section||''), level:examLevel, paper:(PAPER ? PAPER.id : '')});
+      if(!res.userAns && res.q && res.q.id) postScore({type:'mock_answer', who:currentUser||'unknown', date:new Date().toISOString().slice(0,10), key:res.q.id, answer:0, section:(res.q.section||''), level:examLevel, paper:paperId()});
     }); });
   }catch(e){}
 
@@ -625,7 +675,7 @@ function showFinal(){
     var mf = {type:'mock_final', who:currentUser||'unknown',
       date:new Date().toISOString().slice(0,10),
       key:'mock_final', score:totalCorrect, total:totalQ, level:examLevel};
-    if(sheet){ if(PAPER) mf.paper = PAPER.id; mf.scaled = sheet.tot; mf.scaled_lr = sheet.lr; mf.scaled_listening = sheet.li; mf.pass = sheet.pass ? 1 : 0; }
+    if(sheet){ var pid = paperId(); if(pid) mf.paper = pid; mf.scaled = sheet.tot; mf.scaled_lr = sheet.lr; mf.scaled_listening = sheet.li; mf.pass = sheet.pass ? 1 : 0; }
     postScore(mf);
   }catch(e){}
 
