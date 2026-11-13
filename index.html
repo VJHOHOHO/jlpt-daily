@@ -548,7 +548,8 @@ dy>
 
 
 <div class="card" id="histCard" style="display:none">
-  <h2><span class="kicon">史</span>歷史記錄</h2>
+  <h2 onclick="toggleHistCard()" style="cursor:pointer"><span class="kicon">史</span>歷史記錄<span id="histArrow" style="float:right;font-size:18px;opacity:.6">▼</span></h2>
+  <div id="histCardBody">
   <div id="histBody"></div>
   <h3 style="margin:20px 0 12px;font-size:18px;">考試範圍完成度</h3>
   <div class="scope-grid">
@@ -579,11 +580,12 @@ dy>
   </div>
   <div class="hint" style="margin-top:12px">綠圈係進度，80% 合格變小皇冠。</div>
   <div style="margin-top:16px;text-align:center"><button id="resubmitBtn" onclick="resubmitAllScores()" style="font-size:13px;padding:8px 20px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:8px;cursor:pointer">補送分數</button></div>
+  </div>
 </div>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v41</div>
+<div class="src" style="opacity:0.5">v20261113-v42</div>
 
 <script>
 var N4SET={};
@@ -5526,6 +5528,14 @@ document.addEventListener('click', function(e){
 });
 </script>
 <script>
+/* 歷史記錄卡收起／展開（2026-11-13 用戶指示補返：撳標題收起成卡，箭頭跟狀態轉） */
+function toggleHistCard(){
+  var b = $('histCardBody'), a = $('histArrow');
+  if(!b) return;
+  var hide = b.style.display !== 'none';
+  b.style.display = hide ? 'none' : 'block';
+  if(a) a.textContent = hide ? '▶' : '▼';
+}
 // ===== 考試範圍完成度：數字＋載入／失敗狀態（2026-11-13 新增 helper，走新路徑）=====
 function scopeFetchJson(url, ms){
   return new Promise(function(resolve){
