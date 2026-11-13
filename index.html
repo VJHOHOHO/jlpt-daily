@@ -565,7 +565,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v38</div>
+<div class="src" style="opacity:0.5">v20261113-v39</div>
 
 <script>
 var N4SET={};
@@ -3174,6 +3174,7 @@ function pickChild(name){
   $('btnGobi').className = 'testbtn' + (name==='GOBI' ? ' active' : '');
   ['missCard','recallCard','quizCard','weekCard','randCard','fullCard','dailyCard','examCard','flashCard','anaCard','mockCard','corrCard','formCard','histCard'].forEach(function(id){ var el=$(id); if(el) el.style.display='block'; });
   document.querySelectorAll('.main-section').forEach(function(el){ el.style.display='block'; });
+  setTimeout(function(){ try{ updateScopeCard(); }catch(e){} }, 0); /* 獨立觸發：唔俾下面成串 render 任何一環拋錯拖死考試範圍完成度（2026-11-13 修，renderQuizHist 拋錯曾拖死成串） */
   renderHomework(); /* 提早渲染作業卡，唔好等成串 render 先出（2026-11-02 用戶實測生字唔顯示） */
   if(name==='GOBI'){
     fetchGobiPool();
@@ -3648,7 +3649,7 @@ function endQuiz(){
     '<div class="msg '+c[1]+'">'+c[0]+'</div>'+review+'<button class="btn2" onclick="backQuiz()">返去</button>';
   renderQuizHist();
 }
-function backQuiz(){ $('quizBody').style.display='none'; $('quizIntro').style.display='block'; }
+function backQuiz(){ var qb=$('quizBody'), qi=$('quizIntro'); if(qb) qb.style.display='none'; if(qi) qi.style.display='block'; } /* 元素唔存在唔好拋錯（2026-11-13 修，同 renderQuizHist 同因） */
 
 /* 振假名系統 */
 var READMAP = {};
@@ -3876,8 +3877,10 @@ function flashKnow(know){
 }
 function backFlash(){ $('flashBody').style.display='none'; $('flashIntro').style.display='block'; }
 function renderQuizHist(){
+  var qh = $('quizHist');
+  if(!qh) return; /* quizCard 已下架，元素唔存在就跳過，唔好拋錯拖死 pickChild 成串 render（2026-11-13 修） */
   var h=loadQuizRec().slice(-5).reverse();
-  $('quizHist').innerHTML = h.length
+  qh.innerHTML = h.length
     ? '<div class="hint" style="margin-top:10px">最近測驗：</div>'+h.map(function(r){ return '<div class="recall-empty">'+esc(r.date)+'：'+r.score+'/'+r.total+'</div>'; }).join('')
     : '';
 }
