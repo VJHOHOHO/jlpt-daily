@@ -554,25 +554,25 @@ dy>
   <div class="scope-grid">
     <div class="scope-item">
       <div class="scope-name">語彙</div>
-      <span class="task-progress" data-percent="0" id="scope-vocab"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <span class="task-progress scope-pie" data-percent="0" id="scope-vocab"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
       <div class="scope-pct" id="scope-vocab-pct">…</div>
       <div class="scope-desc">N4 單語掌握度</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">文法</div>
-      <span class="task-progress" data-percent="0" id="scope-grammar"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <span class="task-progress scope-pie" data-percent="0" id="scope-grammar"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
       <div class="scope-pct" id="scope-grammar-pct">…</div>
       <div class="scope-desc">文法練習正確率</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">讀解</div>
-      <span class="task-progress" data-percent="0" id="scope-reading"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <span class="task-progress scope-pie" data-percent="0" id="scope-reading"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
       <div class="scope-pct" id="scope-reading-pct">…</div>
       <div class="scope-desc">讀解正確率</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">聽解</div>
-      <span class="task-progress" data-percent="0" id="scope-listening"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <span class="task-progress scope-pie" data-percent="0" id="scope-listening"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
       <div class="scope-pct" id="scope-listening-pct">…</div>
       <div class="scope-desc">聽解正確率</div>
     </div>
@@ -583,7 +583,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v40</div>
+<div class="src" style="opacity:0.5">v20261113-v41</div>
 
 <script>
 var N4SET={};
@@ -5417,6 +5417,7 @@ function toggleSection(el){
 <script>
 function renderProgressRings(){
   document.querySelectorAll('.task-progress').forEach(function(el){
+    if(el.classList.contains('scope-pie')) return; /* 考試範圍四格用圓餅圖，renderScopePies 專責（2026-11-13 用戶指示） */
     var percent = Math.min(100, Math.max(0, parseInt(el.dataset.percent) || 0));
     var radius = 20;
     var circumference = 2 * Math.PI * radius;
@@ -5549,6 +5550,27 @@ function setScopeState(ids, state){
     else if(state === 'error') setScopePct(id, '載入失敗，撳此重試', 'error');
   });
 }
+/* 圓餅圖（2026-11-13 用戶指示改）：灰色底餅＋綠色扇形，百分比即扇形角度 */
+function scopePieSvg(p){
+  var r = 22;
+  var bg = '<circle cx="24" cy="24" r="' + r + '" fill="#e6e6e6"></circle>';
+  if(p <= 0) return '<svg viewBox="0 0 48 48">' + bg + '</svg>';
+  if(p >= 100) return '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="' + r + '" fill="#4CAF50"></circle></svg>';
+  var a = (p / 100) * Math.PI * 2;
+  var x = (24 + r * Math.sin(a)).toFixed(2);
+  var y = (24 - r * Math.cos(a)).toFixed(2);
+  var laf = p > 50 ? 1 : 0;
+  return '<svg viewBox="0 0 48 48">' + bg + '<path d="M24 24 L24 2 A' + r + ' ' + r + ' 0 ' + laf + ' 1 ' + x + ' ' + y + ' Z" fill="#4CAF50"></path></svg>';
+}
+function renderScopePies(){
+  ['scope-vocab','scope-grammar','scope-reading','scope-listening'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    var p = Math.min(100, Math.max(0, parseInt(el.dataset.percent) || 0));
+    el.innerHTML = scopePieSvg(p);
+    if(p >= 80) el.classList.add('completed'); else el.classList.remove('completed');
+  });
+}
 function updateScopeCard(){
   if(!child) return;
   // 確保元素存在
@@ -5559,6 +5581,8 @@ function updateScopeCard(){
   var runId = (window.__scopeRunId || 0) + 1; window.__scopeRunId = runId;
   var secIds = ['scope-grammar','scope-reading','scope-listening'];
   setScopeState(['scope-vocab'].concat(secIds), 'loading');
+  ['scope-vocab'].concat(secIds).forEach(function(id){ var e2 = document.getElementById(id); if(e2) e2.dataset.percent = 0; });
+  renderScopePies();
   var base = 'https://jlpt-scores.hoo-c27.workers.dev';
   var who = encodeURIComponent(child);
   loadQBank(function(){
@@ -5591,6 +5615,7 @@ function updateScopeCard(){
         setScopePct(map[sec], pct + '%');
       });
       renderProgressRings();
+      renderScopePies();
     });
     // 語彙：N4 單語掌握度 = 生字庫已收集字數（本人）/ 750
     scopeFetchJson(base + '/vocab', 25000).then(function(v){
@@ -5603,6 +5628,7 @@ function updateScopeCard(){
       if(el) el.dataset.percent = pct;
       setScopePct('scope-vocab', pct + '%');
       renderProgressRings();
+      renderScopePies();
     });
   });
 }
