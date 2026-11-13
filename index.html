@@ -283,6 +283,24 @@
     cursor: pointer;
     text-decoration: underline;
   }
+  /* 考試範圍完成度：大圈（2026-11-13 用戶指示，scope 四圈專用，唔影響其他卡嘅 18px 細圈） */
+  .scope-item .task-progress {
+    width: 88px;
+    height: 88px;
+    margin: 4px auto 2px;
+    display: flex;
+  }
+  .scope-item .task-progress svg {
+    width: 88px;
+    height: 88px;
+  }
+  .scope-item .task-progress .bg,
+  .scope-item .task-progress .fg {
+    stroke-width: 4;
+  }
+  .scope-item .task-progress.completed::after {
+    font-size: 52px;
+  }
 
 </style>
 
@@ -565,7 +583,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v39</div>
+<div class="src" style="opacity:0.5">v20261113-v40</div>
 
 <script>
 var N4SET={};
