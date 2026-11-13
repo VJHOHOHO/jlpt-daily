@@ -455,13 +455,8 @@ dy>
   <h2><span class="kicon">卷</span>N4 完整模擬卷</h2>
   <div id="fullIntro">
     <div class="hint">完整 N4 模擬考試（言語知識＋讀解＋聽解），計時完成，成績會記錄並分析錯題。</div>
-    <button class="btn2" onclick="openMockExam()">開始模擬卷</button>
-    <button class="btn2" onclick="openPaperExam()">N4 成份卷（Nihonez 2026）</button>
-    <button class="btn2" onclick="openPaperExam2025()">N4 成份卷（Nihonez 2025）</button>
-    <button class="btn2" onclick="openPaperExamWB2012()">N4 成份卷（Workbook 2012）</button>
-    <button class="btn2" onclick="openPaperExamN5_2025()">N5 成份卷（Nihonez 2025）</button>
-    <button class="btn2" onclick="openPaperExamN5_2024()">N5 成份卷（Nihonez 2024）</button>
-    <button class="btn2" onclick="openPaperExamN3_2025()">N3 成份卷（Nihonez 2025）</button>
+    <button class="btn2" onclick="openMockExam()">開始模組卷</button>
+    <button class="btn2" onclick="openMockN4Exam()">開始N4模組卷</button>
     <div id="fullHist"></div>
   </div>
   <div id="fullBody" style="display:none"></div>
@@ -525,7 +520,7 @@ dy>
     <div class="scope-item">
       <div class="scope-name">文法</div>
       <span class="task-progress" data-percent="0" id="scope-grammar"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
-      <div class="scope-desc">229 文型掌握度</div>
+      <div class="scope-desc">文法練習正確率</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">讀解</div>
@@ -544,7 +539,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261108-v36</div>
+<div class="src" style="opacity:0.5">v20261113-v37</div>
 
 <script>
 var N4SET={};
@@ -4262,7 +4257,11 @@ function backPractice(mode){
 }
 function openMockExam(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
-  window.open('mock-exam.html?user='+encodeURIComponent(child)+'&v=r1','_blank');
+  window.open('mock-exam.html?user='+encodeURIComponent(child)+'&v=r2','_blank');
+}
+function openMockN4Exam(){
+  if(!child){ setMsg('請先選擇孩子。','err'); return; }
+  window.open('mock-exam.html?mode=n4&user='+encodeURIComponent(child)+'&v=r2','_blank');
 }
 function openPaperExam(){
   if(!child){ setMsg('請先選擇孩子。','err'); return; }
@@ -5354,31 +5353,44 @@ function updateScopeCard(){
   // 確保元素存在
   var testEl = document.getElementById('scope-vocab');
   if(!testEl){ setTimeout(updateScopeCard, 500); return; }
-  try{
-    // 從練習記錄計各範疇最近 20 題正確率
-    var secs = {vocab:[], grammar:[], reading:[], listening:[]};
-    ['n4_rand_scores','n4_full_scores'].forEach(function(key){
-      var rec = JSON.parse(localStorage.getItem(key)||'{}');
-      Object.keys(rec).forEach(function(k){
-        if(k.indexOf(child)<0) return;
-        var s = rec[k].sections;
-        if(!s) return;
-        Object.keys(secs).forEach(function(sec){
-          if(s[sec] && s[sec].t>0) secs[sec].push(s[sec]);
-        });
+  // 2026-11-13 改：完成度改用後端真實作答記錄計（舊版讀本機 n4_rand/full_scores，細路實際冇用嗰個模式，永遠顯示 0）
+  var base = 'https://jlpt-scores.hoo-c27.workers.dev';
+  var who = encodeURIComponent(child);
+  loadQBank(function(){
+    var ansMap = {}, secMap = {};
+    (QBANK||[]).forEach(function(q){ ansMap[q.id] = q.answer; secMap[q.id] = q.section; });
+    Promise.all([
+      fetch(base + '/scores?type=daily20_answer&who=' + who).then(function(r){ return r.json(); }).catch(function(){ return []; }),
+      fetch(base + '/scores?type=mock_answer&who=' + who).then(function(r){ return r.json(); }).catch(function(){ return []; })
+    ]).then(function(res){
+      var latest = {};
+      [].concat(res[0]||[], res[1]||[]).forEach(function(r){
+        if(!r.key || !(r.key in ansMap)) return;
+        if(!latest[r.key] || (r.submittedAt||0) >= (latest[r.key].submittedAt||0)) latest[r.key] = r;
       });
-    });
-    var map = {'vocab':'scope-vocab','grammar':'scope-grammar','reading':'scope-reading','listening':'scope-listening'};
-    Object.keys(map).forEach(function(sec){
-      var arr = secs[sec].slice(-20);
-      var t=0, c=0;
-      arr.forEach(function(s){ t+=s.t; c+=s.c; });
-      var pct = t>0 ? Math.round(c/t*100) : 0;
-      var el = document.getElementById(map[sec]);
-      if(el) el.dataset.percent = pct;
-    });
-  }catch(e){}
-  renderProgressRings();
+      var st = {grammar:[0,0], reading:[0,0], listening:[0,0]};
+      Object.keys(latest).forEach(function(k){
+        var sec = secMap[k];
+        if(!st[sec]) return;
+        st[sec][1]++;
+        if(Number(latest[k].answer) === Number(ansMap[k])) st[sec][0]++;
+      });
+      var map = {'grammar':'scope-grammar','reading':'scope-reading','listening':'scope-listening'};
+      Object.keys(map).forEach(function(sec){
+        var el = document.getElementById(map[sec]);
+        if(el && st[sec][1] > 0) el.dataset.percent = Math.round(st[sec][0]/st[sec][1]*100);
+      });
+      renderProgressRings();
+    }).catch(function(){});
+    // 語彙：N4 單語掌握度 = 生字庫已收集字數（本人）/ 750
+    fetch(base + '/vocab').then(function(r){ return r.json(); }).then(function(v){
+      var seen = {};
+      (v||[]).forEach(function(it){ if(it.who === child && it.word) seen[it.word] = 1; });
+      var el = document.getElementById('scope-vocab');
+      if(el) el.dataset.percent = Math.min(100, Math.round(Object.keys(seen).length/750*100));
+      renderProgressRings();
+    }).catch(function(){});
+  });
 }
 </script>
 <script>
