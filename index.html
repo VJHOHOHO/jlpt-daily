@@ -298,6 +298,7 @@
 
 <style>#whoCard { background: #a3b8d4; border-radius: 16px; }</style>
 <style>#histCard { background: #eaeff5; border-radius: 16px; }</style>
+<style>.kw { color:#d32f2f; font-weight:bold; } .kwbox { margin-top:10px; padding:10px 12px; background:#fff8e1; border:1px solid #ffe082; border-radius:8px; font-size:15px; line-height:1.65; } .kwbox-title { font-weight:bold; color:#e65100; } .kwbox-tip { color:#555; } .kwbox-list { margin-top:4px; }</style>
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <script src="readmap-extra.js?v=20261101a"></script>
@@ -4126,6 +4127,7 @@ review+='</div>';
 $('weekBody').innerHTML='<div class="q-score">本週得分：'+total+' / 25</div>'+
 '<div class="hint" style="text-align:center">語彙 '+s['語彙']+'/8 · 文法 '+s['文法']+'/8 · 讀解 '+s['讀解']+'/4 · 複習 '+s['複習']+'/5<br>成績已交，星期日會有分析。</div>'+
 '<div class="msg '+c[1]+'">'+c[0]+'</div>'+review+'<div style="text-align:center"><button class="btn2" onclick="backWeekQuiz()">返去</button></div>';
+kwWeekReviewPass();
 renderWeekHist();
 }
 function backWeekQuiz(){ $('weekBody').style.display='none'; $('weekIntro').style.display='block'; if(typeof refreshWeekResumeBtn==='function') refreshWeekResumeBtn(); }
@@ -4135,6 +4137,132 @@ var rec=loadWeekRec(), keys=Object.keys(rec).sort().reverse().slice(0,4);
 $('weekHist').innerHTML = keys.length
 ? '<div class="hint" style="margin-top:10px">最近成績：</div>'+keys.map(function(k){ return '<div class="recall-empty">'+esc(k)+'：'+rec[k].total+'</div>';}).join('')
 : '';
+}
+
+/* ---------- 看關鍵字（2026-11-13 新增）：解答畫面標紅關鍵字＋技巧框 ----------
+   新路徑：只喺交卷後嘅解釋畫面裝飾題幹文字同加框，唔郁作答／交卷／計分／後端記錄。
+   關鍵字表按類別，每類配一句訊號；匹配長字優先，避免重疊重複標。 */
+var KW_CATS = [
+  { signal: '否定，睇漏咗成句意思會掉轉', words: ['ではない', 'なくて', 'ません', 'ない', 'ずに'] },
+  { signal: '轉折，重點通常喺佢後面嗰句', words: ['けれども', 'しかし', 'ところが', 'でも'] },
+  { signal: '因果，前因後果要連埋睇', words: ['だから', 'それで', 'ので'] },
+  { signal: '指前面講過嘅嘢，畫箭頭返去搵', words: ['これ', 'それ', 'あれ', 'この', 'その', 'あの'] },
+  { signal: '次序或時間，答案多數喺附近', words: ['それから', '前に', '後で', '先に', 'それに', 'まず'] },
+  { signal: '題目問嘅就係呢樣，答案只搵呢樣', words: ['どうして', 'いくつ', 'いつ', 'どこ', 'だれ', 'なに', 'なぜ', 'どの', 'どちら', 'いくら'] },
+  { signal: '講者改主意，答案取最後決定', words: ['やっぱり', '実は'] }
+];
+var KW_FLAT = [];
+KW_CATS.forEach(function(c){ c.words.forEach(function(w){ KW_FLAT.push({ w: w, s: c.signal }); }); });
+KW_FLAT.sort(function(a, b){ return b.w.length - a.w.length; });
+function kwScan(text){
+  text = String(text || '');
+  var parts = [], found = [], seen = {}, i = 0;
+  while(i < text.length){
+    var hit = null;
+    for(var k = 0; k < KW_FLAT.length; k++){
+      if(text.substr(i, KW_FLAT[k].w.length) === KW_FLAT[k].w){ hit = KW_FLAT[k]; break; }
+    }
+    if(hit && hit.w === 'ので' && text.charAt(i + 2) === 'す') hit = null; // のです＝說明語氣，唔係因果「ので」
+    if(hit && hit.w === 'ない' && i >= 2 && text.substr(i - 2, 2) === 'あん') hit = null; // あんない＝案内，入面嘅「ない」唔係否定
+    if(hit && hit.w === 'この' && i >= 2 && text.substr(i - 2, 2) === 'あそ') hit = null; // あそこ＝嗰度，入面嘅「この」唔係指示詞
+    if(hit && hit.w === 'それ' && text.charAt(i + 2) === 'ぞ') hit = null; // それぞれ＝各自，唔係指示詞「それ」
+    if(hit){
+      parts.push({ t: hit.w, kw: true });
+      if(!seen[hit.w]){ seen[hit.w] = 1; found.push(hit); }
+      i += hit.w.length;
+    } else {
+      if(parts.length && !parts[parts.length - 1].kw) parts[parts.length - 1].t += text.charAt(i);
+      else parts.push({ t: text.charAt(i), kw: false });
+      i++;
+    }
+  }
+  return { parts: parts, found: found };
+}
+function kwBoxHtml(text){
+  var found = kwScan(text).found;
+  var h = '<div class="kwbox"><div class="kwbox-title">🔑 看關鍵字</div>';
+  h += '<div class="kwbox-tip">先睇問題問乜，圈起關鍵字，再帶住佢去搵答案。</div>';
+  if(found.length){
+    h += '<div class="kwbox-list">' + found.map(function(f){
+      return '<div><span class="kw">' + esc(f.w) + '</span>：' + esc(f.s) + '</div>';
+    }).join('') + '</div>';
+  }
+  return h + '</div>';
+}
+/* 將一個已渲染嘅文字元素入面嘅關鍵字包紅：只拆文字節點，唔郁現有標記
+   （跳過振假名 rt、已有 inline style 嘅原卷紅標籤／★ span、.slot 槽位）。 */
+function kwHighlightEl(rootEl){
+  if(!rootEl || !document.createTreeWalker) return;
+  var walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node){
+      var p = node.parentNode;
+      while(p && p !== rootEl){
+        if(p.tagName === 'RT' || p.tagName === 'RP') return NodeFilter.FILTER_REJECT;
+        if(p.classList && (p.classList.contains('kw') || p.classList.contains('slot') || p.classList.contains('kwbox'))) return NodeFilter.FILTER_REJECT;
+        if(p.tagName === 'SPAN' && p.getAttribute && p.getAttribute('style')) return NodeFilter.FILTER_REJECT;
+        p = p.parentNode;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  var nodes = [];
+  while(walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(function(node){
+    var res = kwScan(node.nodeValue);
+    if(!res.found.length) return;
+    var frag = document.createDocumentFragment();
+    res.parts.forEach(function(part){
+      if(part.kw){
+        var s = document.createElement('span');
+        s.className = 'kw';
+        s.textContent = part.t;
+        frag.appendChild(s);
+      } else {
+        frag.appendChild(document.createTextNode(part.t));
+      }
+    });
+    if(node.parentNode) node.parentNode.replaceChild(frag, node);
+  });
+}
+/* 解釋格裝飾：同一 .qblock 入面嘅題幹 .qtext 標紅＋解釋下面加關鍵字框 */
+function kwEnhance(expEl, rawText){
+  try{
+    if(!expEl || expEl.querySelector('.kwbox')) return;
+    var block = expEl.parentNode;
+    if(block){
+      var qts = block.querySelectorAll('.qtext');
+      for(var i = 0; i < qts.length; i++) kwHighlightEl(qts[i]);
+    }
+    expEl.innerHTML += kwBoxHtml(rawText);
+  }catch(e){}
+}
+/* 週測答案回顧裝飾（endWeekQuiz 渲染完之後行） */
+function kwWeekReviewPass(){
+  try{
+    if(typeof wq === 'undefined' || !wq || !wq.qs) return;
+    var items = $('weekBody').querySelectorAll('.ritem');
+    wq.qs.forEach(function(q, i){
+      var it = items[i];
+      if(!it) return;
+      var rq = it.querySelector('.rq');
+      if(rq) kwHighlightEl(rq);
+      it.innerHTML += kwBoxHtml(q.q || '');
+    });
+  }catch(e){}
+}
+/* 站內模擬考錯題詳解裝飾（submitExamMock 渲染完之後行） */
+function kwExamReviewPass(wrongList){
+  try{
+    if(!wrongList || !wrongList.length) return;
+    var blocks = $('examBody').querySelectorAll('.qblock');
+    wrongList.forEach(function(w, idx){
+      var b = blocks[idx];
+      if(!b) return;
+      var qt = b.querySelector('.qtext');
+      if(qt) kwHighlightEl(qt);
+      b.innerHTML += kwBoxHtml((w.q && w.q.question) || '');
+    });
+  }catch(e){}
 }
 
 /* ---------- N4 隨機練習 ---------- */
@@ -4194,6 +4322,7 @@ function submitPractice(mode, ids){
     expDiv.innerHTML = isCorrect
       ? '<div class="ok">✓ 答對了！</div>'
       : '<div class="err">✗ 答錯了。正確答案是 '+q.answer+'. '+(q.explanation?esc(q.explanation).replace(/\n/g,'<br>'):'')+'</div>';
+    kwEnhance(expDiv, q.question);
   });
   var score = correct + '/' + qs.length;
   // 分範疇計分
@@ -4517,6 +4646,7 @@ function submitDailyPractice(){
     var guessed = ok && ((dailyQTimes[i]||{ans:0}).ans ? (((dailyQTimes[i].ans - dailyQTimes[i].start)/1000) < 8) : false);
     exp.innerHTML = ok ? (guessed ? '<div class="ok">✓ 答對了！（🎲 '+(((dailyQTimes[i].ans-dailyQTimes[i].start)/1000).toFixed(1))+'秒，可能係猜，建議重溫）</div>' : '<div class="ok">✓ 答對了！</div>')
       : '<div class="err">✗ 答錯了。你揀咗：'+esc(q.options[userAns-1]||'(無作答)')+'<br>正確答案：'+esc(q.options[q.answer-1])+(q.explanation?'<br>講解：'+esc(q.explanation).replace(/\n/g,'<br>'):'')+'</div>';
+    kwEnhance(exp, q.question);
   });
   saveDailyWrong(wrongQs);
   try{
@@ -5117,6 +5247,7 @@ function submitExamMock(){
   } else html += '<div class="ok">全部答對，勁！</div>';
   html += '<button class="btn" onclick="backExamMock()">返回</button>';
   $('examBody').innerHTML = html;
+  kwExamReviewPass(wrongList);
   // 記錄成績
   saveExamScore(level, totalCorrect+'/'+totalQ, pct);
   // 送後端
