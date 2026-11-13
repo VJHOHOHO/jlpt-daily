@@ -262,6 +262,27 @@
     color: #666;
     margin-top: 8px;
   }
+  /* 考試範圍完成度：百分比數字（2026-11-13 新增，scope 四圈專用） */
+  .scope-pct {
+    font-size: 26px;
+    font-weight: 900;
+    color: #2e7d32;
+    margin-top: 6px;
+    min-height: 32px;
+    line-height: 1.2;
+  }
+  .scope-pct.loading {
+    font-size: 15px;
+    font-weight: 700;
+    color: #999;
+  }
+  .scope-pct.error {
+    font-size: 14px;
+    font-weight: 700;
+    color: #c62828;
+    cursor: pointer;
+    text-decoration: underline;
+  }
 
 </style>
 
@@ -516,21 +537,25 @@ dy>
     <div class="scope-item">
       <div class="scope-name">語彙</div>
       <span class="task-progress" data-percent="0" id="scope-vocab"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <div class="scope-pct" id="scope-vocab-pct">…</div>
       <div class="scope-desc">N4 單語掌握度</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">文法</div>
       <span class="task-progress" data-percent="0" id="scope-grammar"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <div class="scope-pct" id="scope-grammar-pct">…</div>
       <div class="scope-desc">文法練習正確率</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">讀解</div>
       <span class="task-progress" data-percent="0" id="scope-reading"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <div class="scope-pct" id="scope-reading-pct">…</div>
       <div class="scope-desc">讀解正確率</div>
     </div>
     <div class="scope-item">
       <div class="scope-name">聽解</div>
       <span class="task-progress" data-percent="0" id="scope-listening"><svg viewBox="0 0 48 48"><circle class="bg" cx="24" cy="24" r="20"></circle><circle class="fg" cx="24" cy="24" r="20" style="stroke-dasharray:125.66; stroke-dashoffset:125.66"></circle></svg></span>
+      <div class="scope-pct" id="scope-listening-pct">…</div>
       <div class="scope-desc">聽解正確率</div>
     </div>
   </div>
@@ -540,7 +565,7 @@ dy>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v37</div>
+<div class="src" style="opacity:0.5">v20261113-v38</div>
 
 <script>
 var N4SET={};
@@ -5479,21 +5504,52 @@ document.addEventListener('click', function(e){
 });
 </script>
 <script>
+// ===== 考試範圍完成度：數字＋載入／失敗狀態（2026-11-13 新增 helper，走新路徑）=====
+function scopeFetchJson(url, ms){
+  return new Promise(function(resolve){
+    var done = false;
+    var ctl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function(){ if(!done){ done = true; if(ctl){ try{ ctl.abort(); }catch(e){} } resolve(null); } }, ms || 25000);
+    fetch(url, ctl ? { signal: ctl.signal } : undefined).then(function(r){ return r.json(); }).then(function(j){
+      if(!done){ done = true; clearTimeout(timer); resolve(j); }
+    }).catch(function(){ if(!done){ done = true; clearTimeout(timer); resolve(null); } });
+  });
+}
+function setScopePct(ringId, text, cls){
+  var pctEl = document.getElementById(ringId + '-pct');
+  if(!pctEl) return;
+  pctEl.textContent = text;
+  pctEl.className = 'scope-pct' + (cls ? ' ' + cls : '');
+  pctEl.onclick = (cls === 'error') ? function(){ updateScopeCard(); } : null;
+}
+function setScopeState(ids, state){
+  ids.forEach(function(id){
+    if(state === 'loading') setScopePct(id, '載入中…', 'loading');
+    else if(state === 'error') setScopePct(id, '載入失敗，撳此重試', 'error');
+  });
+}
 function updateScopeCard(){
   if(!child) return;
   // 確保元素存在
   var testEl = document.getElementById('scope-vocab');
   if(!testEl){ setTimeout(updateScopeCard, 500); return; }
   // 2026-11-13 改：完成度改用後端真實作答記錄計（舊版讀本機 n4_rand/full_scores，細路實際冇用嗰個模式，永遠顯示 0）
+  // 2026-11-13 再修：加數字顯示＋載入中／失敗重試狀態；fetch 失敗或逾時唔再靜默扮 0；切人時舊回應唔覆蓋新數（runId 守衛）
+  var runId = (window.__scopeRunId || 0) + 1; window.__scopeRunId = runId;
+  var secIds = ['scope-grammar','scope-reading','scope-listening'];
+  setScopeState(['scope-vocab'].concat(secIds), 'loading');
   var base = 'https://jlpt-scores.hoo-c27.workers.dev';
   var who = encodeURIComponent(child);
   loadQBank(function(){
+    if(window.__scopeRunId !== runId) return;
     var ansMap = {}, secMap = {};
     (QBANK||[]).forEach(function(q){ ansMap[q.id] = q.answer; secMap[q.id] = q.section; });
     Promise.all([
-      fetch(base + '/scores?type=daily20_answer&who=' + who).then(function(r){ return r.json(); }).catch(function(){ return []; }),
-      fetch(base + '/scores?type=mock_answer&who=' + who).then(function(r){ return r.json(); }).catch(function(){ return []; })
+      scopeFetchJson(base + '/scores?type=daily20_answer&who=' + who, 25000),
+      scopeFetchJson(base + '/scores?type=mock_answer&who=' + who, 25000)
     ]).then(function(res){
+      if(window.__scopeRunId !== runId) return;
+      if(res[0] === null || res[1] === null){ setScopeState(secIds, 'error'); return; }
       var latest = {};
       [].concat(res[0]||[], res[1]||[]).forEach(function(r){
         if(!r.key || !(r.key in ansMap)) return;
@@ -5508,19 +5564,25 @@ function updateScopeCard(){
       });
       var map = {'grammar':'scope-grammar','reading':'scope-reading','listening':'scope-listening'};
       Object.keys(map).forEach(function(sec){
+        var pct = st[sec][1] > 0 ? Math.round(st[sec][0]/st[sec][1]*100) : 0;
         var el = document.getElementById(map[sec]);
-        if(el && st[sec][1] > 0) el.dataset.percent = Math.round(st[sec][0]/st[sec][1]*100);
+        if(el) el.dataset.percent = pct;
+        setScopePct(map[sec], pct + '%');
       });
       renderProgressRings();
-    }).catch(function(){});
+    });
     // 語彙：N4 單語掌握度 = 生字庫已收集字數（本人）/ 750
-    fetch(base + '/vocab').then(function(r){ return r.json(); }).then(function(v){
+    scopeFetchJson(base + '/vocab', 25000).then(function(v){
+      if(window.__scopeRunId !== runId) return;
+      if(v === null){ setScopeState(['scope-vocab'], 'error'); return; }
       var seen = {};
       (v||[]).forEach(function(it){ if(it.who === child && it.word) seen[it.word] = 1; });
+      var pct = Math.min(100, Math.round(Object.keys(seen).length/750*100));
       var el = document.getElementById('scope-vocab');
-      if(el) el.dataset.percent = Math.min(100, Math.round(Object.keys(seen).length/750*100));
+      if(el) el.dataset.percent = pct;
+      setScopePct('scope-vocab', pct + '%');
       renderProgressRings();
-    }).catch(function(){});
+    });
   });
 }
 </script>
