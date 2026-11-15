@@ -405,6 +405,10 @@ dy>
   </div>
   <div id="dailyBody" style="display:none"></div>
 </div>
+<div class="card" id="grammarLessonCard">
+  <h2><span class="kicon">文</span><em>今日文法教學</em></h2>
+  <div id="glBody"><div class="hint">載入中…</div></div>
+</div>
 </div>
 </div>
 <div class="main-section sec-zuoye" style="display:none">
@@ -5656,6 +5660,103 @@ function getWeakSections(childName){
   });
   return weak;
 }
+</script>
+<style>
+.gl-opt{display:block;width:100%;text-align:left;margin:6px 0;padding:10px 12px;font-size:16px;border:2px solid #d8cfc0;border-radius:10px;background:#fffdf8;cursor:pointer}
+.gl-opt.gl-right{border-color:#3d9970;background:#e6f7ee}
+.gl-opt.gl-wrong{border-color:#d9534f;background:#fdecea}
+.gl-why{display:none;margin:6px 0 14px;padding:8px 12px;background:#fff7e0;border-radius:8px;font-size:15px;line-height:1.6}
+.gl-day{margin:4px 4px 4px 0;padding:6px 14px;font-size:15px}
+.gl-teach{font-size:16px;line-height:1.8}
+.gl-teach b{color:#8a5a00}
+</style>
+<script>
+/* ---------- 每日文法教學（2026-11-15 新增：按星期輪換，對應本週對策） ---------- */
+var GL_LESSONS = {
+1:{dow:'星期一', title:'★句子重組方法',
+teach:'<b>做★題四步：</b><br>① 先睇句首同句尾，嗰兩格通常固定。<br>② 拼「黏塊」：名詞＋助詞（学校に）、動詞て形＋補助動詞（食べて いる）、固定配搭（〜て くれる）係一塊，唔好拆散。<br>③ 將啲塊排好，成句讀一次，順口先算啱。<br>④ 最後先數★係邊一塊。<br><b>示範：</b>母は 私に ＿＿ ＿＿ ★ ＿＿ くれました。［誕生日に／ケーキを／作って］→ 誕生日に ケーキを <b>作って</b> くれました。★＝作って（て形＋くれました 係黏塊）。',
+quiz:[
+{q:'弟は 今 ＿＿ ＿＿ ★ ＿＿ います。［公園で／友達と／遊んで］★に入るのは？', options:['公園で','友達と','遊んで','毎日'], answer:3, why:'成句：公園で 友達と 遊んで います。「〜て います」係黏塊，遊んで 要貼住 います 前面。'},
+{q:'私は ＿＿ ＿＿ ★ ＿＿ たいです。［医者に／将来／なり］★に入るのは？', options:['医者に','将来','なり','病院へ'], answer:3, why:'成句：将来 医者に なり たいです。「なり＋たい」係黏塊（なる 嘅連用形＋たい）。'}
+]},
+2:{dow:'星期二', title:'文章填空方法',
+teach:'<b>做文章填空三步：</b><br>① 唔好一嚟就填：先由頭到尾讀一次成篇，知道篇文講咩。<br>② 每個空格問「接續詞三問」：同方向（だから・それで）、反方向（でも・ところが）、加多樣嘢（それに）。<br>③ 填完再讀一次成篇，順先交。<br><b>示範：</b>きのうは 雨が 降りました。（でも）試合は ありました。——落雨同照常比賽係反方向，用 でも。',
+quiz:[
+{q:'田中さんは 毎日 電車で 会社へ 行きます。ある日、本が とても おもしろくて、降りる 駅を 過ぎて しまいました。（　）次の 駅で 降りて、歩いて 戻りました。', options:['それで','でも','たとえば','つまり'], answer:1, why:'過咗站之後落車行返轉頭，係前面件事嘅結果——同方向，用 それで。'},
+{q:'私は 魚が 苦手です。（　）肉は 大好きです。', options:['だから','ところが','でも','それで'], answer:3, why:'唔鍾意魚，但鍾意肉——反方向，用 でも。'}
+]},
+3:{dow:'星期三', title:'助詞運用（に・で・へ・も）',
+teach:'<b>助詞點揀：</b><br>・<b>に</b>：到達點、時間、目的——学校に 行く、7時に 起きる、買い物に 行く。<br>・<b>で</b>：喺邊度做動作、手段——公園で 遊ぶ、電車で 行く。<br>・<b>へ</b>：方向——家へ 帰る。<br>・<b>も</b>：「都」——日本語も 中国語も 話せます。<br><b>最易錯：</b>做動作嘅地方用 で，唔用 に（公園で 遊ぶ）；手段用 で（電車で 行く），但「電車に 乗る」係搭入去，例外用 に。<br><b>許逸加深：</b>〜たまま＝保持住個狀態（レシートを 入れたまま 洗濯した）；〜ところ＝啱啱嗰個階段（今、食べた ところです）。',
+quiz:[
+{q:'私は 図書館（　）本を 読みます。', options:['に','で','へ','も'], answer:2, why:'圖書館係「做動作嘅地方」，用 で。'},
+{q:'日曜日に 友達と 買い物（　）行きます。', options:['で','へ','に','を'], answer:3, why:'買い物に 行く＝為咗買嘢而去，「目的」用 に。'},
+{q:'弟は 英語（　）フランス語も 話せます。', options:['も','に','で','へ'], answer:1, why:'後面有 も，前面都要 も：「英語も フランス語も」兩個都識。'}
+]},
+4:{dow:'星期四', title:'授受表現＋〜という',
+teach:'<b>授受：企喺「我」嗰邊睇。</b><br>・<b>〜て くれる</b>：人哋為我做——母が ケーキを 作って くれました。<br>・<b>〜て もらう</b>：我請人做／由人哋度得到——先生に 作文を 直して もらいました。<br>・<b>〜て あげる</b>：我為人哋做——友達に 本を 貸して あげました。<br><b>〜という</b>：「叫做…」——「さくら」と いう 花。<br><b>最易錯：</b>人哋俾我，永遠用 くれる，唔好用 あげる。',
+quiz:[
+{q:'友達が 私の 荷物を 持って（　）。', options:['くれました','あげました','もらいました','ありました'], answer:1, why:'朋友幫「我」拎嘢——人哋為我做，用 くれました。'},
+{q:'私は 田中さんに 写真を 見せて（　）。', options:['くれました','もらいました','あげました','くださいました'], answer:2, why:'主語係「私」，我由田中嗰度得到（請佢俾我睇），用 もらいました。'},
+{q:'これは 「たんぽぽ」（　）花です。', options:['という','の','に','へ'], answer:1, why:'「叫做蒲公英嘅花」——「〜と いう＋名詞」。'}
+]},
+5:{dow:'星期五', title:'接續總整理（先睇空格後面）',
+teach:'<b>空格後面嗰個詞，決定前面用邊種形：</b><br>・た形＋ことが ある＝經驗：日本へ 行った ことが あります。<br>・辭書形＋前に＝做…之前：寝る 前に、歯を 磨きます。<br>・ない形＋ないで ください＝唔好做：ここで 写真を 撮らないで ください。<br>・て形＋ください／も いい＝請做／可以做。<br><b>做法：</b>做文法題，第一眼睇空格「後面」嗰個詞，佢會話你知要用邊種形。<br><b>許悅覆檢：</b>で＝地方做嘢・手段（バスで 行く）；や＝「同」列舉（本や ノート）。',
+quiz:[
+{q:'私は 一度も 馬に（　）ことが ありません。', options:['乗る','乗った','乗って','乗り'], answer:2, why:'〜ことが ある／ない 前面用 た形：乗った。'},
+{q:'ここで 写真を（　）ください。', options:['撮らないで','撮る','撮った','撮り'], answer:1, why:'「唔好影相」係禁止：ない形＋ないで ください。'},
+{q:'寝る（　）、歯を 磨きます。', options:['前に','後で','まで','から'], answer:1, why:'瞓覺之前刷牙：辭書形＋前に。'}
+]},
+6:{dow:'星期六', title:'本週混合複習',
+teach:'<b>本週五點，一句記一個：</b><br>★題：先拼黏塊，成句讀順，最後數★。<br>文章填空：先讀全篇，接續詞三問。<br>助詞：地方做嘢用 で，目的・到達用 に。<br>授受：人哋為我用 くれる，我求人用 もらう。<br>接續：睇空格後面嗰個詞，決定動詞形。',
+quiz:[
+{q:'姉は ＿＿ ＿＿ ★ ＿＿ います。［部屋で／ピアノを／練習して］★に入るのは？', options:['部屋で','ピアノを','練習して','毎日'], answer:3, why:'成句：部屋で ピアノを 練習して います。て形＋います 係黏塊。'},
+{q:'私は 友達（　）映画を 見に 行きました。', options:['と','で','を','へ'], answer:1, why:'同朋友「一齊」去，用 と。'},
+{q:'妹が 私に プレゼントを（　）。', options:['くれました','あげました','もらいました','いました'], answer:1, why:'妹俾我——人哋俾我用 くれました。'}
+]},
+0:{dow:'星期日', title:'模組卷驗收日（唔教新嘢）',
+teach:'<b>今日考模組卷，記住三件事：</b><br>① 時間：語彙 20 分鐘、文法・讀解 60 分鐘、聽解 40 分鐘；卡住超過 1 分鐘，先填最似嗰個再跳過去，唔好留空。<br>② 讀解：先睇問題同選項，帶住關鍵字入篇文搵證據句。<br>③ 改答案要有新證據（睇錯題目、漏咗關鍵字）；冇新證據，第一次嗰個唔好郁。<br><b>本週五點考前掃一次：</b>★拼黏塊／填空三問／助詞 で・に／授受企我嗰邊／接續睇後面。',
+quiz:[
+{q:'今日は 日曜日です。（　）、私は 10時まで 寝ました。', options:['だから','でも','たとえば','ところが'], answer:1, why:'因為星期日，所以瞓到 10 點——同方向（原因→結果），用 だから。'},
+{q:'彼は ＿＿ ＿＿ ★ ＿＿ あります。［海で／泳いだ／ことが］★に入るのは？', options:['海で','泳いだ','ことが','去年'], answer:3, why:'成句：海で 泳いだ ことが あります。た形＋ことが ある 係經驗黏塊，ことが 貼住 あります。'}
+]}
+};
+var GL_CUR = null;
+function glRender(day){
+  GL_CUR = day;
+  var L = GL_LESSONS[day];
+  if(!L) return;
+  var days = [[1,'一'],[2,'二'],[3,'三'],[4,'四'],[5,'五'],[6,'六'],[0,'日']];
+  var html = '<div style="margin-bottom:8px">';
+  days.forEach(function(d){
+    html += '<button class="btn2 gl-day" onclick="glRender('+d[0]+')"'+(d[0]===day?' style="background:#8a5a00;color:#fff"':'')+'>'+d[1]+'</button>';
+  });
+  html += '</div>';
+  html += '<div class="gl-teach"><b>【'+L.dow+'】'+L.title+'</b><br>'+L.teach+'</div>';
+  html += '<div style="margin-top:12px;font-size:16px"><b>即刻練習（撳答案即刻知啱唔啱）</b></div>';
+  L.quiz.forEach(function(q,qi){
+    html += '<div style="margin-top:10px;font-size:16px">'+(qi+1)+'. '+q.q+'</div>';
+    q.options.forEach(function(op,oi){
+      html += '<button class="gl-opt" onclick="glAnswer(this,'+qi+','+oi+')">'+(oi+1)+'. '+op+'</button>';
+    });
+    html += '<div class="gl-why" id="glWhy'+qi+'"></div>';
+  });
+  var el = document.getElementById('glBody');
+  if(el) el.innerHTML = html;
+}
+function glAnswer(btn, qi, oi){
+  var L = GL_LESSONS[GL_CUR];
+  if(!L) return;
+  var q = L.quiz[qi];
+  var why = document.getElementById('glWhy'+qi);
+  if(oi+1 === q.answer){
+    btn.classList.add('gl-right');
+    if(why){ why.style.display='block'; why.innerHTML = '✅ 啱！'+q.why; }
+  } else {
+    btn.classList.add('gl-wrong');
+    if(why){ why.style.display='block'; why.innerHTML = '❌ 再諗下：'+q.why; }
+  }
+}
+(function(){ try{ glRender(new Date().getDay()); }catch(e){} })();
 </script>
 </body>
 </html>
