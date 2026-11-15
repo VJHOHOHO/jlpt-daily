@@ -318,10 +318,10 @@ function loadRestore(cb){
   var whoQ = '&who=' + encodeURIComponent(currentUser); // 只拉自己嘅記錄，快好多
   var retried = false;
   function attempt(){
-    fetchJsonTO(base + '/scores?type=mock_final' + whoQ, 30000).then(function(finals){
+    fetchJsonTO(base + '/scores?type=mock_final' + whoQ, 90000).then(function(finals){
       var doneToday = (finals || []).some(function(f){ return normUser(f.who) === currentUser && f.date === todayISO && ((f.paper || '') === paperId()); });
       if(doneToday) return null; // 今日已交卷：新一輪唔預填
-      return fetchJsonTO(base + '/scores?type=mock_answer' + whoQ, 30000);
+      return fetchJsonTO(base + '/scores?type=mock_answer' + whoQ, 90000);
     }).then(function(recs){
       if(recs){
         var mine = recs.filter(function(r){ return normUser(r.who) === currentUser && r.date === todayISO; });
