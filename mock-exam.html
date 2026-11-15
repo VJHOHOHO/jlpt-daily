@@ -275,7 +275,7 @@ function pickFromN4(secId, n, rand){
   return picked;
 }
 
-var RESTORE_MAP = null, _restoreState = 0, _restoreCbs = [];
+var RESTORE_MAP = null, _restoreState = 0, _restoreCbs = [], _restoreFailed = false;
 function buildRestoreMap(recs, paperId){
   var latest = {};
   (recs || []).forEach(function(r){
@@ -330,7 +330,7 @@ function loadRestore(cb){
       done();
     }).catch(function(){
       if(!retried){ retried = true; setTimeout(attempt, 1500); } // 網絡唔穩自動重試一次
-      else done();
+      else { _restoreFailed = true; done(); }
     });
   }
   attempt();
@@ -352,6 +352,7 @@ function resumeMock(){
   var tick = setInterval(function(){ if(st) st.textContent = '正在載入你今日嘅答案…（已等 ' + Math.round((Date.now() - t0) / 1000) + ' 秒，唔好關頁面）'; }, 1000);
   loadRestoreWait(function(){
     clearInterval(tick);
+    if(_restoreFailed){ if(rb){ rb.disabled = false; rb.textContent = '↩️ 繼續之前的考試（載入今日答案）'; } if(st) st.textContent = ''; alert('載入唔到你今日嘅答案（網絡太慢）。答案已經保存好，唔會唔見。請重新整理頁面再試。'); return; }
     secIdx = 0;
     allResults = [];
     if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
@@ -401,7 +402,10 @@ function startMock(){
   allResults = [];
   if(PAPER){ sections[0].mins = PAPER.mins.vocab; sections[1].mins = PAPER.mins.gram_read; sections[2].mins = PAPER.mins.listening; }
   else if(MODE_N4){ sections[0].mins = 20; sections[1].mins = 60; sections[2].mins = 40; }
-  loadRestoreWait(function(){ document.getElementById('introCard').style.display = 'none'; startSection(); }); // 等恢復真正完成先入卷（跳頁/斷線都唔怕）
+  loadRestoreWait(function(){
+    if(_restoreFailed){ var b2 = document.querySelector('#introCard .btn'); if(b2){ b2.textContent = '開始模擬考'; b2.disabled = false; } alert('載入唔到你今日嘅答案（網絡太慢），而家唔好開始住。答案已經保存好，唔會唔見。請重新整理頁面，等綠色提示出現先再撳入去。'); return; }
+    document.getElementById('introCard').style.display = 'none'; startSection();
+  }); // 等恢復真正完成先入卷（跳頁/斷線都唔怕）
 }
 
 var USER_MIX = {
