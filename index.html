@@ -586,12 +586,11 @@ dy>
   </div>
   <div class="hint" style="margin-top:12px">綠圈係進度，80% 合格變小皇冠。</div>
   <div style="margin-top:16px;text-align:center"><button id="resubmitBtn" onclick="resubmitAllScores()" style="font-size:13px;padding:8px 20px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:8px;cursor:pointer">補送分數</button><button id="lastExamBtn" onclick="showLastExamReport()" style="font-size:13px;padding:8px 20px;background:#4a90d9;color:#fff;border:1px solid #4a90d9;border-radius:8px;cursor:pointer;margin-left:8px">上次測驗成績表</button></div>
-  <div id="lastExamReport" style="display:none;margin-top:14px;text-align:left"></div>
 </div>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261116-v46</div>
+<div class="src" style="opacity:0.5">v20261116-v47</div>
 
 <script>
 var N4SET={};
@@ -5761,16 +5760,28 @@ function glAnswer(btn, qi, oi){
 </script>
 <script>
 /* ---------- 上次測驗成績表（2026-11-16 新增：睇上次模組卷成績＋錯題） ---------- */
-var LE_OPEN = false;
 function leNormTs(ts){ ts = +ts || 0; return ts > 1e11 ? ts : ts * 1000; }
 function leTrunc(s, n){ s = String(s == null ? '' : s).replace(/\s+/g, ' '); return s.length > n ? s.slice(0, n) + '…' : s; }
+function lePopup(){
+  var p = document.getElementById('lastExamPopup');
+  if(!p){
+    p = document.createElement('div');
+    p.id = 'lastExamPopup';
+    p.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px;';
+    p.innerHTML = '<div style="background:#fff;border-radius:16px;padding:20px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 4px 20px rgba(0,0,0,0.2)">'
+      + '<div id="lastExamPopupBody" style="text-align:left"></div>'
+      + '<div style="text-align:center;margin-top:16px"><button onclick="document.getElementById(\'lastExamPopup\').style.display=\'none\'" style="font-size:16px;padding:10px 32px;background:#4a90d9;color:#fff;border:none;border-radius:8px;cursor:pointer">好</button></div></div>';
+    p.addEventListener('click', function(e){ if(e.target === p) p.style.display = 'none'; });
+    document.body.appendChild(p);
+  }
+  return p;
+}
 function showLastExamReport(){
-  var box = document.getElementById('lastExamReport');
-  if(!box) return;
-  if(LE_OPEN){ box.style.display = 'none'; LE_OPEN = false; return; }
   if(typeof child === 'undefined' || !child){ if(typeof showPopup === 'function') showPopup('請先選擇使用者'); return; }
-  LE_OPEN = true;
-  box.style.display = 'block';
+  var p = lePopup();
+  var box = document.getElementById('lastExamPopupBody');
+  if(!box) return;
+  p.style.display = 'flex';
   box.innerHTML = '<div class="hint">載入緊上次測驗記錄…（後端較慢，請稍等）</div>';
   var api = (typeof WORKER_API !== 'undefined') ? WORKER_API : 'https://jlpt-scores.hoo-c27.workers.dev';
   fetch(api + '/scores?type=mock_final&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(finals){
