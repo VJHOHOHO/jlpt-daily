@@ -585,12 +585,13 @@ dy>
     </div>
   </div>
   <div class="hint" style="margin-top:12px">綠圈係進度，80% 合格變小皇冠。</div>
-  <div style="margin-top:16px;text-align:center"><button id="resubmitBtn" onclick="resubmitAllScores()" style="font-size:13px;padding:8px 20px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:8px;cursor:pointer">補送分數</button></div>
+  <div style="margin-top:16px;text-align:center"><button id="resubmitBtn" onclick="resubmitAllScores()" style="font-size:13px;padding:8px 20px;background:#f0f0f0;color:#666;border:1px solid #ddd;border-radius:8px;cursor:pointer">補送分數</button><button id="lastExamBtn" onclick="showLastExamReport()" style="font-size:13px;padding:8px 20px;background:#4a90d9;color:#fff;border:1px solid #4a90d9;border-radius:8px;cursor:pointer;margin-left:8px">上次測驗成績表</button></div>
+  <div id="lastExamReport" style="display:none;margin-top:14px;text-align:left"></div>
 </div>
 
 
 <div class="src">詞彙級別對照：OpenJLPT（CC BY-SA 4.0，基於 Waller 詞表，粗略參考）</div>
-<div class="src" style="opacity:0.5">v20261113-v45</div>
+<div class="src" style="opacity:0.5">v20261116-v46</div>
 
 <script>
 var N4SET={};
@@ -5757,6 +5758,92 @@ function glAnswer(btn, qi, oi){
   }
 }
 (function(){ try{ glRender(new Date().getDay()); }catch(e){} })();
+</script>
+<script>
+/* ---------- 上次測驗成績表（2026-11-16 新增：睇上次模組卷成績＋錯題） ---------- */
+var LE_OPEN = false;
+function leNormTs(ts){ ts = +ts || 0; return ts > 1e11 ? ts : ts * 1000; }
+function leTrunc(s, n){ s = String(s == null ? '' : s).replace(/\s+/g, ' '); return s.length > n ? s.slice(0, n) + '…' : s; }
+function showLastExamReport(){
+  var box = document.getElementById('lastExamReport');
+  if(!box) return;
+  if(LE_OPEN){ box.style.display = 'none'; LE_OPEN = false; return; }
+  if(typeof child === 'undefined' || !child){ if(typeof showPopup === 'function') showPopup('請先選擇使用者'); return; }
+  LE_OPEN = true;
+  box.style.display = 'block';
+  box.innerHTML = '<div class="hint">載入緊上次測驗記錄…（後端較慢，請稍等）</div>';
+  var api = (typeof WORKER_API !== 'undefined') ? WORKER_API : 'https://jlpt-scores.hoo-c27.workers.dev';
+  fetch(api + '/scores?type=mock_final&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(finals){
+    if(!finals || !finals.length){ box.innerHTML = '<div class="hint">暫時未有測驗記錄。</div>'; return; }
+    finals.sort(function(a, b){ return leNormTs(b.submittedAt) - leNormTs(a.submittedAt); });
+    var fin = finals[0];
+    fetch(api + '/scores?type=mock_answer&who=' + encodeURIComponent(child)).then(function(r){ return r.json(); }).then(function(recs){
+      loadQBank(function(){ leRender(box, fin, recs || []); });
+    }).catch(function(){ box.innerHTML = '<div class="hint">載入作答記錄失敗，請再撳一次。</div>'; });
+  }).catch(function(){ box.innerHTML = '<div class="hint">載入測驗記錄失敗，請再撳一次。</div>'; });
+}
+function leRender(box, fin, recs){
+  var bank = {};
+  (typeof QBANK !== 'undefined' && QBANK ? QBANK : []).forEach(function(q){ bank[q.id] = q; });
+  var mine = recs.filter(function(r){ return r.date === fin.date && (!fin.paper || r.paper === fin.paper); });
+  var latest = {};
+  mine.forEach(function(r){
+    if(!latest[r.key] || leNormTs(latest[r.key].submittedAt) <= leNormTs(r.submittedAt)) latest[r.key] = r;
+  });
+  var secName = {vocab: '語彙', grammar: '文法', reading: '讀解', listening: '聽解'};
+  var secOrder = ['vocab', 'grammar', 'reading', 'listening'];
+  var secStat = {}, wrong = [];
+  Object.keys(latest).forEach(function(k){
+    var q = bank[k];
+    if(!q) return;
+    var sec = q.section || '';
+    if(!secStat[sec]) secStat[sec] = [0, 0];
+    secStat[sec][1]++;
+    if(+latest[k].answer === +q.answer) secStat[sec][0]++;
+    else wrong.push({q: q, mine: +latest[k].answer, sec: sec});
+  });
+  var paperName = fin.paper === 'n4mod' ? 'N4 模組卷' : ((fin.level || 'N4') + ' 模擬卷');
+  var html = '<div style="background:#f7faff;border:1px solid #cfe2f5;border-radius:12px;padding:14px">';
+  html += '<div style="font-size:17px"><b>上次測驗：' + esc(paperName) + '</b>（' + esc(fin.date || '') + '）</div>';
+  if(fin.scaled != null){
+    html += '<div style="font-size:16px;margin-top:6px">總分：<b>' + fin.scaled + ' / 180</b>' + (fin.pass ? '　✅ 合格' : '　未合格')
+      + '<br>言語知識・讀解：<b>' + fin.scaled_lr + ' / 120</b>　聽解：<b>' + fin.scaled_listening + ' / 60</b>'
+      + '<br>答對：' + fin.score + ' / ' + fin.total + ' 題</div>';
+  } else {
+    html += '<div style="font-size:16px;margin-top:6px">答對：<b>' + fin.score + ' / ' + fin.total + '</b> 題</div>';
+  }
+  html += '<div style="font-size:15px;margin-top:8px">';
+  secOrder.forEach(function(s){
+    if(secStat[s]) html += secName[s] + ' ' + secStat[s][0] + '/' + secStat[s][1] + '　';
+  });
+  html += '</div>';
+  if(!wrong.length){
+    html += '<div style="font-size:16px;margin-top:10px">🎉 冇錯題，全部答對！</div>';
+  } else {
+    html += '<div style="font-size:16px;margin-top:12px"><b>錯題（' + wrong.length + ' 題）</b></div>';
+    secOrder.forEach(function(s){
+      var ws = wrong.filter(function(w){ return w.sec === s; });
+      if(!ws.length) return;
+      html += '<div style="margin-top:10px"><b>【' + secName[s] + '】</b></div>';
+      ws.forEach(function(w){
+        var q = w.q;
+        var opts = q.options || [];
+        var myTxt = w.mine >= 1 && opts[w.mine - 1] != null ? opts[w.mine - 1] : '（冇答）';
+        var okTxt = opts[+q.answer - 1] != null ? opts[+q.answer - 1] : '';
+        var head = q.section === 'listening'
+          ? '第 ' + esc(q.number || '') + ' 題' + (q.script ? '：' + leTrunc(q.script, 70) : '')
+          : leTrunc(q.question, 110);
+        html += '<div style="margin-top:8px;padding:10px;background:#fff;border:1px solid #eee;border-radius:8px">'
+          + '<div style="font-size:15px">' + esc(head) + '</div>'
+          + '<div style="font-size:14px;margin-top:4px">你揀：<span style="color:#d9534f">' + esc(myTxt) + '</span>　正確：<span style="color:#3d9970">' + esc(okTxt) + '</span></div>'
+          + (q.explanation ? '<div style="font-size:13px;color:#666;margin-top:4px">' + esc(leTrunc(q.explanation, 150)) + '</div>' : '')
+          + '</div>';
+      });
+    });
+  }
+  html += '</div>';
+  box.innerHTML = html;
+}
 </script>
 </body>
 </html>
